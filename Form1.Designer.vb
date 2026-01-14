@@ -24,6 +24,8 @@ Partial Class Form1
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.PanelTop = New System.Windows.Forms.Panel()
+        Me.ButtonRenderRemain = New System.Windows.Forms.Button()
+        Me.ButtonHistory = New System.Windows.Forms.Button()
         Me.ButtonContinueRendering = New System.Windows.Forms.Button()
         Me.ButtonTest = New System.Windows.Forms.Button()
         Me.ButtonSavePaintRobot = New System.Windows.Forms.Button()
@@ -59,6 +61,8 @@ Partial Class Form1
         'PanelTop
         '
         Me.PanelTop.BackColor = System.Drawing.Color.Black
+        Me.PanelTop.Controls.Add(Me.ButtonRenderRemain)
+        Me.PanelTop.Controls.Add(Me.ButtonHistory)
         Me.PanelTop.Controls.Add(Me.ButtonContinueRendering)
         Me.PanelTop.Controls.Add(Me.ButtonTest)
         Me.PanelTop.Controls.Add(Me.ButtonSavePaintRobot)
@@ -86,6 +90,31 @@ Partial Class Form1
         Me.PanelTop.Name = "PanelTop"
         Me.PanelTop.Size = New System.Drawing.Size(1548, 60)
         Me.PanelTop.TabIndex = 1
+        '
+        'ButtonRenderRemain
+        '
+        Me.ButtonRenderRemain.BackColor = System.Drawing.Color.Green
+        Me.ButtonRenderRemain.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonRenderRemain.ForeColor = System.Drawing.Color.White
+        Me.ButtonRenderRemain.Location = New System.Drawing.Point(720, 32)
+        Me.ButtonRenderRemain.Name = "ButtonRenderRemain"
+        Me.ButtonRenderRemain.Size = New System.Drawing.Size(80, 25)
+        Me.ButtonRenderRemain.TabIndex = 22
+        Me.ButtonRenderRemain.Text = "Restanti"
+        Me.ButtonRenderRemain.UseVisualStyleBackColor = False
+        Me.ButtonRenderRemain.Visible = False
+        '
+        'ButtonHistory
+        '
+        Me.ButtonHistory.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.ButtonHistory.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonHistory.ForeColor = System.Drawing.Color.White
+        Me.ButtonHistory.Location = New System.Drawing.Point(1094, 32)
+        Me.ButtonHistory.Name = "ButtonHistory"
+        Me.ButtonHistory.Size = New System.Drawing.Size(153, 25)
+        Me.ButtonHistory.TabIndex = 21
+        Me.ButtonHistory.Text = "Render History"
+        Me.ButtonHistory.UseVisualStyleBackColor = False
         '
         'ButtonContinueRendering
         '
@@ -129,7 +158,7 @@ Partial Class Form1
         '
         Me.LabelEseguiti.AutoSize = True
         Me.LabelEseguiti.ForeColor = System.Drawing.Color.White
-        Me.LabelEseguiti.Location = New System.Drawing.Point(866, 38)
+        Me.LabelEseguiti.Location = New System.Drawing.Point(975, 38)
         Me.LabelEseguiti.Name = "LabelEseguiti"
         Me.LabelEseguiti.Size = New System.Drawing.Size(88, 13)
         Me.LabelEseguiti.TabIndex = 16
@@ -139,7 +168,7 @@ Partial Class Form1
         '
         Me.LabelNumCmds.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LabelNumCmds.ForeColor = System.Drawing.Color.White
-        Me.LabelNumCmds.Location = New System.Drawing.Point(757, 32)
+        Me.LabelNumCmds.Location = New System.Drawing.Point(866, 32)
         Me.LabelNumCmds.Name = "LabelNumCmds"
         Me.LabelNumCmds.Size = New System.Drawing.Size(103, 25)
         Me.LabelNumCmds.TabIndex = 15
@@ -427,4 +456,6 @@ Partial Class Form1
     Friend WithEvents ButtonHelp As Button
     Friend WithEvents PictureBoxPR As PictureBox
     Friend WithEvents ButtonContinueRendering As Button
+    Friend WithEvents ButtonHistory As Button
+    Friend WithEvents ButtonRenderRemain As Button
 End Class

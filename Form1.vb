@@ -67,10 +67,10 @@ Public Class Form1
     Private View As New Viewport()
 
     'PaintRobot
-    Private Comandi As List(Of RobotCommand)
-    Private Commands As List(Of RobotCommand)
+    Private Comandi As List(Of RobotCommand) 'Da script
+    Private Commands As List(Of RobotCommand) 'Old interfaccia adesso non usato
     ' History dei comandi
-    Private History As New List(Of RobotCommand)
+    Private History As New List(Of RobotCommand) 'Storico
 
     Private Execute As Boolean = False 'Sovraintende alla eseguzione dei comandi interfaccia
     Private Comando As String = ""
@@ -114,6 +114,8 @@ Public Class Form1
                 History.Clear()
                 History.AddRange(Comandi)
 
+                Dim HistoryIndex = History.Count   ' 👈 TUTTI attivi
+
                 numComandi = Comandi.Count - 1
                 ProgressBar1.Minimum = 0
                 ProgressBar1.Maximum = numComandi
@@ -132,6 +134,7 @@ Public Class Form1
         ButtonTest.Visible = True
 
         ButtonTest.Location = New Point(ButtonSavePaintRobot.Right + 20, ButtonSavePaintRobot.Location.Y)
+        ButtonHistory.Location = New Point(ButtonSavePaintRobot.Location.X + 1, 32)
     End Sub
 
     Private Sub StartRender()
@@ -220,17 +223,6 @@ Public Class Form1
         ' Una variabile per comandare anche la pausa STEP;0
         Dim commandsHERETick As Integer = Form1.commandsPerTick
 
-        'For i = 1 To commandsPerTick ' Modificabile col comando STEP;n
-        'If renderIndex >= Comandi.Count OrElse PaintRobotAlted Then Exit For
-
-        'Drawer.Esegui(Comandi(renderIndex), renderCtx)
-
-        'renderIndex += 1
-        'ProgressBar1.Value = Math.Min(renderIndex, ProgressBar1.Maximum)
-
-        'Debug.WriteLine("RenderIndex " & renderIndex.ToString)
-        'Next
-
         ' ciclo esecuzione
         For i = 1 To commandsHERETick
             If renderIndex >= Comandi.Count OrElse PaintRobotAlted Then
@@ -257,8 +249,10 @@ Public Class Form1
         ' Aggiorno visibilità pulsante dopo il ciclo
         If Form1.waitForContinue AndAlso renderIndex < Comandi.Count Then
             ButtonContinueRendering.Visible = True
+            ButtonRenderRemain.Visible = True
         Else
             ButtonContinueRendering.Visible = False
+            ButtonRenderRemain.Visible = False
         End If
 
         PictureBox1.Invalidate()   ' preview live
@@ -303,7 +297,11 @@ Public Class Form1
 
             Commands = Interpreter.CaricaComandiMultipli(TextBoxCommands.Text)
 
-            ' Lo aggiunge alla lista History
+            ' Se ero tornato indietro con undo → cancello il futuro
+            If renderIndex < History.Count Then
+                History.RemoveRange(renderIndex, History.Count - renderIndex)
+            End If
+
             History.AddRange(Commands)
 
             If Commands Is Nothing OrElse Commands.Count = 0 Then Return
@@ -311,6 +309,78 @@ Public Class Form1
             ' Renderizza il comando
             Render(Commands)
         End If
+    End Sub
+
+    Private Sub RenderAllHistory()
+        'Renderizza la History 
+        If rendering Then Return
+
+        rendering = True
+
+        ' A zero l'indice principale
+        Dim HistoryIndex = 0
+        Debug.WriteLine("HistoryIndex " & HistoryIndex.ToString)
+
+        ProgressBar1.Minimum = 0
+        ProgressBar1.Maximum = Comandi.Count
+        ProgressBar1.Value = 0
+
+        ' Prepariamo bitmap e Graphics UNA SOLA VOLTA
+        'renderGraphics = Graphics.FromImage(PaintRobotBMP)
+        renderGraphics.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+
+        ' ResetContext
+        renderGraphics.Clear(Color.White)
+
+        For Each Comando As RobotCommand In History
+            If HistoryIndex = renderIndex Then Exit For
+            Drawer.Esegui(Comando, renderCtx)
+
+            HistoryIndex += 1
+            ProgressBar1.Value = HistoryIndex
+            Debug.WriteLine("RenderIndex " & renderIndex.ToString)
+        Next
+
+        LabelNumCmds.Text = renderIndex.ToString ' num comandi eseguiti
+        Debug.WriteLine("Eseguiti " & HistoryIndex.ToString & " History commands")
+
+        StopRender()
+    End Sub
+
+    Private Sub ButtonHistory_Click(sender As Object, e As EventArgs) Handles ButtonHistory.Click
+        'Renderizza tutta la History
+        If History.Count = 0 Then Return
+        MsgBox("H" & History.ToList.ToString)
+
+        StopRender()
+
+        rendering = False
+
+        RenderAllHistory()
+    End Sub
+
+    Private Sub ButtonContinueRendering_Click(sender As Object, e As EventArgs) Handles ButtonContinueRendering.Click
+        'Continue Rendering
+        If renderIndex >= Comandi.Count Then Return
+
+        ' riavvia il timer per eseguire il prossimo comando
+        ButtonContinueRendering.Visible = False
+        Debug.WriteLine("PAUSA per STEP=0")
+        RenderTimer.Start()
+    End Sub
+
+    Private Sub ButtonRenderRemain_Click(sender As Object, e As EventArgs) Handles ButtonRenderRemain.Click
+        'Render Remains
+        If renderIndex >= Comandi.Count Then Return
+
+        ' riavvia il timer per eseguire il prossimo comando
+        ButtonContinueRendering.Visible = False
+        Debug.WriteLine("REMAIN commandsPerTick=40")
+
+        waitForContinue = False
+        commandsPerTick = 40
+
+        RenderTimer.Start()
     End Sub
 
     Private Sub ButtonStop_Click(sender As Object, e As EventArgs) Handles ButtonStop.Click
@@ -767,15 +837,6 @@ Public Class Form1
         'Help di PaintRobot
         Dim FormHelp As New Form2
         FormHelp.ShowDialog()
-    End Sub
-
-    Private Sub ButtonContinueRendering_Click(sender As Object, e As EventArgs) Handles ButtonContinueRendering.Click
-        If renderIndex >= Comandi.Count Then Return
-
-        ' riavvia il timer per eseguire il prossimo comando
-        ButtonContinueRendering.Visible = False
-        Debug.WriteLine("PAUSA per STEP=0")
-        RenderTimer.Start()
     End Sub
 End Class
 
