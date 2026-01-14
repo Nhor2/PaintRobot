@@ -113,7 +113,49 @@ Usalo, modificalo e ridistribuiscilo liberamente.
 
 ---
 
-## 🧾 Linguaggio PaintRobotScript
+
+## 📜 Sintassi Comandi Linguaggio PaintRobotScript
+
+Ecco la sintassi di tutti i comandi disponibili:
+
+```text
+LINEA       ; LINEA;x1,y1;x2,y2;Colore;Spessore
+CERCHIO     ; CERCHIO;x,y;Raggio;Colore;Spessore
+RETT        ; RETT;x1,y1;x2,y2;Tipo;Colore;Spessore
+TRIANG      ; TRIANG;x1,y1;x2,y2;x3,y3;Colore;Tipo;Spessore
+PULISCI     ; PULISCI;Colore
+ARCO        ; ARCO;x1,y1;x2,y2;Colore;Tipo;Spessore;AngoloStart;AngoloSweep
+SCACCHI     ; SCACCHI;x1,y1;x2,y2;Colore;Colore2
+TESTO       ; TESTO;x1,y1;x2,y2;Testo;Colore;Dimensione;Font;Stile
+POLIGONO    ; POLIGONO;xN,yN;Colore;Tipo
+GRIGLIA     ; GRIGLIA;Lato;Colore
+TRASLA      ; TRASLA;x1,y1
+SALVA       ; SALVA;Percorso;Formato(PNG,BMP,JPG)
+INVERTI     ; INVERTI;Direzione;-Percentuale
+RUOTA       ; RUOTA;Gradi;-Percentuale
+APPUNTI     ; APPUNTI
+COPIA       ; COPIA;Percorso
+INCOLLA     ; INCOLLA;x1,y1
+RIDIMENSIONA; RIDIMENSIONA;Appunti;Larghezza,Altezza
+SPLINE      ; SPLINE;xN,yN;Colore;Spessore
+SPLINE2     ; SPLINE2;xN,yN;Colore;Spessore;Tensione
+#           ; #Commento
+CROCE       ; CROCE;x1,y1;x2,y2;Colore;Spessore
+BEZIER      ; BEZIER;x1,y1;x2,y2;x3,y3;x4,y4;Colore;Spessore
+TEXTURE     ; TEXTURE;Nome;Percorso
+DRAWTEXTURE ; DRAWTEXTURE;Nome;x,y
+PATTERN     ; PATTERN;Nome;LINEE;Angolo;Spaziatura;Colore;Spessore
+FILLPATTERN ; FILLPATTERN;Nome;x1,y1;x2,y2
+INIZIO      ; INIZIO
+INIZIOCAD   ; INIZIOCAD;Passo;Colore
+INIZIOMATH  ; INIZIOMATH;ScalaX;ScalaY;ColoreScale
+ADDLIVELLO  ; ADDLIVELLO;NomeLivello
+DELLIVELLO  ; DELLIVELLO;NomeLivello
+RENLIVELLO  ; RENLIVELLO;NomeLivello;NuovoNomeLivello
+STEP        ; STEP;Numero
+SPIRALE     ; SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione
+SINUSOIDE   ; SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
+
 
 ## ⬇️ Download
 
