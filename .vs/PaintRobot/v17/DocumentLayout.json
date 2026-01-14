@@ -1,0 +1,53 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\lordm\\source\\repos2\\PaintRobot\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|c:\\users\\lordm\\source\\repos2\\paintrobot\\form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|C:\\Users\\lordm\\source\\repos2\\PaintRobot\\form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
+      "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Form1.vb",
+              "DocumentMoniker": "C:\\Users\\lordm\\source\\repos2\\PaintRobot\\Form1.vb",
+              "RelativeDocumentMoniker": "Form1.vb",
+              "ToolTip": "C:\\Users\\lordm\\source\\repos2\\PaintRobot\\Form1.vb",
+              "RelativeToolTip": "Form1.vb",
+              "ViewState": "AgIAANgAAAAAAAAAAAAwwO8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-01-08T11:42:53.004Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Form1.vb [Progettazione]",
+              "DocumentMoniker": "C:\\Users\\lordm\\source\\repos2\\PaintRobot\\Form1.vb",
+              "RelativeDocumentMoniker": "Form1.vb",
+              "ToolTip": "C:\\Users\\lordm\\source\\repos2\\PaintRobot\\Form1.vb [Progettazione]",
+              "RelativeToolTip": "Form1.vb [Progettazione]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-01-08T11:42:43.787Z",
+              "EditorCaption": " [Progettazione]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
