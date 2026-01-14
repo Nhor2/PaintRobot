@@ -83,3 +83,4 @@ Puoi scaricare il codice sorgente direttamente da GitHub:
 
 - **v2.0** – Prima release pubblica (codice sorgente)
  
+>>>>>>> 8c2d1e810aa72bf446efdd9937d874e6edf7013c
