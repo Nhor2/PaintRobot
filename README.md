@@ -47,7 +47,7 @@ PaintRobot utilizza una tecnologia chiamata **Timer-Driven Rendering**:
 
 ---
 
-## Esempi dei Comandi
+## 📋 Esempi dei Comandi
 
 Alcuni Esempi dei comandi grafici presenti in questa versione:
 
