@@ -155,7 +155,7 @@ RENLIVELLO  ; RENLIVELLO;NomeLivello;NuovoNomeLivello
 STEP        ; STEP;Numero
 SPIRALE     ; SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione
 SINUSOIDE   ; SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
-
+```
 
 ## ⬇️ Download
 
