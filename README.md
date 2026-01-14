@@ -11,6 +11,8 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 
 ![PaintRobot Screenshot](Screenshot.png)
 
+![PaintRobot Screenshot2](ScreenShot2.png)
+
 ---
 
 ## 📌 Caratteristiche principali
