@@ -19,6 +19,7 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 
 - Rendering grafico **timer-driven**
 - Esecuzione rapida di **migliaia di comandi grafici**
+- Esecuzione di comandi STEP/CONTINUE
 - Linguaggio proprietario **PaintRobotScript**
 - Nessuna interferenza dell’utente durante il disegno
 - Output coerente su qualsiasi sistema Windows
@@ -45,6 +46,43 @@ PaintRobot utilizza una tecnologia chiamata **Timer-Driven Rendering**:
 - Massima velocità e coerenza del risultato
 
 ---
+
+## Esempi dei Comandi
+
+Alcuni Esempi dei comandi grafici presenti in questa versione:
+
+#Un comando alla volta
+STEP;1
+LINEA;7,10;96,92;Blu;2
+RETT;50,50;200,150;Nero;VUOTO;2
+CERCHIO;200,200;50;Rosso;PIENO;3
+TRIANG;72,50;440,358;17,340;Rosso;VUOTO;1
+PULISCI;Bianco
+ARCO;50,50;150,150;Rosso;PIENO;2;0;180
+ARCO;200,50;300,150;Blu;VUOTO;3;90;270
+SCACCHI;100,10;400,310;Blu;Rosso
+TESTO;100,200;Ciao mondo;Rosso;20;Arial;Normal
+POLIGONO;10,10;100,30;80,120;30,90;Verde;PIENO
+GRIGLIA;20;Grigio
+TRASLA;50;100
+SALVA;C:\Temp\foto.jpg;JPG
+APPUNTI
+COPIA;C:\Immagini\foto.png
+INCOLLA;50,100
+RIDIMENSIONA;Appunti;400,400
+SPLINE;29,15;53,500;1000,183;Giallo;1
+SPLINE2;10,10;50,80;100,50;150,120;Blu;2;0.7
+SPIRALE;400,300;10;150;5;Blu;2;Oraria
+SINUSOIDE;600,200;700,200;50;25;Blu;2
+CROCE;50,50;100,100;Arancio;3
+BEZIER;800,320;850,340;900,310;950,210;VIOLA;2
+TEXTURE;Texture01;C:\TEXTURE\textures_autocad_45635.gif
+DRAWTEXTURE;Texture01;950,400
+PATTERN;PUNTI;DOT;1000;10;Nero;1
+FILLPATTERN;PUNTI;1000,100;400,300
+INIZIO
+INIZIOMATH;20;10;Blu
+INIZIOCAD;10;Lime
 
 ## 👤 A chi è utile
 
