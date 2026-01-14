@@ -25,6 +25,7 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 - Nessuna interferenza dell’utente durante il disegno
 - Output coerente su qualsiasi sistema Windows
 - Ideale per disegno automatico, generativo o standardizzato
+- Modalità Test: salva un file test.txt con migliaia di comandi casuali
 
 ---
 
