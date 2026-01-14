@@ -20,6 +20,7 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 - Rendering grafico **timer-driven**
 - Esecuzione rapida di **migliaia di comandi grafici**
 - Esecuzione di comandi STEP/CONTINUE
+- Esecuzione di comandi da History Commands
 - Linguaggio proprietario **PaintRobotScript**
 - Nessuna interferenza dell’utente durante il disegno
 - Output coerente su qualsiasi sistema Windows
