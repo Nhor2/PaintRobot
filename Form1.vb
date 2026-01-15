@@ -1614,14 +1614,13 @@ Public Class RobotDrawer
             bmp.Save(path, imgFormat)
             Debug.WriteLine("Bitmap salvata: " & path)
         Catch ex As Exception
-            ' Fallback su Desktop
+            ' Fallback negli appunti
             Try
-                Dim desk = My.Computer.FileSystem.SpecialDirectories.Desktop
-                Dim newPath = System.IO.Path.Combine(desk, System.IO.Path.GetFileName(path))
-                bmp.Save(newPath, imgFormat)
-                Debug.WriteLine("Bitmap salvata su Desktop: " & newPath)
+                Clipboard.SetImage(bmp)
+                Debug.WriteLine("Bitmap salvata negli appunti")
+                MsgBox("Impossibile salvare. L'immagine é stata copiata negli Appunti di Windows", MsgBoxStyle.Information, "PaintRobot")
             Catch innerEx As Exception
-                Debug.WriteLine("Errore salvataggio: " & innerEx.Message)
+                Debug.WriteLine("Errore appunti: " & innerEx.Message)
             End Try
         End Try
     End Sub
