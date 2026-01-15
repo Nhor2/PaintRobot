@@ -49,6 +49,10 @@ FILLPATTERN, FILLPATTERN;Nome;x1,y1;x2,y2,
 INIZIO, INIZIO,
 INIZIOCAD, INIZIOCAD;Passo;Colore,
 INIZIOMATH, INIZIOMATH;ScalaX;ScalaY;ColoreScale,
+STEP, STEP;n,
+ADDLIVELLO, ADDLIVELLO;NomeLivello,
+DELLIVELLO, DELLIVELLO;NomeLivello,
+RENLIVELLO, RENLIVELLO;NomeLivello;NuovoNomeLivello,
 SPIRALE, SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione,
 SINUSOIDE, SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
 
@@ -172,7 +176,32 @@ L’esempio seguente pulisce e inizializza il foglio schermo di colore Bianco e 
 
 L’esempio seguente pulisce e inizializza il foglio schermo di colore Nero e disegna una griglia di punti in stile AutoCAD di colore Lime con passo 10 pixel.
 
-		INIZIOCAD;10;Lime"
+		INIZIOCAD;10;Lime
+
+L’esempio seguente inizializza PaintRobot ad eseguire i comandi uno (1) alla volta e a fermarsi mostrando il pulsante Continua.
+
+		STEP;0
+
+L’esempio seguente inizializza PaintRobot ad eseguire i comandi uno (10) alla volta senza fermarsi.
+
+		STEP;10
+
+L’esempio seguente aggiunge un livello di disegno chiamato LIVELLO1 sul quale verranno disegnati i successivi comandi. Senza nessun comando di livello il disegno viene creato su BackGround.
+
+		ADDLIVELLO;LIVELLO1
+
+L’esempio seguente rimuove il livello LIVELLO1 dal disegno e i successivi comandi verrano disegnati sul livello precedente/sottostante.
+
+		DELLIVELLO;LIVELLO1
+
+L’esempio seguente rinomina il livello LIVELLO1 in LIVELLO2. Nessuna modifica su dove viene disegnato il comando successivo.
+
+		RENLIVELLO;LIVELLO1;LIVELLO2
+
+
+
+
+"
 
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'A tutto schermo
