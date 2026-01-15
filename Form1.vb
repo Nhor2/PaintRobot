@@ -32,8 +32,11 @@ Public Class Form1
     Private AltezzaPaginaPixel As Integer = 10000
     Private Origine As Point = New Point(0, 0)
     Private OrigineF As PointF = New PointF(0, 0)
+
+    'Mondo 10K, disegno e snapshot 0
     Private PaintRobotBMP As Bitmap = New Bitmap(LarghezzaPaginaPixel, AltezzaPaginaPixel)
     Private picbmp As Bitmap = Nothing
+    Private BgSnapshot As Bitmap = Nothing
 
     'Abilita il Debug
     Private DEBUGOK As Boolean = False
@@ -79,6 +82,8 @@ Public Class Form1
     Private Drawer As New RobotDrawer()
     Private Interpreter As New RobotInterpreter()
 
+
+    ' PaintRobot
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'Finestra sempre massimizzata
         Me.WindowState = FormWindowState.Maximized
@@ -145,6 +150,9 @@ Public Class Form1
         rendering = True
         renderIndex = 0
 
+        ' Misura
+        swRender.Start()
+
         ProgressBar1.Minimum = 0
         ProgressBar1.Maximum = Comandi.Count
         ProgressBar1.Value = 0
@@ -166,11 +174,11 @@ Public Class Form1
         renderCtx.OrdineLivelli.Clear()
 
         ' ✅ Snapshot iniziale = BackGround
-        Dim bgSnap As Bitmap = CType(picbmp.Clone(), Bitmap)
+        BgSnapshot = CType(PaintRobotBMP.Clone(), Bitmap)
 
         renderCtx.Livelli.Add("BackGround", New Livello With {
         .Nome = "BackGround",
-        .Bitmap = bgSnap
+        .Bitmap = BgSnapshot
     })
 
         renderCtx.OrdineLivelli.Add("BackGround") 'Aggiunge all'indice OrdineLivelli
@@ -192,9 +200,35 @@ Public Class Form1
         ProgressBar1.Value = 0
 
         ' Prepariamo bitmap e Graphics UNA SOLA VOLTA
-        'renderGraphics = Graphics.FromImage(PaintRobotBMP)
+        renderGraphics = Graphics.FromImage(PaintRobotBMP)
         renderGraphics.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
 
+        ' Se non esiste crea lo snapshot iniziale BackGround
+        If BgSnapshot Is Nothing Then
+            ' Inizializza a bianco
+            renderGraphics.Clear(Color.White)
+
+            renderCtx = New RobotContext With {
+        .Graphics = renderGraphics,
+        .Bitmap = picbmp,
+        .LivelloCorrente = "BackGround",
+        .View = View
+    }
+
+            ' ✅ Snapshot iniziale = BackGround
+            BgSnapshot = CType(PaintRobotBMP.Clone(), Bitmap)
+
+            renderCtx.Livelli.Add("BackGround", New Livello With {
+            .Nome = "BackGround",
+            .Bitmap = BgSnapshot
+        })
+
+            renderCtx.OrdineLivelli.Add("BackGround") 'Aggiunge all'indice OrdineLivelli
+
+            PictureBox1.Image = picbmp
+        End If
+
+        ' Aggiunge i comandi da eseguire
         For Each Comando As RobotCommand In Comandi
             Drawer.Esegui(Comando, renderCtx)
 
@@ -270,6 +304,12 @@ Public Class Form1
 
         ' STOP fluido
         RenderTimer.Stop()
+
+        swRender.Stop()
+
+        Debug.WriteLine("=== TEST PaintRobot ===")
+        Debug.WriteLine($"Tempo totale render: {swRender.ElapsedMilliseconds} ms")
+        Debug.WriteLine($"Comandi eseguiti: {renderIndex}")
 
         rendering = False
         RedrawViewport()
@@ -589,6 +629,20 @@ Public Class Form1
         'Vai a Origine
         ZoomOrigin(1.0, New PointF(0, 0))
         RedrawViewport()
+
+        'Visibile
+        ButtonOrigin.BackColor = Color.Green
+        ButtonCentroMondo.BackColor = Color.White
+    End Sub
+
+    Private Sub ButtonCentroMondo_Click(sender As Object, e As EventArgs) Handles ButtonCentroMondo.Click
+        'Vai al centro del mondo PaintRobot 5000,5000
+        ZoomOrigin(1.0, New PointF(5000, 5000))
+        RedrawViewport()
+
+        'Visibile
+        ButtonOrigin.BackColor = Color.White
+        ButtonCentroMondo.BackColor = Color.Green
     End Sub
 
     'PAN mouse
@@ -754,9 +808,12 @@ Public Class Form1
                 End If
             End If
         End If
-
-
     End Sub
+
+
+    'TEST
+    ' StopWatch misurazione precisa
+    Dim swRender As New Stopwatch()
 
     Private Sub ButtonTest_Click(sender As Object, e As EventArgs) Handles ButtonTest.Click
         'Test - creazione di script
@@ -810,9 +867,6 @@ Public Class Form1
             System.IO.File.WriteAllText(testFile, script)
         End If
 
-        ' Aspettiamo un po per salvare il file
-        System.Threading.Thread.Sleep(2000)
-
         ' Esegue lo script di comandi casuali
         If System.IO.File.Exists(testFile) Then
             If FileLen(testFile) > 0 Then
@@ -838,6 +892,8 @@ Public Class Form1
         Dim FormHelp As New Form2
         FormHelp.ShowDialog()
     End Sub
+
+
 End Class
 
 Public Class RobotCommand
@@ -1015,6 +1071,9 @@ Public Class RobotDrawer
     {"DELLIVELLO", "DELLIVELLO;NomeLivello"},
     {"RENLIVELLO", "RENLIVELLO;NomeLivello;NuovoNomeLivello"},
     {"STEP", "STEP;Numero"},
+    {"GRIGLIAFULL", "GRIGLIAFULL;Lato;Colore"},
+    {"FRECCIA", "FRECCIA;x1,y1;x2,y2;Colore;Spessore"},
+    {"STELLA", "STELLA;x1,y1;NumeroPunte;Diametro;Colore;Spessore"},
     {"SPIRALE", "SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione"},
     {"SINUSOIDE", "SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore"}
 }
@@ -1169,8 +1228,21 @@ Public Class RobotDrawer
             Case "STEP"
                 StepComandi(comando.Parametri)
 
+            Case "GRIGLIAFULL"
+                'GRIGLIAFULL;Lato;Colore
+                GrigliaFull(comando.Parametri, g, ctx)
+
+            Case "FRECCIA"
+                'FRECCIA;x1,y1;x2,y2;Colore;Spessore
+                Freccia(comando.Parametri, g)
+
+            Case "STELLA"
+                'STELLA;x1,y1;NumeroPunte;Diametro;Colore;Spessore
+                Stella(comando.Parametri, g)
+
             Case Else
                 Debug.WriteLine($"Comando sconosciuto: {comando.Tipo}")
+
         End Select
     End Sub
 
@@ -2670,4 +2742,198 @@ Public Class RobotDrawer
             ctx.LivelloCorrente = newName
         End If
     End Sub
+
+    Private Sub Matrice(p As List(Of String), g As Graphics)
+        ' Metrice Quadrata
+        'Significato
+        'x1, y1 → punto iniziale
+        'x2, y2 → passo (distanza tra elementi)
+        'xN, yN → dimensioni totali (oppure punto finale)
+        'tipo → come disegnare ogni cella
+        'spessore → dimensione del simbolo
+
+        If p.Count < 5 Then Return
+
+        Dim start = Punto(p(0))
+        Dim passo = Punto(p(1))
+        Dim fine = Punto(p(2))
+        Dim tipo = p(3).ToUpper()
+        Dim spessore = Integer.Parse(p(4))
+
+        For x = start.X To fine.X Step passo.X
+            For y = start.Y To fine.Y Step passo.Y
+                Select Case tipo
+                    Case "PUNTI"
+                        g.FillEllipse(Brushes.Black, x - spessore, y - spessore, spessore * 2, spessore * 2)
+
+                    Case "QUADRATI"
+                        g.DrawRectangle(Pens.Black, x - spessore, y - spessore, spessore * 2, spessore * 2)
+
+                    Case "CROCI"
+                        g.DrawLine(Pens.Black, x - spessore, y, x + spessore, y)
+                        g.DrawLine(Pens.Black, x, y - spessore, x, y + spessore)
+
+                    Case "X"
+                        g.DrawLine(Pens.Black, x - spessore, y - spessore, x + spessore, y + spessore)
+                        g.DrawLine(Pens.Black, x - spessore, y + spessore, x + spessore, y - spessore)
+                End Select
+            Next
+        Next
+    End Sub
+
+
+    Private Sub GrigliaFull(p As List(Of String), g As Graphics, ctx As RobotContext)
+        If p.Count < 2 Then Return
+
+        Dim lato = Integer.Parse(p(0))
+        Dim colore = ColorConv(p(1))
+
+        Using pen As New Pen(colore, 1)
+            ' Verticali
+            For x = 0 To 9999 Step lato
+                g.DrawLine(pen, x, 0, x, 9999)
+            Next
+
+            ' Orizzontali
+            For y = 0 To 9999 Step lato
+                g.DrawLine(pen, 0, y, 9999, y)
+            Next
+        End Using
+    End Sub
+
+    Private Sub Freccia(p As List(Of String), g As Graphics)
+        If p.Count < 3 Then Return
+
+        Dim p1 = Punto(p(0))
+        Dim p2 = Punto(p(1))
+        Dim colore = ColorConv(p(2))
+        Dim spessore = Integer.Parse(p(3))
+
+        Using pen As New Pen(colore, spessore)
+            g.DrawLine(pen, p1, p2)
+
+            Dim angolo = Math.Atan2(p1.Y - p2.Y, p1.X - p2.X)
+            Dim lung = 10 + spessore * 2
+
+            Dim a1 = angolo + Math.PI / 6
+            Dim a2 = angolo - Math.PI / 6
+
+            Dim pA As New PointF(
+            p2.X + lung * Math.Cos(a1),
+            p2.Y + lung * Math.Sin(a1))
+
+            Dim pB As New PointF(
+            p2.X + lung * Math.Cos(a2),
+            p2.Y + lung * Math.Sin(a2))
+
+            g.DrawLine(pen, p2, pA)
+            g.DrawLine(pen, p2, pB)
+        End Using
+    End Sub
+
+    Private Sub Stella(p As List(Of String), g As Graphics)
+        If p.Count < 4 Then Return
+
+        Dim centro = Punto(p(0))
+        Dim punte = Integer.Parse(p(1))
+        Dim diametro = Single.Parse(p(2))
+        ' Colori
+        Dim colore1 = ColorConv(p(3))
+        Dim spessore = Integer.Parse(p(4))
+
+        Dim rEst = diametro / 2
+        Dim rInt = rEst / 2
+
+        Dim pts As New List(Of PointF)
+        Dim stepAng = Math.PI / punte
+
+        For i = 0 To punte * 2 - 1
+            Dim r = If(i Mod 2 = 0, rEst, rInt)
+            Dim ang = i * stepAng - Math.PI / 2
+
+            pts.Add(New PointF(
+            centro.X + r * Math.Cos(ang),
+            centro.Y + r * Math.Sin(ang)))
+        Next
+
+        g.DrawPolygon(New Pen(colore1, spessore), pts.ToArray())
+    End Sub
+
+    Private Sub MatricePoligono(p As List(Of String), g As Graphics)
+        'MATRICE;x1,y1;x2,y2;x3,y3;...;PASSOX,PASSOY;Tipo;Spessore
+        'esempio TRAPEZIO
+        'MATRICE;100,100;300,100;250,250;150,250;20,20;punti;2
+
+        If p.Count < 5 Then Return
+
+        ' --- 1. Leggi punti poligono ---
+        Dim punti As New List(Of PointF)
+        Dim i As Integer = 0
+
+        While i < p.Count AndAlso p(i).Contains(",")
+            punti.Add(Punto(p(i)))
+            i += 1
+        End While
+
+        ' --- 2. Parametri ---
+        Dim passo = Punto(p(i)) : i += 1
+        Dim tipo = p(i).ToUpper() : i += 1
+        Dim spessore = Integer.Parse(p(i))
+
+        ' --- 3. Bounding box ---
+        Dim minX, minY, maxX, maxY As Single
+        BoundingBox(punti, minX, minY, maxX, maxY)
+
+        ' --- 4. Clip ---
+        Dim oldClip = g.Clip
+        Using path = CreaClipPoligono(punti)
+            g.SetClip(path)
+
+            ' --- 5. Disegno matrice ---
+            For x = minX To maxX Step passo.X
+                For y = minY To maxY Step passo.Y
+                    DisegnaSimbolo(g, tipo, x, y, spessore)
+                Next
+            Next
+
+            ' --- 6. Ripristino ---
+            g.Clip = oldClip
+        End Using
+    End Sub
+
+    Private Function CreaClipPoligono(punti As List(Of PointF)) As Drawing2D.GraphicsPath
+        Dim path As New Drawing2D.GraphicsPath()
+        path.AddPolygon(punti.ToArray())
+        Return path
+    End Function
+
+    Private Sub BoundingBox(punti As List(Of PointF),
+                        ByRef minX As Single, ByRef minY As Single,
+                        ByRef maxX As Single, ByRef maxY As Single)
+
+        minX = punti.Min(Function(p) p.X)
+        minY = punti.Min(Function(p) p.Y)
+        maxX = punti.Max(Function(p) p.X)
+        maxY = punti.Max(Function(p) p.Y)
+    End Sub
+
+    Private Sub DisegnaSimbolo(g As Graphics, tipo As String, x As Single, y As Single, s As Integer)
+
+        Select Case tipo
+            Case "PUNTI"
+                g.FillEllipse(Brushes.Black, x - s, y - s, s * 2, s * 2)
+
+            Case "QUADRATI"
+                g.DrawRectangle(Pens.Black, x - s, y - s, s * 2, s * 2)
+
+            Case "CROCI"
+                g.DrawLine(Pens.Black, x - s, y, x + s, y)
+                g.DrawLine(Pens.Black, x, y - s, x, y + s)
+
+            Case "X"
+                g.DrawLine(Pens.Black, x - s, y - s, x + s, y + s)
+                g.DrawLine(Pens.Black, x - s, y + s, x + s, y - s)
+        End Select
+    End Sub
+
 End Class

@@ -52,6 +52,7 @@ Partial Class Form1
         Me.ButtonHelp = New System.Windows.Forms.Button()
         Me.LabelCoord = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
+        Me.ButtonCentroMondo = New System.Windows.Forms.Button()
         Me.PanelTop.SuspendLayout()
         CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelLeft.SuspendLayout()
@@ -61,6 +62,7 @@ Partial Class Form1
         'PanelTop
         '
         Me.PanelTop.BackColor = System.Drawing.Color.Black
+        Me.PanelTop.Controls.Add(Me.ButtonCentroMondo)
         Me.PanelTop.Controls.Add(Me.ButtonRenderRemain)
         Me.PanelTop.Controls.Add(Me.ButtonHistory)
         Me.PanelTop.Controls.Add(Me.ButtonContinueRendering)
@@ -203,7 +205,7 @@ Partial Class Form1
         Me.ButtonOut.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonOut.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ButtonOut.ForeColor = System.Drawing.Color.Black
-        Me.ButtonOut.Location = New System.Drawing.Point(1038, 5)
+        Me.ButtonOut.Location = New System.Drawing.Point(1058, 5)
         Me.ButtonOut.Name = "ButtonOut"
         Me.ButtonOut.Size = New System.Drawing.Size(25, 25)
         Me.ButtonOut.TabIndex = 13
@@ -216,7 +218,7 @@ Partial Class Form1
         Me.ButtonZoomIn.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonZoomIn.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ButtonZoomIn.ForeColor = System.Drawing.Color.Black
-        Me.ButtonZoomIn.Location = New System.Drawing.Point(1011, 5)
+        Me.ButtonZoomIn.Location = New System.Drawing.Point(1033, 5)
         Me.ButtonZoomIn.Name = "ButtonZoomIn"
         Me.ButtonZoomIn.Size = New System.Drawing.Size(25, 25)
         Me.ButtonZoomIn.TabIndex = 12
@@ -406,6 +408,18 @@ Partial Class Form1
         Me.PictureBox1.TabIndex = 0
         Me.PictureBox1.TabStop = False
         '
+        'ButtonCentroMondo
+        '
+        Me.ButtonCentroMondo.BackColor = System.Drawing.Color.White
+        Me.ButtonCentroMondo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCentroMondo.ForeColor = System.Drawing.Color.Black
+        Me.ButtonCentroMondo.Location = New System.Drawing.Point(995, 5)
+        Me.ButtonCentroMondo.Name = "ButtonCentroMondo"
+        Me.ButtonCentroMondo.Size = New System.Drawing.Size(25, 25)
+        Me.ButtonCentroMondo.TabIndex = 23
+        Me.ButtonCentroMondo.Text = "C"
+        Me.ButtonCentroMondo.UseVisualStyleBackColor = False
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -458,4 +472,5 @@ Partial Class Form1
     Friend WithEvents ButtonContinueRendering As Button
     Friend WithEvents ButtonHistory As Button
     Friend WithEvents ButtonRenderRemain As Button
+    Friend WithEvents ButtonCentroMondo As Button
 End Class
