@@ -142,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="PaintRobot_icon_64.ico" />
+    <None Include="Resources\PaintRobotFirma.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

@@ -24,6 +24,9 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 - Linguaggio proprietario **PaintRobotScript**
 - Nessuna interferenza dell’utente durante il disegno
 - Output coerente su qualsiasi sistema Windows
+- ZOOM e PAN con mouse e pulsanti
+- Guida in App e CHM accessibile con F1
+- Autocompletamento del COMANDO mentre scrivi
 - Ideale per disegno automatico, generativo o standardizzato
 - Modalità Test: salva un file test.txt con migliaia di comandi casuali
 
@@ -70,6 +73,8 @@ POLIGONO;10,10;100,30;80,120;30,90;Verde;PIENO
 GRIGLIA;20;Grigio
 TRASLA;50;100
 SALVA;C:\Temp\foto.jpg;JPG
+INVERTI;Verticale;-50
+RUOTA;-45
 ADDLIVELLO;Due
 APPUNTI
 COPIA;C:\Immagini\foto.png
@@ -155,6 +160,9 @@ ADDLIVELLO  ; ADDLIVELLO;NomeLivello
 DELLIVELLO  ; DELLIVELLO;NomeLivello
 RENLIVELLO  ; RENLIVELLO;NomeLivello;NuovoNomeLivello
 STEP        ; STEP;Numero
+GRIGLIAFULL ; Lato;Colore
+FRECCIA     ; x1,y1;x2,y2;Colore;Spessore
+STELLA      ; x,y;NumeroPunte;Diametro;Colore;Spessore
 SPIRALE     ; SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione
 SINUSOIDE   ; SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
 ```

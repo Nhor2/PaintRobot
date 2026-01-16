@@ -121,10 +121,13 @@
   <data name="PaintRobot_clear" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\PaintRobot_clear.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="PaintRobot215" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PaintRobot215.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="PaintRobot" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\PaintRobot.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="PaintRobot215" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\PaintRobot215.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="PaintRobotFirma" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PaintRobotFirma.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

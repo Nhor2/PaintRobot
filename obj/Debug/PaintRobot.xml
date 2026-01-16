@@ -37,5 +37,10 @@ PaintRobot
   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
 </summary>
 </member>
+<member name="P:PaintRobot.My.Resources.Resources.PaintRobotFirma">
+<summary>
+  Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
+</summary>
+</member>
 </members>
 </doc>

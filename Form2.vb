@@ -31,6 +31,8 @@ TESTO, TESTO;x1,y1;x2,y2;Testo;Colore;Dimensione;Font;Stile,
 POLIGONO, POLIGONO;xN,YN;Colore;Tipo,
 GRIGLIA, GRIGLIA;Lato;Colore,
 TRASLA, TRASLA;x1,y1,
+RUOTA, RUOTA;-Gradi,
+INVERTI, INVERTI;Direzione;-Percentuale,
 SALVA, SALVA;Percorso;Formato(PNG,BMP,JPG),
 INVERTI, INVERTI;Direzione;-Percentuale,
 RUOTA, RUOTA;Gradi;-Percentuale,
@@ -105,9 +107,26 @@ L’esempio seguente crea una griglia sul foglio/schermo dal punto 0,0 fino al v
 
 		GRIGLIA;20;Grigio
 
-L’esempio seguente trasla, sposta completamente, il disegno alla coordinata (50,100).
+L’esempio seguente trasla, sposta completamente, il disegno alla coordinata (50,100). Altri esempi.
 
 		TRASLA;50;100
+		TRASLA;50,100
+		TRASLA;100,50	Sposta la bitmap di 100 px a destra e 50 px In basso
+		TRASLA;-50,100	Sposta 50 px a sinistra e 100 px In basso
+		TRASLA;50%,25%	Sposta del 50% della larghezza e 25% dell'altezza
+		TRASLA;-50%,25%	Sposta verso sinistra di metà larghezza e 25% In basso
+
+L’esempio seguente Ruota il disegno di 45 gradi in senso Anti-Orario.
+
+		RUOTA;-45;Grigio
+
+L’esempio seguente Inverte il 50% del disegno in senso Orizzontale.
+
+		INVERTI;Orizzontale;-50
+		INVERTI;X;50       → inverte metà della bitmap orizzontalmente (da sinistra)
+		INVERTI;Y;-25      → inverte il 25% inferiore della bitmap verticalmente
+		INVERTI;X;100      → inverte tutta la bitmap orizzontale
+		INVERTI;Y;100      → inverte tutta la bitmap verticale
 
 L’esempio seguente salva l’intero contenuto del disegno in un file JPEG nel percorso C:\Temp in un file di nome foto.jpg.
 
@@ -212,7 +231,6 @@ L’esempio seguente disegna una Freccia dal punto (0,0) al punto (100,100) di c
 L’esempio seguente disegna una Stella a 5 punte dal punto centrale (150,150) di diametro 100 di colore Nero e spessore 2 pixel.
 
 		STELLA;150,150;5;100;Nero;2
-
 
 
 

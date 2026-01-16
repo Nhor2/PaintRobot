@@ -24,6 +24,7 @@ Partial Class Form1
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.PanelTop = New System.Windows.Forms.Panel()
+        Me.ButtonCentroMondo = New System.Windows.Forms.Button()
         Me.ButtonRenderRemain = New System.Windows.Forms.Button()
         Me.ButtonHistory = New System.Windows.Forms.Button()
         Me.ButtonContinueRendering = New System.Windows.Forms.Button()
@@ -47,15 +48,14 @@ Partial Class Form1
         Me.ButtonCmd = New System.Windows.Forms.Button()
         Me.ButtonMinimize = New System.Windows.Forms.Button()
         Me.ButtonClose = New System.Windows.Forms.Button()
-        Me.PictureBoxPR = New System.Windows.Forms.PictureBox()
         Me.PanelLeft = New System.Windows.Forms.Panel()
         Me.ButtonHelp = New System.Windows.Forms.Button()
         Me.LabelCoord = New System.Windows.Forms.Label()
+        Me.PictureBoxPR = New System.Windows.Forms.PictureBox()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
-        Me.ButtonCentroMondo = New System.Windows.Forms.Button()
         Me.PanelTop.SuspendLayout()
-        CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelLeft.SuspendLayout()
+        CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -92,6 +92,18 @@ Partial Class Form1
         Me.PanelTop.Name = "PanelTop"
         Me.PanelTop.Size = New System.Drawing.Size(1548, 60)
         Me.PanelTop.TabIndex = 1
+        '
+        'ButtonCentroMondo
+        '
+        Me.ButtonCentroMondo.BackColor = System.Drawing.Color.White
+        Me.ButtonCentroMondo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCentroMondo.ForeColor = System.Drawing.Color.Black
+        Me.ButtonCentroMondo.Location = New System.Drawing.Point(995, 5)
+        Me.ButtonCentroMondo.Name = "ButtonCentroMondo"
+        Me.ButtonCentroMondo.Size = New System.Drawing.Size(25, 25)
+        Me.ButtonCentroMondo.TabIndex = 23
+        Me.ButtonCentroMondo.Text = "C"
+        Me.ButtonCentroMondo.UseVisualStyleBackColor = False
         '
         'ButtonRenderRemain
         '
@@ -358,15 +370,6 @@ Partial Class Form1
         Me.ButtonClose.Text = "X"
         Me.ButtonClose.UseVisualStyleBackColor = False
         '
-        'PictureBoxPR
-        '
-        Me.PictureBoxPR.Image = Global.PaintRobot.My.Resources.Resources.PaintRobot
-        Me.PictureBoxPR.Location = New System.Drawing.Point(1259, -10)
-        Me.PictureBoxPR.Name = "PictureBoxPR"
-        Me.PictureBoxPR.Size = New System.Drawing.Size(670, 86)
-        Me.PictureBoxPR.TabIndex = 19
-        Me.PictureBoxPR.TabStop = False
-        '
         'PanelLeft
         '
         Me.PanelLeft.BackColor = System.Drawing.Color.Gray
@@ -399,6 +402,15 @@ Partial Class Form1
         Me.LabelCoord.TabIndex = 3
         Me.LabelCoord.Text = "X,Y"
         '
+        'PictureBoxPR
+        '
+        Me.PictureBoxPR.Image = Global.PaintRobot.My.Resources.Resources.PaintRobot
+        Me.PictureBoxPR.Location = New System.Drawing.Point(1259, -10)
+        Me.PictureBoxPR.Name = "PictureBoxPR"
+        Me.PictureBoxPR.Size = New System.Drawing.Size(670, 86)
+        Me.PictureBoxPR.TabIndex = 19
+        Me.PictureBoxPR.TabStop = False
+        '
         'PictureBox1
         '
         Me.PictureBox1.BackColor = System.Drawing.Color.White
@@ -407,18 +419,6 @@ Partial Class Form1
         Me.PictureBox1.Size = New System.Drawing.Size(1214, 570)
         Me.PictureBox1.TabIndex = 0
         Me.PictureBox1.TabStop = False
-        '
-        'ButtonCentroMondo
-        '
-        Me.ButtonCentroMondo.BackColor = System.Drawing.Color.White
-        Me.ButtonCentroMondo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonCentroMondo.ForeColor = System.Drawing.Color.Black
-        Me.ButtonCentroMondo.Location = New System.Drawing.Point(995, 5)
-        Me.ButtonCentroMondo.Name = "ButtonCentroMondo"
-        Me.ButtonCentroMondo.Size = New System.Drawing.Size(25, 25)
-        Me.ButtonCentroMondo.TabIndex = 23
-        Me.ButtonCentroMondo.Text = "C"
-        Me.ButtonCentroMondo.UseVisualStyleBackColor = False
         '
         'Form1
         '
@@ -435,8 +435,8 @@ Partial Class Form1
         Me.Text = "PaintRobot"
         Me.PanelTop.ResumeLayout(False)
         Me.PanelTop.PerformLayout()
-        CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).EndInit()
         Me.PanelLeft.ResumeLayout(False)
+        CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()

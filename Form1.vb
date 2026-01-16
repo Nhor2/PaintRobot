@@ -49,7 +49,7 @@ Public Class Form1
 
     'Timer-Driven Renderer
     Private WithEvents RenderTimer As New Windows.Forms.Timer With {.Interval = 16} ' ~60 FPS
-    Private renderIndex As Integer = 0
+    Private renderIndex As Integer = Nothing
     Private rendering As Boolean = False
     Private renderGraphics As Graphics = Nothing
     Private renderCtx As RobotContext = Nothing
@@ -68,6 +68,15 @@ Public Class Form1
 
     'Mondo
     Private View As New Viewport()
+
+    'Test
+    Private inTest As Boolean = False
+
+    'Help CHM
+    Private helpPathCHM As String = Path.Combine(Application.StartupPath, "PaintRobot2Help.chm")
+
+    'Firma
+    Private firmaImg As Bitmap = My.Resources.PaintRobotFirma
 
     'PaintRobot
     Private Comandi As List(Of RobotCommand) 'Da script
@@ -103,6 +112,9 @@ Public Class Form1
         'Zoom Start
         ZoomStart()
 
+        'Help
+        Me.KeyPreview = True
+
         'Interfaccia
         CreaInterfaccia()
 
@@ -133,6 +145,16 @@ Public Class Form1
         End If
     End Sub
 
+    Private Sub Form1_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        'HELP CHM
+        If e.KeyCode = Keys.F1 Then
+            ' Controlla se esiste prima di aprirlo
+            If IO.File.Exists(helpPathCHM) Then
+                Process.Start(helpPathCHM)
+            End If
+        End If
+    End Sub
+
     Private Sub CreaInterfaccia()
         ' Pulsante Test solo se Debug attivo. Crea uno script ultra pesante
         ' Per test con migliaia di comandi grafici casuali.
@@ -151,7 +173,7 @@ Public Class Form1
         renderIndex = 0
 
         ' Misura
-        swRender.Start()
+        If inTest Then swRender.Start()
 
         ProgressBar1.Minimum = 0
         ProgressBar1.Maximum = Comandi.Count
@@ -161,6 +183,9 @@ Public Class Form1
         renderGraphics = Graphics.FromImage(PaintRobotBMP)
         renderGraphics.Clear(Color.White)
         renderGraphics.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+        renderGraphics.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+        renderGraphics.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+
 
         renderCtx = New RobotContext With {
         .Graphics = renderGraphics,
@@ -193,18 +218,30 @@ Public Class Form1
         'Renderizza un comando
         If rendering Then Return
 
+        PaintRobotAlted = False
         rendering = True
 
         ProgressBar1.Minimum = 0
         ProgressBar1.Maximum = Comandi.Count
         ProgressBar1.Value = 0
 
-        ' Prepariamo bitmap e Graphics UNA SOLA VOLTA
-        renderGraphics = Graphics.FromImage(PaintRobotBMP)
-        renderGraphics.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
 
         ' Se non esiste crea lo snapshot iniziale BackGround
-        If BgSnapshot Is Nothing Then
+        If BgSnapshot Is Nothing OrElse renderIndex = Nothing Then
+            ' Prepariamo bitmap e Graphics UNA SOLA VOLTA
+            renderGraphics = Graphics.FromImage(PaintRobotBMP)
+            renderGraphics.Clear(Color.White)
+            renderGraphics.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+            renderGraphics.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+            renderGraphics.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+
+            ' Index = 0
+            renderIndex = 0
+
+            ProgressBar1.Minimum = 0
+            ProgressBar1.Maximum = Comandi.Count
+            ProgressBar1.Value = 0
+
             ' Inizializza a bianco
             renderGraphics.Clear(Color.White)
 
@@ -214,6 +251,10 @@ Public Class Form1
         .LivelloCorrente = "BackGround",
         .View = View
     }
+
+            ' 🔴 PULIZIA STRUTTURE (fondamentale)
+            renderCtx.Livelli.Clear()
+            renderCtx.OrdineLivelli.Clear()
 
             ' ✅ Snapshot iniziale = BackGround
             BgSnapshot = CType(PaintRobotBMP.Clone(), Bitmap)
@@ -242,10 +283,20 @@ Public Class Form1
 
         LabelNumCmds.Text = renderIndex.ToString ' num comandi eseguiti
 
+        ' Firma se vogliamo
+        If firmaImg IsNot Nothing Then
+            renderCtx.Graphics.DrawImage(firmaImg, 10, 10)
+        End If
+
         'If DEBUGOK Then PaintRobotBMP.Save("C:\Temp\debug_master.png")
+
+        'Comando Terminato
+        Execute = False
 
         StopRender()
     End Sub
+
+
 
     Private Sub RenderTimer_Tick(sender As Object, e As EventArgs) Handles RenderTimer.Tick
         ' CUORE DEL SISTEMA
@@ -289,6 +340,11 @@ Public Class Form1
             ButtonRenderRemain.Visible = False
         End If
 
+        ' Firma se vogliamo
+        If firmaImg IsNot Nothing Then
+            renderCtx.Graphics.DrawImage(firmaImg, 10, 10)
+        End If
+
         PictureBox1.Invalidate()   ' preview live
         PictureBox1.Update()
         Application.DoEvents()
@@ -302,18 +358,19 @@ Public Class Form1
             Return
         End If
 
-        ' STOP fluido
-        RenderTimer.Stop()
-
         swRender.Stop()
 
-        Debug.WriteLine("=== TEST PaintRobot ===")
-        Debug.WriteLine($"Tempo totale render: {swRender.ElapsedMilliseconds} ms")
-        Debug.WriteLine($"Comandi eseguiti: {renderIndex}")
+        If inTest Then
+            Debug.WriteLine("=== TEST PaintRobot ===")
+            Debug.WriteLine($"Tempo totale render: {swRender.ElapsedMilliseconds} ms")
+            Debug.WriteLine($"Comandi eseguiti: {renderIndex}")
+        End If
 
         rendering = False
         RedrawViewport()
         PictureBox1.Invalidate()
+        ' STOP fluido
+        RenderTimer.Stop()
     End Sub
 
     Private Sub RedrawMaster()
@@ -338,8 +395,10 @@ Public Class Form1
             Commands = Interpreter.CaricaComandiMultipli(TextBoxCommands.Text)
 
             ' Se ero tornato indietro con undo → cancello il futuro
-            If renderIndex < History.Count Then
-                History.RemoveRange(renderIndex, History.Count - renderIndex)
+            If renderIndex <> Nothing Then
+                If renderIndex < History.Count Then
+                    History.RemoveRange(renderIndex, History.Count - renderIndex)
+                End If
             End If
 
             History.AddRange(Commands)
@@ -744,6 +803,10 @@ Public Class Form1
             TextBoxCommands.SelectionLength = 0
             e.Handled = True
         End If
+        If e.KeyCode = Keys.Enter Then
+            e.SuppressKeyPress = True ' evita il beep della TextBox
+            ButtonCmd.PerformClick()  ' simula click sul pulsante Esegui
+        End If
     End Sub
 
     'Salva
@@ -758,11 +821,6 @@ Public Class Form1
         End Select
 
         Try
-            Dim dir = System.IO.Path.GetDirectoryName(path)
-            If Not System.IO.Directory.Exists(dir) Then
-                System.IO.Directory.CreateDirectory(dir)
-            End If
-
             bmp.Save(path, imgFormat)
             Debug.WriteLine("Bitmap salvata: " & path)
         Catch ex As Exception
@@ -780,32 +838,26 @@ Public Class Form1
 
     Private Sub ButtonSavePaintRobot_Click(sender As Object, e As EventArgs) Handles ButtonSavePaintRobot.Click
         ' Percorso e formato di default
-        Dim sfd As New SaveFileDialog
-        sfd.Title = "Salva L'immagine PaintRobot...."
-        sfd.FileName = "PaintRobot.png"
-        sfd.Filter = "Files PNG|*.png|Files Bitmap|*.bmp|Files Jpeg|*.jpg"
+        Dim sfd As New SaveFileDialog With {
+    .Title = "Salva l'immagine PaintRobot...",
+    .FileName = "PaintRobot.png",
+    .Filter = "Files PNG|*.png|Files Bitmap|*.bmp|Files Jpeg|*.jpg"
+}
 
-        If sfd.ShowDialog(Me) = DialogResult.OK Then
-            If sfd.FileName <> "" Then
+        If sfd.ShowDialog(Me) = DialogResult.OK AndAlso sfd.FileName <> "" Then
+            Dim percorso As String = sfd.FileName
+            Dim estensione As String = System.IO.Path.GetExtension(percorso).TrimStart("."c).ToUpperInvariant()
 
-                Dim percorso As String = sfd.FileName
+            Select Case estensione
+                Case "PNG", "JPG", "JPEG", "BMP"
+                    SalvaBitmapPercorso(PaintRobotBMP, percorso, estensione)
+                Case Else
+                    ' Se non riconosciuta, salva come PNG
+                    SalvaBitmapPercorso(PaintRobotBMP, percorso, "PNG")
+            End Select
 
-                Select Case sfd.FileName.Split(".").Last.ToLower
-                    Case "png"
-                        Dim formato As String = "PNG"
-                        SalvaBitmapPercorso(PaintRobotBMP, percorso, formato)
-                    Case "jpg"
-                        Dim formato As String = "JPG"
-                        SalvaBitmapPercorso(PaintRobotBMP, percorso, formato)
-                    Case "bmp"
-                        Dim formato As String = "BMP"
-                        SalvaBitmapPercorso(PaintRobotBMP, percorso, formato)
-                End Select
-                If System.IO.File.Exists(sfd.FileName) Then
-                    If FileLen(sfd.FileName) > 0 Then
-                        MsgBox("File salvato in " & sfd.FileName.ToString,, "\\(*_*)//  PaintRobot")
-                    End If
-                End If
+            If System.IO.File.Exists(percorso) AndAlso FileLen(percorso) > 0 Then
+                MsgBox("File salvato in " & percorso,, "\\(*_*)//  PaintRobot")
             End If
         End If
     End Sub
@@ -818,6 +870,9 @@ Public Class Form1
     Private Sub ButtonTest_Click(sender As Object, e As EventArgs) Handles ButtonTest.Click
         'Test - creazione di script
         Dim testScriptCommands As List(Of String) = New List(Of String)
+
+        'Test attivo
+        inTest = True
 
         ' Random
         Dim r As New Random
@@ -892,8 +947,6 @@ Public Class Form1
         Dim FormHelp As New Form2
         FormHelp.ShowDialog()
     End Sub
-
-
 End Class
 
 Public Class RobotCommand
@@ -1050,7 +1103,7 @@ Public Class RobotDrawer
     {"TRASLA", "TRASLA;x1,y1"},
     {"SALVA", "SALVA;Percorso;Formato(PNG,BMP,JPG)"},
     {"INVERTI", "INVERTI;Direzione;-Percentuale"},
-    {"RUOTA", "RUOTA;Gradi;-Percentuale"},
+    {"RUOTA", "RUOTA;Gradi"},
     {"APPUNTI", "APPUNTI"},
     {"COPIA", "COPIA;Percorso"},
     {"INCOLLA", "INCOLLA;x1,y1"},
@@ -1129,8 +1182,12 @@ Public Class RobotDrawer
                 Griglia(comando.Parametri, g)
             Case "TRASLA"
                 'Sposta tutto alla coordinata
-                'TRASLA;50;100
-                Trasla(comando.Parametri, g)
+                'TRASLA;50,100
+                'Trasla();100,50	Sposta la bitmap di 100 px a destra e 50 px In basso
+                'Trasla();-50,100	Sposta 50 px a sinistra e 100 px In basso
+                'Trasla();50%,25%	Sposta del 50% della larghezza e 25% dell'altezza
+                'Trasla();-50%,25%	Sposta verso sinistra di metà larghezza e 25% In basso
+                TraslaBitmap(comando.Parametri, g, ctx.Bitmap)
             Case "SALVA"
                 'SALVA;C:\Temp\immagine.png;PNG
                 'SALVA;C:\Temp\immagine.bmp;BMP
@@ -1239,6 +1296,14 @@ Public Class RobotDrawer
             Case "STELLA"
                 'STELLA;x1,y1;NumeroPunte;Diametro;Colore;Spessore
                 Stella(comando.Parametri, g)
+
+            Case "RUOTA"
+                'RUOTA;Gradi
+                RuotaBitmap(comando.Parametri, g, ctx.Bitmap)
+
+            Case "INVERTI"
+                'INVERTI;Direzione;-Percentuale
+                InvertiBitmap(comando.Parametri, g, ctx.Bitmap)
 
             Case Else
                 Debug.WriteLine($"Comando sconosciuto: {comando.Tipo}")
@@ -1585,6 +1650,63 @@ Public Class RobotDrawer
         g.TranslateTransform(Integer.Parse(p(0)), Integer.Parse(p(1)))
     End Sub
 
+    Private Sub TraslaBitmap_old(p As List(Of String), g As Graphics, bmp As Bitmap)
+        If p.Count < 1 Then Return
+        If bmp Is Nothing Then Return
+
+        ' p(0) = "100,100"
+        Dim coords() As String = p(0).Split(","c)
+        If coords.Length <> 2 Then Return
+
+        Dim dx As Integer
+        Dim dy As Integer
+        If Not Integer.TryParse(coords(0).Trim(), dx) Then Return
+        If Not Integer.TryParse(coords(1).Trim(), dy) Then Return
+
+        Dim Tbmp As Bitmap = bmp.Clone
+
+        ' Aggiorna canvas visibile
+        g.Clear(Color.White)
+        g.DrawImageUnscaled(Tbmp, dx, dy)
+    End Sub
+
+    Private Sub TraslaBitmap(p As List(Of String), g As Graphics, bmp As Bitmap)
+        If p.Count < 1 Then Return
+        If bmp Is Nothing Then Return
+
+        ' p(0) = "100,100" oppure "-50,25%" ecc.
+        Dim coords() As String = p(0).Split(","c)
+        If coords.Length <> 2 Then Return
+
+        Dim dx As Integer = 0
+        Dim dy As Integer = 0
+
+        ' Funzione helper per leggere pixel o percentuale
+        Dim ParseCoord = Function(s As String, maxVal As Integer) As Integer
+                             Dim str = s.Trim()
+                             If str.EndsWith("%") Then
+                                 Dim perc As Single
+                                 If Single.TryParse(str.TrimEnd("%"c), perc) Then
+                                     Return CInt(maxVal * perc / 100.0F)
+                                 End If
+                             Else
+                                 Dim val As Integer
+                                 If Integer.TryParse(str, val) Then Return val
+                             End If
+                             Return 0
+                         End Function
+
+        dx = ParseCoord(coords(0), bmp.Width)
+        dy = ParseCoord(coords(1), bmp.Height)
+
+        Dim Tbmp As Bitmap = bmp.Clone
+
+        ' Aggiorna canvas visibile
+        g.Clear(Color.White)
+        g.DrawImageUnscaled(Tbmp, dx, dy)
+    End Sub
+
+
     Private Sub SalvaBitmap(p As List(Of String), bmp As Bitmap)
         If p.Count < 2 Then Return
 
@@ -1625,25 +1747,28 @@ Public Class RobotDrawer
         End Try
     End Sub
 
+    Private Sub InvertiBitmap(p As List(Of String), g As Graphics, bmp As Bitmap)
+        If p.Count < 1 Then Return
 
-    Private Sub InvertiBitmap(p As List(Of String), bmp As Bitmap)
-        If p.Count < 2 Then Return
-
-        Dim tipo = p(0).ToUpper()
-
+        Dim direzione As String = p(0).ToUpper().Trim()   ' "H" / "V" o "ORIZZONTALE" / "VERTICALE"
         Dim inverso As Boolean = False
-        Dim perc = ParsePercentualeConSegno(p(1), inverso) / 100.0F
+        Dim perc As Single = 1.0F
 
-        Select Case tipo
-            Case "VERTICALE"
-                InvertiVerticale(bmp, perc, inverso)
+        If p.Count > 1 Then
+            perc = ParsePercentualeConSegno(p(1), inverso) / 100.0F
+        End If
 
-            Case "ORIZZONTALE"
-                InvertiOrizzontale(bmp, perc, inverso)
+        If direzione = "V" OrElse direzione = "VERTICALE" Then
+            InvertiVerticale(bmp, perc, inverso)
+        ElseIf direzione = "H" OrElse direzione = "ORIZZONTALE" Then
+            InvertiOrizzontale(bmp, perc, inverso)
+        Else
+            ' default verticale
+            InvertiVerticale(bmp, perc, inverso)
+        End If
 
-            Case Else
-                Debug.WriteLine("INVERTI sconosciuto: " & tipo)
-        End Select
+        ' Aggiorna render target
+        g.DrawImageUnscaled(bmp, 0, 0)
     End Sub
 
 
@@ -1744,62 +1869,60 @@ Public Class RobotDrawer
         Next
     End Sub
 
-    Private Sub RuotaBitmap(p As List(Of String), bmp As Bitmap)
+    Private Sub RuotaBitmap_old(p As List(Of String), g As Graphics, bmp As Bitmap)
+
         If p.Count < 1 Then Return
 
-        Dim angolo As Single = CSng(p(0))
+        Dim angolo As Single
+        If Not Single.TryParse(p(0), angolo) Then Return
 
-        Dim inverso As Boolean = False
-        Dim perc As Single = 1.0F
+        Dim w As Integer = bmp.Width
+        Dim h As Integer = bmp.Height
 
-        If p.Count > 1 Then
-            perc = ParsePercentualeConSegno(p(1), inverso) / 100.0F
-        End If
+        ' Bitmap buffer
+        Dim temp As Bitmap = bmp.Clone
+        Using temp
+            Using gTemp As Graphics = Graphics.FromImage(temp)
+                gTemp.Clear(Color.White) ' o sfondo CAD
 
-        If perc >= 1.0F Then
-            RuotaIntera(bmp, angolo)
-        Else
-            RuotaParziale(bmp, angolo, perc, inverso)
-        End If
+                gTemp.TranslateTransform(w / 2.0F, h / 2.0F)
+                gTemp.RotateTransform(angolo)
+                gTemp.TranslateTransform(-w / 2.0F, -h / 2.0F)
+
+                gTemp.DrawImage(bmp, 0, 0, w, h)
+                gTemp.ResetTransform()
+            End Using
+
+            ' Copia finale → bmp
+            g.DrawImage(temp, 0, 0)
+        End Using
     End Sub
 
-    Private Sub RuotaIntera(bmp As Bitmap, angolo As Single)
-        Select Case CInt(angolo Mod 360)
-            Case 90, -270
-                bmp.RotateFlip(RotateFlipType.Rotate90FlipNone)
-            Case 180, -180
-                bmp.RotateFlip(RotateFlipType.Rotate180FlipNone)
-            Case 270, -90
-                bmp.RotateFlip(RotateFlipType.Rotate270FlipNone)
-        End Select
-    End Sub
+    Private Sub RuotaBitmap(p As List(Of String), g As Graphics, bmp As Bitmap)
 
-    Private Sub RuotaParziale(bmp As Bitmap, angolo As Single, perc As Single, inverso As Boolean)
+        If p.Count < 1 Then Return
+
+        Dim angolo As Single
+        If Not Single.TryParse(p(0), Globalization.NumberStyles.Float,
+                           Globalization.CultureInfo.InvariantCulture, angolo) Then Return
+
         Dim w = bmp.Width
         Dim h = bmp.Height
 
-        Dim areaW = CInt(w * perc)
-        Dim startX = If(inverso, w - areaW, 0)
+        Using src As Bitmap = CType(bmp.Clone(), Bitmap)
 
-        Dim areaRect As New Rectangle(startX, 0, areaW, h)
+            g.ResetTransform()
+            g.Clear(Color.White)
 
-        Using temp As New Bitmap(areaRect.Width, areaRect.Height)
-            Using gTemp = Graphics.FromImage(temp)
-                gTemp.DrawImage(bmp, 0, 0, areaRect, GraphicsUnit.Pixel)
-            End Using
+            g.TranslateTransform(w / 2.0F, h / 2.0F)
+            g.RotateTransform(angolo)      ' ← 45.5 OK
+            g.TranslateTransform(-w / 2.0F, -h / 2.0F)
 
-            Using gTemp = Graphics.FromImage(temp)
-                gTemp.TranslateTransform(temp.Width / 2, temp.Height / 2)
-                gTemp.RotateTransform(angolo)
-                gTemp.TranslateTransform(-temp.Width / 2, -temp.Height / 2)
-                gTemp.DrawImage(temp, 0, 0)
-            End Using
-
-            Using g = Graphics.FromImage(bmp)
-                g.DrawImage(temp, areaRect)
-            End Using
+            g.DrawImage(src, 0, 0)
+            g.ResetTransform()
         End Using
     End Sub
+
 
     Private Sub SfumaBitmap(p As List(Of String), bmp As Bitmap)
         If p.Count < 3 Then Return
@@ -2053,6 +2176,30 @@ Public Class RobotDrawer
             Debug.WriteLine("Errore ridimensiona appunti: " & ex.Message)
         End Try
     End Sub
+
+    Private Sub RidimensionaBitmap(bmp As Bitmap, g As Graphics, nuovaLarghezza As Integer, nuovaAltezza As Integer)
+        If bmp Is Nothing Then Return
+        If nuovaLarghezza <= 0 OrElse nuovaAltezza <= 0 Then Return
+
+        ' Creiamo una nuova bitmap ridimensionata
+        Using temp As New Bitmap(nuovaLarghezza, nuovaAltezza)
+            Using gTemp As Graphics = Graphics.FromImage(temp)
+                gTemp.Clear(Color.White) ' sfondo CAD
+                gTemp.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+                gTemp.DrawImage(bmp, 0, 0, nuovaLarghezza, nuovaAltezza)
+            End Using
+
+            ' Copia finale sulla bitmap originale
+            Using gDst = Graphics.FromImage(bmp)
+                gDst.Clear(Color.White)
+                gDst.DrawImageUnscaled(temp, 0, 0)
+            End Using
+        End Using
+
+        ' Aggiorna canvas visibile
+        g.DrawImageUnscaled(bmp, 0, 0)
+    End Sub
+
 
     Private Sub Spline(p As List(Of String), g As Graphics)
         If p.Count < 4 Then Return ' almeno 3 punti + colore

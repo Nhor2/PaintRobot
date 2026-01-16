@@ -24,3 +24,4 @@ C:\Users\lordm\source\repos2\PaintRobot2\obj\Debug\PaintRobot.exe
 C:\Users\lordm\source\repos2\PaintRobot2\obj\Debug\PaintRobot.xml
 C:\Users\lordm\source\repos2\PaintRobot2\obj\Debug\PaintRobot.pdb
 C:\Users\lordm\source\repos2\PaintRobot2\obj\Debug\PaintRobot.Form2.resources
+C:\Users\lordm\source\repos2\PaintRobot2\obj\Debug\PaintRobot.exe.config
