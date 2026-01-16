@@ -53,6 +53,9 @@ STEP, STEP;n,
 ADDLIVELLO, ADDLIVELLO;NomeLivello,
 DELLIVELLO, DELLIVELLO;NomeLivello,
 RENLIVELLO, RENLIVELLO;NomeLivello;NuovoNomeLivello,
+GRIGLIAFULL;Lato;Colore,
+FRECCIA;x1,y1;x2,y2;Colore;Spessore,
+STELLA;x1,y1;NumeroPunte;Diametro;Colore;Spessore,
 SPIRALE, SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione,
 SINUSOIDE, SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
 
@@ -197,6 +200,19 @@ L’esempio seguente rimuove il livello LIVELLO1 dal disegno e i successivi coma
 L’esempio seguente rinomina il livello LIVELLO1 in LIVELLO2. Nessuna modifica su dove viene disegnato il comando successivo.
 
 		RENLIVELLO;LIVELLO1;LIVELLO2
+
+L’esempio seguente crea una griglia su tutto il disegno con passo 20 e colore Grigio.
+
+		GRIGLIAFULL;20;Grigio
+
+L’esempio seguente disegna una Freccia dal punto (0,0) al punto (100,100) di colore Nero e spessore 3 pixel.
+
+		FRECCIA;0,0;100,100;Nero;3
+
+L’esempio seguente disegna una Stella a 5 punte dal punto centrale (150,150) di diametro 100 di colore Nero e spessore 2 pixel.
+
+		STELLA;150,150;5;100;Nero;2
+
 
 
 
