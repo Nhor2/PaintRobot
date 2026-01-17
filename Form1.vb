@@ -83,6 +83,9 @@ Public Class Form1
     Private Commands As List(Of RobotCommand) 'Old interfaccia adesso non usato
     ' History dei comandi
     Private History As New List(Of RobotCommand) 'Storico
+    ' History di stringhe user-friendly
+    ' Storico testuale (UI / TXT)
+    Private HistoryString As New List(Of String)
 
     Private Execute As Boolean = False 'Sovraintende alla eseguzione dei comandi interfaccia
     Private Comando As String = ""
@@ -131,6 +134,14 @@ Public Class Form1
                 History.Clear()
                 History.AddRange(Comandi)
 
+                ' Linee Script
+                Dim ComandiStringa As List(Of String) = Interpreter.CaricaLineeScript(ofd.FileName)
+                HistoryString.Clear()
+                HistoryString.AddRange(ComandiStringa)
+
+                ' ListBox Comandi
+                AggiornaListaComandiStringa()
+
                 Dim HistoryIndex = History.Count   ' 👈 TUTTI attivi
 
                 numComandi = Comandi.Count - 1
@@ -162,7 +173,38 @@ Public Class Form1
 
         ButtonTest.Location = New Point(ButtonSavePaintRobot.Right + 20, ButtonSavePaintRobot.Location.Y)
         ButtonHistory.Location = New Point(ButtonSavePaintRobot.Location.X + 1, 32)
+
+        ' Layout principale
+        PanelTop.Dock = DockStyle.Top
+        PanelLeft.Dock = DockStyle.Left
+
+        LstComandi.Dock = DockStyle.Bottom
+        LstComandi.Height = 60
+        LstComandi.DrawMode = DrawMode.OwnerDrawFixed
+        'LstComandi.ItemHeight = 30   ' altezza riga
+
+        PictureBox1.Dock = DockStyle.Fill
     End Sub
+
+    Private Sub AggiornaListaComandiStringa()
+        'Aggiunge i comandi stringa alla listbox
+        LstComandi.BeginUpdate()
+        LstComandi.Items.Clear()
+
+        ' Popola senza Indice
+        'For Each s In HistoryString
+        'LstComandi.Items.Add(s)
+        'Next
+
+        ' Popola con Indice
+        For i As Integer = 0 To HistoryString.Count - 1
+            ' Aggiungi numero + comando
+            LstComandi.Items.Add($"{i + 1}: {HistoryString(i)}")
+        Next
+
+        LstComandi.EndUpdate()
+    End Sub
+
 
     Private Sub StartRender()
         ' avvio del timer Rendering
@@ -273,6 +315,8 @@ Public Class Form1
         For Each Comando As RobotCommand In Comandi
             Drawer.Esegui(Comando, renderCtx)
 
+            EvidenziaComando(renderIndex)
+
             renderIndex += 1
             ProgressBar1.Value += 1
             Debug.WriteLine("RenderIndex " & renderIndex.ToString)
@@ -296,8 +340,6 @@ Public Class Form1
         StopRender()
     End Sub
 
-
-
     Private Sub RenderTimer_Tick(sender As Object, e As EventArgs) Handles RenderTimer.Tick
         ' CUORE DEL SISTEMA
         If PaintRobotAlted OrElse renderIndex >= Comandi.Count Then
@@ -316,6 +358,9 @@ Public Class Form1
             End If
 
             Drawer.Esegui(Comandi(renderIndex), renderCtx)
+
+            EvidenziaComando(renderIndex)
+
             renderIndex += 1
             ProgressBar1.Value = Math.Min(renderIndex, ProgressBar1.Maximum)
 
@@ -373,6 +418,20 @@ Public Class Form1
         RenderTimer.Stop()
     End Sub
 
+    Public Sub EvidenziaComando(index As Integer)
+        'Evidenzia il comando eseguito nella Listbox
+        If index < 0 OrElse index >= LstComandi.Items.Count Then Return
+
+        LstComandi.SelectedIndex = index
+
+        ' Centra la riga selezionata nella ListBox
+        Dim visibleItems As Integer = Math.Max(1, LstComandi.ClientSize.Height \ LstComandi.ItemHeight)
+        Dim top As Integer = Math.Max(0, index - (visibleItems \ 2))
+
+        LstComandi.TopIndex = top
+    End Sub
+
+
     Private Sub RedrawMaster()
         ' Copio picbmp sul Master PaintRobotBMP
         Using g As Graphics = Graphics.FromImage(PaintRobotBMP)
@@ -392,6 +451,7 @@ Public Class Form1
             Execute = True
             PaintRobotAlted = False
 
+            ' Crea la lista di RobotCommands
             Commands = Interpreter.CaricaComandiMultipli(TextBoxCommands.Text)
 
             ' Se ero tornato indietro con undo → cancello il futuro
@@ -401,6 +461,14 @@ Public Class Form1
                 End If
             End If
 
+            ' Crea la lista di comandi stringa da visualizzare
+            Dim CommandsStringa As List(Of String) = Interpreter.CaricaComandiStringaMultipli(TextBoxCommands.Text)
+            HistoryString.AddRange(CommandsStringa)
+
+            ' ListBox Comandi
+            AggiornaListaComandiStringa()
+
+            ' Aggiorna la History
             History.AddRange(Commands)
 
             If Commands Is Nothing OrElse Commands.Count = 0 Then Return
@@ -663,6 +731,14 @@ Public Class Form1
 
             ' Aggiunge i comandi alla History
             History.AddRange(Comandi)
+
+            ' Linee Script
+            Dim ComandiStringa As List(Of String) = Interpreter.CaricaLineeScript(ofd.FileName)
+            HistoryString.Clear()
+            HistoryString.AddRange(ComandiStringa)
+
+            ' ListBox Comandi
+            AggiornaListaComandiStringa()
 
             ' Imposta la progressBar
             numComandi = newCommands.Count - 1
@@ -947,6 +1023,42 @@ Public Class Form1
         Dim FormHelp As New Form2
         FormHelp.ShowDialog()
     End Sub
+
+    'HISTORY
+    Private Sub ButtonEditHistory_Click(sender As Object, e As EventArgs) Handles ButtonEditHistory.Click
+
+    End Sub
+
+    ' Lista Comandi Stringa
+    Private Sub LstComandi_DrawItem(sender As Object, e As DrawItemEventArgs) Handles LstComandi.DrawItem
+        If e.Index < 0 Then Return
+
+        Dim lb As ListBox = DirectCast(sender, ListBox)
+        Dim text As String = lb.Items(e.Index).ToString()
+
+        ' Colore riga: verde se selezionata, bianco se no
+        Dim backColor As Color
+        Dim foreColor As Color = Color.White
+
+        If (e.State And DrawItemState.Selected) = DrawItemState.Selected Then
+            backColor = Color.Green
+        Else
+            backColor = Color.Black
+        End If
+
+        ' Disegna lo sfondo
+        Using b As New SolidBrush(backColor)
+            e.Graphics.FillRectangle(b, e.Bounds)
+        End Using
+
+        ' Disegna il testo
+        Using f As New SolidBrush(foreColor)
+            e.Graphics.DrawString(text, lb.Font, f, e.Bounds.Location)
+        End Using
+
+        ' Disegna il focus rectangle (se necessario)
+        e.DrawFocusRectangle()
+    End Sub
 End Class
 
 Public Class RobotCommand
@@ -997,6 +1109,21 @@ Public Class RobotInterpreter
         Return comandi
     End Function
 
+    Public Function CaricaLineeScript(percorso As String) As List(Of String)
+        Dim comandiStringa As New List(Of String)
+
+        For Each riga In IO.File.ReadAllLines(percorso)
+            Dim line = riga.Trim()
+
+            ' # Commento, [ Aggiunge livello
+            If line = "" OrElse line.StartsWith("#") Then Continue For
+
+            comandiStringa.Add(line)
+        Next
+
+        Return comandiStringa
+    End Function
+
     Public Function CaricaComando(comando As String) As List(Of RobotCommand)
         Dim comandi As New List(Of RobotCommand)
 
@@ -1037,6 +1164,28 @@ Public Class RobotInterpreter
             Dim parametri = parti.Skip(1).ToList()
 
             lista.Add(New RobotCommand(tipo, parametri))
+        Next
+
+        Return lista
+    End Function
+
+    Public Function CaricaComandiStringaMultipli(input As String) As List(Of String)
+        ' Per comandi multipli da linea singola
+        Dim lista As New List(Of String)
+
+        If String.IsNullOrWhiteSpace(input) Then Return lista
+
+        ' separa per +
+        Dim blocchi = input.Split("+"c)
+
+        For Each blocco In blocchi
+
+            Dim line = blocco.Trim()
+
+            ' Commento
+            If line = "" OrElse line.StartsWith("#") Then Continue For
+
+            lista.Add(line)
         Next
 
         Return lista

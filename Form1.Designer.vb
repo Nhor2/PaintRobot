@@ -48,14 +48,16 @@ Partial Class Form1
         Me.ButtonCmd = New System.Windows.Forms.Button()
         Me.ButtonMinimize = New System.Windows.Forms.Button()
         Me.ButtonClose = New System.Windows.Forms.Button()
+        Me.PictureBoxPR = New System.Windows.Forms.PictureBox()
         Me.PanelLeft = New System.Windows.Forms.Panel()
+        Me.ButtonEditHistory = New System.Windows.Forms.Button()
         Me.ButtonHelp = New System.Windows.Forms.Button()
         Me.LabelCoord = New System.Windows.Forms.Label()
-        Me.PictureBoxPR = New System.Windows.Forms.PictureBox()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
+        Me.LstComandi = New System.Windows.Forms.ListBox()
         Me.PanelTop.SuspendLayout()
-        Me.PanelLeft.SuspendLayout()
         CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.PanelLeft.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -370,15 +372,37 @@ Partial Class Form1
         Me.ButtonClose.Text = "X"
         Me.ButtonClose.UseVisualStyleBackColor = False
         '
+        'PictureBoxPR
+        '
+        Me.PictureBoxPR.Image = Global.PaintRobot.My.Resources.Resources.PaintRobot
+        Me.PictureBoxPR.Location = New System.Drawing.Point(1259, -10)
+        Me.PictureBoxPR.Name = "PictureBoxPR"
+        Me.PictureBoxPR.Size = New System.Drawing.Size(670, 86)
+        Me.PictureBoxPR.TabIndex = 19
+        Me.PictureBoxPR.TabStop = False
+        '
         'PanelLeft
         '
         Me.PanelLeft.BackColor = System.Drawing.Color.Gray
+        Me.PanelLeft.Controls.Add(Me.ButtonEditHistory)
         Me.PanelLeft.Controls.Add(Me.ButtonHelp)
         Me.PanelLeft.Dock = System.Windows.Forms.DockStyle.Left
         Me.PanelLeft.Location = New System.Drawing.Point(0, 60)
         Me.PanelLeft.Name = "PanelLeft"
         Me.PanelLeft.Size = New System.Drawing.Size(60, 570)
         Me.PanelLeft.TabIndex = 2
+        '
+        'ButtonEditHistory
+        '
+        Me.ButtonEditHistory.BackColor = System.Drawing.Color.Black
+        Me.ButtonEditHistory.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonEditHistory.ForeColor = System.Drawing.Color.White
+        Me.ButtonEditHistory.Location = New System.Drawing.Point(2, 50)
+        Me.ButtonEditHistory.Name = "ButtonEditHistory"
+        Me.ButtonEditHistory.Size = New System.Drawing.Size(56, 25)
+        Me.ButtonEditHistory.TabIndex = 20
+        Me.ButtonEditHistory.Text = "History"
+        Me.ButtonEditHistory.UseVisualStyleBackColor = False
         '
         'ButtonHelp
         '
@@ -402,15 +426,6 @@ Partial Class Form1
         Me.LabelCoord.TabIndex = 3
         Me.LabelCoord.Text = "X,Y"
         '
-        'PictureBoxPR
-        '
-        Me.PictureBoxPR.Image = Global.PaintRobot.My.Resources.Resources.PaintRobot
-        Me.PictureBoxPR.Location = New System.Drawing.Point(1259, -10)
-        Me.PictureBoxPR.Name = "PictureBoxPR"
-        Me.PictureBoxPR.Size = New System.Drawing.Size(670, 86)
-        Me.PictureBoxPR.TabIndex = 19
-        Me.PictureBoxPR.TabStop = False
-        '
         'PictureBox1
         '
         Me.PictureBox1.BackColor = System.Drawing.Color.White
@@ -420,11 +435,22 @@ Partial Class Form1
         Me.PictureBox1.TabIndex = 0
         Me.PictureBox1.TabStop = False
         '
+        'LstComandi
+        '
+        Me.LstComandi.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LstComandi.FormattingEnabled = True
+        Me.LstComandi.ItemHeight = 24
+        Me.LstComandi.Location = New System.Drawing.Point(66, 507)
+        Me.LstComandi.Name = "LstComandi"
+        Me.LstComandi.Size = New System.Drawing.Size(549, 28)
+        Me.LstComandi.TabIndex = 4
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1548, 630)
+        Me.Controls.Add(Me.LstComandi)
         Me.Controls.Add(Me.LabelCoord)
         Me.Controls.Add(Me.PanelLeft)
         Me.Controls.Add(Me.PanelTop)
@@ -435,8 +461,8 @@ Partial Class Form1
         Me.Text = "PaintRobot"
         Me.PanelTop.ResumeLayout(False)
         Me.PanelTop.PerformLayout()
-        Me.PanelLeft.ResumeLayout(False)
         CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.PanelLeft.ResumeLayout(False)
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -473,4 +499,6 @@ Partial Class Form1
     Friend WithEvents ButtonHistory As Button
     Friend WithEvents ButtonRenderRemain As Button
     Friend WithEvents ButtonCentroMondo As Button
+    Friend WithEvents ButtonEditHistory As Button
+    Friend WithEvents LstComandi As ListBox
 End Class
