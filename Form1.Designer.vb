@@ -55,6 +55,7 @@ Partial Class Form1
         Me.LabelCoord = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.LstComandi = New System.Windows.Forms.ListBox()
+        Me.ButtonScript = New System.Windows.Forms.Button()
         Me.PanelTop.SuspendLayout()
         CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelLeft.SuspendLayout()
@@ -384,6 +385,7 @@ Partial Class Form1
         'PanelLeft
         '
         Me.PanelLeft.BackColor = System.Drawing.Color.Gray
+        Me.PanelLeft.Controls.Add(Me.ButtonScript)
         Me.PanelLeft.Controls.Add(Me.ButtonEditHistory)
         Me.PanelLeft.Controls.Add(Me.ButtonHelp)
         Me.PanelLeft.Dock = System.Windows.Forms.DockStyle.Left
@@ -445,6 +447,18 @@ Partial Class Form1
         Me.LstComandi.Size = New System.Drawing.Size(549, 28)
         Me.LstComandi.TabIndex = 4
         '
+        'ButtonScript
+        '
+        Me.ButtonScript.BackColor = System.Drawing.Color.Black
+        Me.ButtonScript.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonScript.ForeColor = System.Drawing.Color.White
+        Me.ButtonScript.Location = New System.Drawing.Point(2, 85)
+        Me.ButtonScript.Name = "ButtonScript"
+        Me.ButtonScript.Size = New System.Drawing.Size(56, 25)
+        Me.ButtonScript.TabIndex = 21
+        Me.ButtonScript.Text = "Script"
+        Me.ButtonScript.UseVisualStyleBackColor = False
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -501,4 +515,5 @@ Partial Class Form1
     Friend WithEvents ButtonCentroMondo As Button
     Friend WithEvents ButtonEditHistory As Button
     Friend WithEvents LstComandi As ListBox
+    Friend WithEvents ButtonScript As Button
 End Class

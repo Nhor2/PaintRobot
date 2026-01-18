@@ -49,7 +49,7 @@ Public Class Form1
 
     'Timer-Driven Renderer
     Private WithEvents RenderTimer As New Windows.Forms.Timer With {.Interval = 16} ' ~60 FPS
-    Private renderIndex As Integer = Nothing
+    Private renderIndex As Integer = -1
     Private rendering As Boolean = False
     Private renderGraphics As Graphics = Nothing
     Private renderCtx As RobotContext = Nothing
@@ -185,26 +185,6 @@ Public Class Form1
 
         PictureBox1.Dock = DockStyle.Fill
     End Sub
-
-    Private Sub AggiornaListaComandiStringa()
-        'Aggiunge i comandi stringa alla listbox
-        LstComandi.BeginUpdate()
-        LstComandi.Items.Clear()
-
-        ' Popola senza Indice
-        'For Each s In HistoryString
-        'LstComandi.Items.Add(s)
-        'Next
-
-        ' Popola con Indice
-        For i As Integer = 0 To HistoryString.Count - 1
-            ' Aggiungi numero + comando
-            LstComandi.Items.Add($"{i + 1}: {HistoryString(i)}")
-        Next
-
-        LstComandi.EndUpdate()
-    End Sub
-
 
     Private Sub StartRender()
         ' avvio del timer Rendering
@@ -350,6 +330,9 @@ Public Class Form1
         ' Una variabile per comandare anche la pausa STEP;0
         Dim commandsHERETick As Integer = Form1.commandsPerTick
 
+        ' Inizializza l'indice principale
+        If renderIndex = -1 Then renderIndex = 0
+
         ' ciclo esecuzione
         For i = 1 To commandsHERETick
             If renderIndex >= Comandi.Count OrElse PaintRobotAlted Then
@@ -431,7 +414,6 @@ Public Class Form1
         LstComandi.TopIndex = top
     End Sub
 
-
     Private Sub RedrawMaster()
         ' Copio picbmp sul Master PaintRobotBMP
         Using g As Graphics = Graphics.FromImage(PaintRobotBMP)
@@ -454,11 +436,13 @@ Public Class Form1
             ' Crea la lista di RobotCommands
             Commands = Interpreter.CaricaComandiMultipli(TextBoxCommands.Text)
 
-            ' Se ero tornato indietro con undo → cancello il futuro
-            If renderIndex <> Nothing Then
-                If renderIndex < History.Count Then
-                    History.RemoveRange(renderIndex, History.Count - renderIndex)
-                End If
+            ' Inizializza l'indice principale
+            If renderIndex = -1 Then renderIndex = 0
+
+            ' 🔥 UNDO: elimina il futuro (comandi + stringhe)
+            If renderIndex >= 0 AndAlso renderIndex < History.Count Then
+                History.RemoveRange(renderIndex, History.Count - renderIndex)
+                HistoryString.RemoveRange(renderIndex, HistoryString.Count - renderIndex)
             End If
 
             ' Crea la lista di comandi stringa da visualizzare
@@ -476,6 +460,25 @@ Public Class Form1
             ' Renderizza il comando
             Render(Commands)
         End If
+    End Sub
+
+    Private Sub AggiornaListaComandiStringa()
+        'Aggiunge i comandi stringa alla listbox
+        LstComandi.BeginUpdate()
+        LstComandi.Items.Clear()
+
+        ' Popola senza Indice
+        'For Each s In HistoryString
+        'LstComandi.Items.Add(s)
+        'Next
+
+        ' Popola con Indice
+        For i As Integer = 0 To HistoryString.Count - 1
+            ' Aggiungi numero + comando
+            LstComandi.Items.Add($"{i + 1}: {HistoryString(i)}")
+        Next
+
+        LstComandi.EndUpdate()
     End Sub
 
     Private Sub RenderAllHistory()
@@ -1059,6 +1062,49 @@ Public Class Form1
         ' Disegna il focus rectangle (se necessario)
         e.DrawFocusRectangle()
     End Sub
+
+    'SCRIPT
+    Private Sub ButtonScript_Click(sender As Object, e As EventArgs) Handles ButtonScript.Click
+        If HistoryString Is Nothing OrElse HistoryString.Count = 0 Then
+            MessageBox.Show("Nessun comando da salvare.")
+            Return
+        End If
+
+        ' Mostra la finestra per Titolo e Autore
+        Using formInput As New FormTitoloAutore()
+            If formInput.ShowDialog() <> DialogResult.OK Then
+                ' Se l'utente annulla
+                Return
+            End If
+
+            Dim titoloDisegno As String = formInput.Titolo
+            Dim autore As String = formInput.Autore
+
+            ' Salva file
+            Using sfd As New SaveFileDialog()
+                sfd.Filter = "Script PaintRobot (*.txt)|*.txt|Tutti i file (*.*)|*.*"
+                sfd.Title = "Salva script"
+
+                If sfd.ShowDialog() = DialogResult.OK Then
+                    Dim dataOra As String = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")
+                    Dim scriptFinale As New List(Of String)
+
+                    scriptFinale.Add("# ===============================")
+                    scriptFinale.Add("# Titolo : " & titoloDisegno)
+                    scriptFinale.Add("# Autore : " & autore)
+                    scriptFinale.Add("# Data   : " & dataOra)
+                    scriptFinale.Add("# PaintRobot \\(*_*)//")
+                    scriptFinale.Add("# ===============================")
+                    scriptFinale.Add("")
+
+                    scriptFinale.AddRange(HistoryString)
+                    IO.File.WriteAllLines(sfd.FileName, scriptFinale)
+                End If
+            End Using
+        End Using
+    End Sub
+
+
 End Class
 
 Public Class RobotCommand
