@@ -95,6 +95,12 @@
     <Compile Include="FormTitoloAutore.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="HistoryEditorForm.Designer.vb">
+      <DependentUpon>HistoryEditorForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryEditorForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -120,6 +126,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormTitoloAutore.resx">
       <DependentUpon>FormTitoloAutore.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HistoryEditorForm.resx">
+      <DependentUpon>HistoryEditorForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -151,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="PaintRobot_icon_64.ico" />
+    <None Include="Resources\FloppyS.png" />
     <None Include="Resources\PaintRobotFirma.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

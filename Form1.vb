@@ -80,7 +80,7 @@ Public Class Form1
 
     'PaintRobot
     Private Comandi As List(Of RobotCommand) 'Da script
-    Private Commands As List(Of RobotCommand) 'Old interfaccia adesso non usato
+    Private Commands As List(Of RobotCommand) 'Interfaccia
     ' History dei comandi
     Private History As New List(Of RobotCommand) 'Storico
     ' History di stringhe user-friendly
@@ -1029,8 +1029,21 @@ Public Class Form1
 
     'HISTORY
     Private Sub ButtonEditHistory_Click(sender As Object, e As EventArgs) Handles ButtonEditHistory.Click
+        ' Apre la finestra fi History
+        If History Is Nothing OrElse History.Count = 0 Then Return
 
+        Using historyForm As New HistoryEditorForm(History, HistoryString)
+            If historyForm.ShowDialog() = DialogResult.OK Then
+
+                History = historyForm.EditedHistory
+                HistoryString = historyForm.EditedHistoryString
+
+                'Ridisegna tutto
+                RenderAllHistory()
+            End If
+        End Using
     End Sub
+
 
     ' Lista Comandi Stringa
     Private Sub LstComandi_DrawItem(sender As Object, e As DrawItemEventArgs) Handles LstComandi.DrawItem
@@ -1084,6 +1097,7 @@ Public Class Form1
             Using sfd As New SaveFileDialog()
                 sfd.Filter = "Script PaintRobot (*.txt)|*.txt|Tutti i file (*.*)|*.*"
                 sfd.Title = "Salva script"
+                sfd.FileName = "PaintRobotScript.txt"
 
                 If sfd.ShowDialog() = DialogResult.OK Then
                     Dim dataOra As String = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")

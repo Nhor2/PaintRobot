@@ -22,6 +22,11 @@ PaintRobot
   ricerche di risorse eseguite utilizzando questa classe di risorse fortemente tipizzata.
 </summary>
 </member>
+<member name="P:PaintRobot.My.Resources.Resources.FloppyS">
+<summary>
+  Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
+</summary>
+</member>
 <member name="P:PaintRobot.My.Resources.Resources.PaintRobot">
 <summary>
   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
