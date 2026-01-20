@@ -22,6 +22,7 @@ Partial Class Form1
     'Non modificarla mediante l'editor del codice.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.PanelTop = New System.Windows.Forms.Panel()
         Me.ButtonCentroMondo = New System.Windows.Forms.Button()
@@ -50,12 +51,14 @@ Partial Class Form1
         Me.ButtonClose = New System.Windows.Forms.Button()
         Me.PictureBoxPR = New System.Windows.Forms.PictureBox()
         Me.PanelLeft = New System.Windows.Forms.Panel()
+        Me.ButtonAttivaListBox = New System.Windows.Forms.Button()
+        Me.ButtonScript = New System.Windows.Forms.Button()
         Me.ButtonEditHistory = New System.Windows.Forms.Button()
         Me.ButtonHelp = New System.Windows.Forms.Button()
         Me.LabelCoord = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.LstComandi = New System.Windows.Forms.ListBox()
-        Me.ButtonScript = New System.Windows.Forms.Button()
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.PanelTop.SuspendLayout()
         CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelLeft.SuspendLayout()
@@ -385,6 +388,7 @@ Partial Class Form1
         'PanelLeft
         '
         Me.PanelLeft.BackColor = System.Drawing.Color.Gray
+        Me.PanelLeft.Controls.Add(Me.ButtonAttivaListBox)
         Me.PanelLeft.Controls.Add(Me.ButtonScript)
         Me.PanelLeft.Controls.Add(Me.ButtonEditHistory)
         Me.PanelLeft.Controls.Add(Me.ButtonHelp)
@@ -393,6 +397,30 @@ Partial Class Form1
         Me.PanelLeft.Name = "PanelLeft"
         Me.PanelLeft.Size = New System.Drawing.Size(60, 570)
         Me.PanelLeft.TabIndex = 2
+        '
+        'ButtonAttivaListBox
+        '
+        Me.ButtonAttivaListBox.BackColor = System.Drawing.Color.DarkOrchid
+        Me.ButtonAttivaListBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonAttivaListBox.ForeColor = System.Drawing.Color.White
+        Me.ButtonAttivaListBox.Location = New System.Drawing.Point(2, 120)
+        Me.ButtonAttivaListBox.Name = "ButtonAttivaListBox"
+        Me.ButtonAttivaListBox.Size = New System.Drawing.Size(56, 25)
+        Me.ButtonAttivaListBox.TabIndex = 22
+        Me.ButtonAttivaListBox.Text = "Lista"
+        Me.ButtonAttivaListBox.UseVisualStyleBackColor = False
+        '
+        'ButtonScript
+        '
+        Me.ButtonScript.BackColor = System.Drawing.Color.Black
+        Me.ButtonScript.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonScript.ForeColor = System.Drawing.Color.White
+        Me.ButtonScript.Location = New System.Drawing.Point(2, 85)
+        Me.ButtonScript.Name = "ButtonScript"
+        Me.ButtonScript.Size = New System.Drawing.Size(56, 25)
+        Me.ButtonScript.TabIndex = 21
+        Me.ButtonScript.Text = "Script"
+        Me.ButtonScript.UseVisualStyleBackColor = False
         '
         'ButtonEditHistory
         '
@@ -446,18 +474,6 @@ Partial Class Form1
         Me.LstComandi.Name = "LstComandi"
         Me.LstComandi.Size = New System.Drawing.Size(549, 28)
         Me.LstComandi.TabIndex = 4
-        '
-        'ButtonScript
-        '
-        Me.ButtonScript.BackColor = System.Drawing.Color.Black
-        Me.ButtonScript.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonScript.ForeColor = System.Drawing.Color.White
-        Me.ButtonScript.Location = New System.Drawing.Point(2, 85)
-        Me.ButtonScript.Name = "ButtonScript"
-        Me.ButtonScript.Size = New System.Drawing.Size(56, 25)
-        Me.ButtonScript.TabIndex = 21
-        Me.ButtonScript.Text = "Script"
-        Me.ButtonScript.UseVisualStyleBackColor = False
         '
         'Form1
         '
@@ -516,4 +532,6 @@ Partial Class Form1
     Friend WithEvents ButtonEditHistory As Button
     Friend WithEvents LstComandi As ListBox
     Friend WithEvents ButtonScript As Button
+    Friend WithEvents ButtonAttivaListBox As Button
+    Friend WithEvents ToolTip1 As ToolTip
 End Class

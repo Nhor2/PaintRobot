@@ -187,6 +187,26 @@ Public Class Form1
         'LstComandi.ItemHeight = 30   ' altezza riga
 
         PictureBox1.Dock = DockStyle.Fill
+
+        ToolTip1.IsBalloon = True
+        ToolTip1.ToolTipIcon = ToolTipIcon.Info
+        ToolTip1.ToolTipTitle = "PaintRobot CAD"
+        ToolTip1.ShowAlways = True
+
+        ToolTip1.SetToolTip(ButtonCmd, "Eseguire il comando CAD scritto o dettato")
+        ToolTip1.SetToolTip(ButtonStop, "Interrompere il rendering in corso")
+        ToolTip1.SetToolTip(TextBoxCommands, "Scrivere o dettare un comando CAD")
+        ToolTip1.SetToolTip(PictureBox1, "Area di disegno CAD")
+        ToolTip1.SetToolTip(ButtonContinueRendering, "Eseguire il comando CAD successivo")
+        ToolTip1.SetToolTip(ButtonRenderRemain, "Eseguire i restanti comandi CAD")
+        ToolTip1.SetToolTip(ButtonHelp, "Aprire la finestra di aiuto")
+        ToolTip1.SetToolTip(ButtonScript, "Salvare lo script generato dai comandi PaintRobot")
+        ToolTip1.SetToolTip(ButtonEditHistory, "Aprire la finestra della History comandi")
+        ToolTip1.SetToolTip(ButtonAttivaListBox, "Attivare o disattivare la lista comandi History")
+        ToolTip1.SetToolTip(ButtonHistory, "Renderizzare tutti i comandi CAD dalla History")
+        ToolTip1.SetToolTip(ButtonTest, "Testare PaintRobot con comandi casuali")
+        ToolTip1.SetToolTip(ButtonSavePaintRobot, "Salvare l'area di disegno in 10k")
+
     End Sub
 
     Private Sub StartRender()
@@ -298,7 +318,7 @@ Public Class Form1
         For Each Comando As RobotCommand In Comandi
             Drawer.Esegui(Comando, renderCtx)
 
-            EvidenziaComando(renderIndex)
+            If ListaComandiStringa Then EvidenziaComando(renderIndex)
 
             renderIndex += 1
             ProgressBar1.Value += 1
@@ -345,7 +365,7 @@ Public Class Form1
 
             Drawer.Esegui(Comandi(renderIndex), renderCtx)
 
-            EvidenziaComando(renderIndex)
+            If ListaComandiStringa Then EvidenziaComando(renderIndex)
 
             renderIndex += 1
             ProgressBar1.Value = Math.Min(renderIndex, ProgressBar1.Maximum)
@@ -550,7 +570,6 @@ Public Class Form1
     Private Sub ButtonHistory_Click(sender As Object, e As EventArgs) Handles ButtonHistory.Click
         'Renderizza tutta la History
         If History.Count = 0 Then Return
-        MsgBox("H" & History.ToList.ToString)
 
         StopRender()
 
@@ -772,6 +791,9 @@ Public Class Form1
 
             ' ListBox Comandi
             AggiornaListaComandiStringa()
+
+            ' Init renderindex
+            If renderIndex = -1 Then renderIndex = 0
 
             ' Imposta la progressBar
             numComandi = newCommands.Count - 1
@@ -1104,6 +1126,17 @@ Public Class Form1
 
         ' Disegna il focus rectangle (se necessario)
         e.DrawFocusRectangle()
+    End Sub
+
+    ' ATTIVA DISATTIVA LISTA COMANDI STRINGA
+    Private ListaComandiStringa As Boolean = True
+    Private Sub ButtonAttivaListBox_Click(sender As Object, e As EventArgs) Handles ButtonAttivaListBox.Click
+        ListaComandiStringa = Not ListaComandiStringa
+        If ListaComandiStringa Then
+            ButtonAttivaListBox.BackColor = Color.DarkOrchid
+        Else
+            ButtonAttivaListBox.BackColor = Color.Black
+        End If
     End Sub
 
     'SCRIPT
