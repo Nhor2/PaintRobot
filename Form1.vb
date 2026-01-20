@@ -196,7 +196,6 @@ Public Class Form1
         ToolTip1.SetToolTip(ButtonCmd, "Eseguire il comando CAD scritto o dettato")
         ToolTip1.SetToolTip(ButtonStop, "Interrompere il rendering in corso")
         ToolTip1.SetToolTip(TextBoxCommands, "Scrivere o dettare un comando CAD")
-        ToolTip1.SetToolTip(PictureBox1, "Area di disegno CAD")
         ToolTip1.SetToolTip(ButtonContinueRendering, "Eseguire il comando CAD successivo")
         ToolTip1.SetToolTip(ButtonRenderRemain, "Eseguire i restanti comandi CAD")
         ToolTip1.SetToolTip(ButtonHelp, "Aprire la finestra di aiuto")
@@ -206,6 +205,16 @@ Public Class Form1
         ToolTip1.SetToolTip(ButtonHistory, "Renderizzare tutti i comandi CAD dalla History")
         ToolTip1.SetToolTip(ButtonTest, "Testare PaintRobot con comandi casuali")
         ToolTip1.SetToolTip(ButtonSavePaintRobot, "Salvare l'area di disegno in 10k")
+        ToolTip1.SetToolTip(ButtonClose, "Chiudere PaintRobot")
+        ToolTip1.SetToolTip(ButtonMinimize, "Ridurre a icona PaintRobot")
+        ToolTip1.SetToolTip(ButtonLeft, "Spostare il disegno a Sinistra")
+        ToolTip1.SetToolTip(ButtonRight, "Spostare il disegno a Destra")
+        ToolTip1.SetToolTip(ButtonUp, "Spostare il disegno in Su")
+        ToolTip1.SetToolTip(ButtonDown, "Spostare il disegno in Giu")
+        ToolTip1.SetToolTip(ButtonOrigin, "Tonare al punto 0,0")
+        ToolTip1.SetToolTip(ButtonCentroMondo, "Spostare la vista al centro")
+        ToolTip1.SetToolTip(ButtonZoomIn, "Aumentare lo Zoom disegno")
+        ToolTip1.SetToolTip(ButtonOut, "Diminuire lo Zoom disegno")
 
     End Sub
 
