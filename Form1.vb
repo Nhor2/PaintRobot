@@ -460,45 +460,48 @@ Public Class Form1
             Return
         End If
 
-        If TextBoxCommands.Text <> "" Then
-            ' 🔥 1. Normalizza il testo dettato
-            Dim testoNormalizzato As String = NormalizeSpeechInput(TextBoxCommands.Text.Trim)
-            ' 🔥 2. Normalizza le coordinate e rimuove gli spazi
-            ' Ma puoi usare anche NormalizzaStruttura()
-            Dim SpaziNormalizzati As String = NormalizzaCoordinate(testoNormalizzato)
-            testoNormalizzato = SpaziNormalizzati.Replace(" ", "")
+        If TextBoxCommands.Text = "" Then Return
 
-            Comando = testoNormalizzato
-            Execute = True
-            PaintRobotAlted = False
+        ' 🔥 1. Normalizza il testo dettato
+        'Dim testoNormalizzato As String = NormalizeSpeechInput(TextBoxCommands.Text.Trim)
+        ' 🔥 2. Normalizza le coordinate e rimuove gli spazi
+        ' Ma puoi usare anche NormalizzaStruttura()
+        'Dim SpaziNormalizzati As String = NormalizzaCoordinate(TextBoxCommands.Text.Trim)
+        'Dim testoNormalizzato = SpaziNormalizzati.Replace(" ", "")
 
-            ' Crea la lista di RobotCommands
-            Commands = Interpreter.CaricaComandiMultipli(testoNormalizzato)
+        Dim testoNormalizzato = TextBoxCommands.Text.Trim
+        testoNormalizzato = testoNormalizzato.Replace(" ", "")
 
-            ' Inizializza l'indice principale
-            If renderIndex = -1 Then renderIndex = 0
+        Comando = testoNormalizzato
+        Execute = True
+        PaintRobotAlted = False
 
-            ' 🔥 UNDO: elimina il futuro (comandi + stringhe)
-            If renderIndex >= 0 AndAlso renderIndex < History.Count Then
-                History.RemoveRange(renderIndex, History.Count - renderIndex)
-                HistoryString.RemoveRange(renderIndex, HistoryString.Count - renderIndex)
-            End If
+        ' Crea la lista di RobotCommands
+        Commands = Interpreter.CaricaComandiMultipli(testoNormalizzato)
 
-            ' Crea la lista di comandi stringa da visualizzare
-            Dim CommandsStringa As List(Of String) = Interpreter.CaricaComandiStringaMultipli(testoNormalizzato)
-            HistoryString.AddRange(CommandsStringa)
+        ' Inizializza l'indice principale
+        If renderIndex = -1 Then renderIndex = 0
 
-            ' ListBox Comandi
-            AggiornaListaComandiStringa()
-
-            ' Aggiorna la History
-            History.AddRange(Commands)
-
-            If Commands Is Nothing OrElse Commands.Count = 0 Then Return
-
-            ' Renderizza il comando
-            Render(Commands)
+        ' 🔥 UNDO: elimina il futuro (comandi + stringhe)
+        If renderIndex >= 0 AndAlso renderIndex < History.Count Then
+            History.RemoveRange(renderIndex, History.Count - renderIndex)
+            HistoryString.RemoveRange(renderIndex, HistoryString.Count - renderIndex)
         End If
+
+        ' Crea la lista di comandi stringa da visualizzare
+        Dim CommandsStringa As List(Of String) = Interpreter.CaricaComandiStringaMultipli(testoNormalizzato)
+        HistoryString.AddRange(CommandsStringa)
+
+        ' ListBox Comandi
+        AggiornaListaComandiStringa()
+
+        ' Aggiorna la History
+        History.AddRange(Commands)
+
+        If Commands Is Nothing OrElse Commands.Count = 0 Then Return
+
+        ' Renderizza il comando
+        Render(Commands)
     End Sub
 
     Private Function NormalizzaCoordinate(input As String) As String
@@ -1322,6 +1325,11 @@ Public Class Form1
 
         Return result
     End Function
+
+    'RIAVVIA
+    Private Sub ButtonRiavvia_Click(sender As Object, e As EventArgs) Handles ButtonRiavvia.Click
+        Application.Restart()
+    End Sub
 End Class
 
 Public Class RobotCommand
@@ -1554,7 +1562,8 @@ Public Class RobotDrawer
                 'LINEA;10,10;200,50;Blu;2
                 Linea(comando.Parametri, g)
             Case "RETT"
-                'RETT;50,50;200,150;Nero;PIENO/VUOTO;2
+                'Comando Rettangolo è:
+                'RETT;x1,y1;x2,y2;Colore;Tipo;Spessore con Tipo = PIENO o VUOTO
                 Rettangolo(comando.Parametri, g)
             Case "CERCHIO"
                 'CERCHIO;centroX,centroY;raggio;Colore;PIENO/VUOTO;spessore
@@ -1595,11 +1604,11 @@ Public Class RobotDrawer
             Case "TRASLA"
                 'Sposta tutto alla coordinata
                 'TRASLA;50,100
-                'Trasla();100,50	Sposta la bitmap di 100 px a destra e 50 px In basso
-                'Trasla();-50,100	Sposta 50 px a sinistra e 100 px In basso
-                'Trasla();50%,25%	Sposta del 50% della larghezza e 25% dell'altezza
-                'Trasla();-50%,25%	Sposta verso sinistra di metà larghezza e 25% In basso
-                TraslaBitmap(comando.Parametri, g, ctx.Bitmap)
+                'Trasla;100,50	Sposta la bitmap di 100 px a destra e 50 px In basso
+                'Trasla;-50,100	Sposta 50 px a sinistra e 100 px In basso
+                'Trasla;50%,25%	Sposta del 50% della larghezza e 25% dell'altezza
+                'Trasla;-50%,25%	Sposta verso sinistra di metà larghezza e 25% In basso
+                TraslaBitmap(comando.Parametri, g, ctx)
             Case "SALVA"
                 'SALVA;C:\Temp\immagine.png;PNG
                 'SALVA;C:\Temp\immagine.bmp;BMP
@@ -1841,7 +1850,7 @@ Public Class RobotDrawer
         Math.Abs(p2.X - p1.X),
         Math.Abs(p2.Y - p1.Y)
     )
-
+        Debug.WriteLine("p1" & p1.ToString & " p2" & p2.ToString & " Colore " & p(2) & " Tipo " & p(3) & " Spessore " & spessore.ToString)
         If pieno Then
             g.FillRectangle(New SolidBrush(colore), rect)
         Else
@@ -1890,36 +1899,11 @@ Public Class RobotDrawer
         End If
     End Sub
 
-    Private Function Punto_OLD(s As String) As Point
+    Private Function Punto(s As String) As Point
         If s Is Nothing Then Return New Point(0, 0)
-        s = s.TrimStart(" ")
-        s = s.TrimEnd(" ")
 
         'Se nel punto ci sono coordinate separate da virgola, oppure punto o infine spazio
-        Dim xy() As String = Nothing
-        If s.Contains(",") Then
-            xy = s.Split(","c)
-        End If
-        If s.Contains(".") Then
-            xy = s.Split("."c)
-        End If
-        If s.Contains(" ") Then
-            xy = s.Split(" "c)
-        End If
-
-        Return New Point(CInt(xy(0)), CInt(xy(1)))
-    End Function
-
-    Private Function Punto(s As String) As Point
-        If String.IsNullOrWhiteSpace(s) Then
-            Return New Point(0, 0)
-        End If
-
         Dim xy = s.Split(","c)
-
-        If xy.Length <> 2 Then
-            Throw New FormatException("Formato punto non valido: " & s)
-        End If
 
         Return New Point(CInt(xy(0)), CInt(xy(1)))
     End Function
@@ -2086,67 +2070,58 @@ Public Class RobotDrawer
         End Using
     End Sub
 
-    Private Sub Trasla(p As List(Of String), g As Graphics)
-        If p.Count < 2 Then Return
-        g.TranslateTransform(Integer.Parse(p(0)), Integer.Parse(p(1)))
-    End Sub
 
-    Private Sub TraslaBitmap_old(p As List(Of String), g As Graphics, bmp As Bitmap)
-        If p.Count < 1 Then Return
-        If bmp Is Nothing Then Return
+    Private Sub TraslaBitmap(p As List(Of String), g As Graphics, ctx As RobotContext)
+        'g passato verrà aggiornato nel ViewPort
+        If p.Count < 1 OrElse ctx.Bitmap Is Nothing Then Return
 
-        ' p(0) = "100,100"
-        Dim coords() As String = p(0).Split(","c)
+        Dim coords = p(0).Split(","c)
         If coords.Length <> 2 Then Return
 
-        Dim dx As Integer
-        Dim dy As Integer
-        If Not Integer.TryParse(coords(0).Trim(), dx) Then Return
-        If Not Integer.TryParse(coords(1).Trim(), dy) Then Return
-
-        Dim Tbmp As Bitmap = bmp.Clone
-
-        ' Aggiorna canvas visibile
-        g.Clear(Color.White)
-        g.DrawImageUnscaled(Tbmp, dx, dy)
-    End Sub
-
-    Private Sub TraslaBitmap(p As List(Of String), g As Graphics, bmp As Bitmap)
-        If p.Count < 1 Then Return
-        If bmp Is Nothing Then Return
-
-        ' p(0) = "100,100" oppure "-50,25%" ecc.
-        Dim coords() As String = p(0).Split(","c)
-        If coords.Length <> 2 Then Return
-
-        Dim dx As Integer = 0
-        Dim dy As Integer = 0
-
-        ' Funzione helper per leggere pixel o percentuale
         Dim ParseCoord = Function(s As String, maxVal As Integer) As Integer
-                             Dim str = s.Trim()
-                             If str.EndsWith("%") Then
+                             s = s.Trim()
+                             If s.EndsWith("%") Then
                                  Dim perc As Single
-                                 If Single.TryParse(str.TrimEnd("%"c), perc) Then
+                                 If Single.TryParse(s.TrimEnd("%"c), perc) Then
                                      Return CInt(maxVal * perc / 100.0F)
                                  End If
                              Else
-                                 Dim val As Integer
-                                 If Integer.TryParse(str, val) Then Return val
+                                 Dim v As Integer
+                                 If Integer.TryParse(s, v) Then Return v
                              End If
                              Return 0
                          End Function
 
-        dx = ParseCoord(coords(0), bmp.Width)
-        dy = ParseCoord(coords(1), bmp.Height)
+        Dim dx = ParseCoord(coords(0), ctx.Bitmap.Width)
+        Dim dy = ParseCoord(coords(1), ctx.Bitmap.Height)
 
-        Dim Tbmp As Bitmap = bmp.Clone
+        Dim oldBmp As Bitmap = ctx.Bitmap
+        Dim newBmp As New Bitmap(oldBmp.Width, oldBmp.Height)
 
-        ' Aggiorna canvas visibile
-        g.Clear(Color.White)
-        g.DrawImageUnscaled(Tbmp, dx, dy)
+        ' Riempimento sfondo
+        Using gtmp As Graphics = Graphics.FromImage(newBmp)
+            gtmp.Clear(Color.White)
+        End Using
+
+        For y = 0 To oldBmp.Height - 1
+            For x = 0 To oldBmp.Width - 1
+
+                Dim nx = x + dx
+                Dim ny = y + dy
+
+                ' Controllo limiti
+                If nx >= 0 AndAlso nx < newBmp.Width AndAlso ny >= 0 AndAlso ny < newBmp.Height Then
+                    newBmp.SetPixel(nx, ny, oldBmp.GetPixel(x, y))
+                End If
+
+            Next
+        Next
+
+        ' Ridisegno CAD
+        ' Il ridisegno viene ricreato nella Vista con ViewPort.
+        g.DrawImageUnscaled(newBmp, 0, 0)
+        'ctx.Bitmap = newBmp
     End Sub
-
 
     Private Sub SalvaBitmap(p As List(Of String), bmp As Bitmap)
         If p.Count < 2 Then Return

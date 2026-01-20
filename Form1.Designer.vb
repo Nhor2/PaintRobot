@@ -59,6 +59,7 @@ Partial Class Form1
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.LstComandi = New System.Windows.Forms.ListBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.ButtonRiavvia = New System.Windows.Forms.Button()
         Me.PanelTop.SuspendLayout()
         CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelLeft.SuspendLayout()
@@ -388,6 +389,7 @@ Partial Class Form1
         'PanelLeft
         '
         Me.PanelLeft.BackColor = System.Drawing.Color.Gray
+        Me.PanelLeft.Controls.Add(Me.ButtonRiavvia)
         Me.PanelLeft.Controls.Add(Me.ButtonAttivaListBox)
         Me.PanelLeft.Controls.Add(Me.ButtonScript)
         Me.PanelLeft.Controls.Add(Me.ButtonEditHistory)
@@ -475,6 +477,18 @@ Partial Class Form1
         Me.LstComandi.Size = New System.Drawing.Size(549, 28)
         Me.LstComandi.TabIndex = 4
         '
+        'ButtonRiavvia
+        '
+        Me.ButtonRiavvia.BackColor = System.Drawing.Color.Black
+        Me.ButtonRiavvia.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonRiavvia.ForeColor = System.Drawing.Color.White
+        Me.ButtonRiavvia.Location = New System.Drawing.Point(2, 155)
+        Me.ButtonRiavvia.Name = "ButtonRiavvia"
+        Me.ButtonRiavvia.Size = New System.Drawing.Size(56, 25)
+        Me.ButtonRiavvia.TabIndex = 23
+        Me.ButtonRiavvia.Text = "Reset"
+        Me.ButtonRiavvia.UseVisualStyleBackColor = False
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -534,4 +548,5 @@ Partial Class Form1
     Friend WithEvents ButtonScript As Button
     Friend WithEvents ButtonAttivaListBox As Button
     Friend WithEvents ToolTip1 As ToolTip
+    Friend WithEvents ButtonRiavvia As Button
 End Class
