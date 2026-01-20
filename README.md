@@ -32,6 +32,17 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 
 ---
 
+## 🎤 CAD Vocale (Novità)
+
+Il CAD supporta l’input vocale in tempo reale tramite **Accesso Vocale di Windows**.
+
+È possibile **disegnare parlando**, senza tastiera o mouse:
+- I comandi vengono interpretati mentre vengono dettati
+- Le coordinate vocali vengono normalizzate automaticamente
+- Gli errori tipici del riconoscimento vocale (spazi, virgole mancanti, separatori) vengono corretti a runtime
+
+---
+
 ## ❓ Cos’è PaintRobot
 
 PaintRobot **non è AutoCAD**.  
