@@ -6,6 +6,7 @@ Imports System.Net.Sockets
 Imports System.Runtime.InteropServices.ComTypes
 Imports System.Runtime.Remoting
 Imports System.Security.Cryptography
+Imports System.Text.RegularExpressions
 Imports System.Threading
 Imports Microsoft.SqlServer
 
@@ -97,8 +98,10 @@ Public Class Form1
 
     ' PaintRobot
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        'Finestra sempre massimizzata
-        Me.WindowState = FormWindowState.Maximized
+        'Finestra sempre massimizzata. 
+        Dim WR As Rectangle = Screen.GetWorkingArea(New Point(0, 0))
+        Me.Size = New Size(WR.Width, WR.Height - 50)
+        Me.Location = New Point(0, 40)
 
         ButtonClose.Location = New Point(Me.Width - 30, 3)
         ButtonMinimize.Location = New Point(Me.Width - 60, 3)
@@ -429,12 +432,19 @@ Public Class Form1
         End If
 
         If TextBoxCommands.Text <> "" Then
-            Comando = TextBoxCommands.Text.Trim
+            ' 🔥 1. Normalizza il testo dettato
+            Dim testoNormalizzato As String = NormalizeSpeechInput(TextBoxCommands.Text.Trim)
+            ' 🔥 2. Normalizza le coordinate e rimuove gli spazi
+            ' Ma puoi usare anche NormalizzaStruttura()
+            Dim SpaziNormalizzati As String = NormalizzaCoordinate(testoNormalizzato)
+            testoNormalizzato = SpaziNormalizzati.Replace(" ", "")
+
+            Comando = testoNormalizzato
             Execute = True
             PaintRobotAlted = False
 
             ' Crea la lista di RobotCommands
-            Commands = Interpreter.CaricaComandiMultipli(TextBoxCommands.Text)
+            Commands = Interpreter.CaricaComandiMultipli(testoNormalizzato)
 
             ' Inizializza l'indice principale
             If renderIndex = -1 Then renderIndex = 0
@@ -446,7 +456,7 @@ Public Class Form1
             End If
 
             ' Crea la lista di comandi stringa da visualizzare
-            Dim CommandsStringa As List(Of String) = Interpreter.CaricaComandiStringaMultipli(TextBoxCommands.Text)
+            Dim CommandsStringa As List(Of String) = Interpreter.CaricaComandiStringaMultipli(testoNormalizzato)
             HistoryString.AddRange(CommandsStringa)
 
             ' ListBox Comandi
@@ -461,6 +471,26 @@ Public Class Form1
             Render(Commands)
         End If
     End Sub
+
+    Private Function NormalizzaCoordinate(input As String) As String
+        ' 1. Rimuove spazi dopo ;
+        input = Regex.Replace(input, ";\s+", ";")
+
+        ' 2. Trasforma "numero spazio numero" in "numero,numero"
+        input = Regex.Replace(input, "(?<=\d)\s+(?=\d)", ",")
+
+        Return input
+    End Function
+
+    Private Function NormalizzaStruttura(input As String) As String
+        ' Rimuove spazi prima e dopo ;
+        input = Regex.Replace(input, "\s*;\s*", ";")
+
+        ' Rimuove spazi prima e dopo ,
+        input = Regex.Replace(input, "\s*,\s*", ",")
+
+        Return input
+    End Function
 
     Private Sub AggiornaListaComandiStringa()
         'Aggiunge i comandi stringa alla listbox
@@ -831,7 +861,6 @@ Public Class Form1
         LabelCoord.Visible = True
     End Sub
 
-
     Private Sub PictureBox1_MouseUp(sender As Object, e As MouseEventArgs) Handles PictureBox1.MouseUp
         If e.Button = MouseButtons.Middle Then
             isPanning = False
@@ -853,7 +882,6 @@ Public Class Form1
     Private Const OFFSET_X As Integer = 20
     Private Const OFFSET_Y As Integer = 20
 
-
     'Autocomplete Sintassi
     Private suppressTextChanged As Boolean = False
 
@@ -864,6 +892,7 @@ Public Class Form1
 
         Dim match = RobotDrawer.ComandiSintassi.Keys.FirstOrDefault(Function(k) k.StartsWith(txt))
 
+        ' Autocompletamento o Suggerimento del comando
         If match IsNot Nothing AndAlso txt.Length > 0 Then
             Dim suggerimento = RobotDrawer.ComandiSintassi(match)
 
@@ -874,6 +903,7 @@ Public Class Form1
             suppressTextChanged = False
         End If
     End Sub
+
 
     Private Sub TextBoxCommands_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBoxCommands.KeyDown
         If e.KeyCode = Keys.Tab Then
@@ -1118,7 +1148,138 @@ Public Class Form1
         End Using
     End Sub
 
+    'ACCESSO VOCALE
+    Private Shared ReadOnly SymbolMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase) From {
+    {"punto e virgola", ";"},
+    {"punto virgola", ";"},
+    {"virgola", ","},
+    {"punto", ","},
+    {"spazio", ","},
+    {"due punti", ":"},
+    {"duepunti", ":"},
+    {"e", ","},
+    {"meno", "-"},
+    {"più", "+"}
+}
 
+    Public Function WordToNumber(text As String) As String
+        Dim numberWords = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase) From {
+        {"zero", 0}, {"uno", 1}, {"due", 2}, {"tre", 3}, {"quattro", 4},
+        {"cinque", 5}, {"sei", 6}, {"sette", 7}, {"otto", 8}, {"nove", 9},
+        {"dieci", 10}, {"undici", 11}, {"dodici", 12}, {"tredici", 13},
+        {"quattordici", 14}, {"quindici", 15}, {"sedici", 16}, {"diciassette", 17},
+        {"diciotto", 18}, {"diciannove", 19}, {"venti", 20}, {"trenta", 30},
+        {"quaranta", 40}, {"cinquanta", 50}, {"sessanta", 60}, {"settanta", 70},
+        {"ottanta", 80}, {"novanta", 90}, {"cento", 100}, {"mille", 1000}
+    }
+
+        If numberWords.ContainsKey(text) Then
+            Return numberWords(text).ToString()
+        End If
+
+        Return text
+    End Function
+
+    Public Function ConvertItalianNumberWordsToNumber(text As String) As String
+        Dim units = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase) From {
+        {"zero", 0}, {"uno", 1}, {"una", 1}, {"due", 2}, {"tre", 3}, {"quattro", 4},
+        {"cinque", 5}, {"sei", 6}, {"sette", 7}, {"otto", 8}, {"nove", 9}
+    }
+
+        Dim teens = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase) From {
+        {"dieci", 10}, {"undici", 11}, {"dodici", 12}, {"tredici", 13}, {"quattordici", 14},
+        {"quindici", 15}, {"sedici", 16}, {"diciassette", 17}, {"diciotto", 18}, {"diciannove", 19}
+    }
+
+        Dim tens = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase) From {
+        {"venti", 20}, {"trenta", 30}, {"quaranta", 40}, {"cinquanta", 50},
+        {"sessanta", 60}, {"settanta", 70}, {"ottanta", 80}, {"novanta", 90}
+    }
+
+        Dim hundreds = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase) From {
+        {"cento", 100}
+    }
+
+        Dim thousands = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase) From {
+        {"mille", 1000}, {"mila", 1000}
+    }
+
+        ' Spezza parole composte (ventitré → venti tre)
+        text = Regex.Replace(text, "([a-z]+)(tre|uno|otto)", "$1 $2", RegexOptions.IgnoreCase)
+
+        Dim words = text.Split(" "c)
+        Dim total As Integer = 0
+        Dim current As Integer = 0
+
+        For Each w In words
+            If units.ContainsKey(w) Then
+                current += units(w)
+            ElseIf teens.ContainsKey(w) Then
+                current += teens(w)
+            ElseIf tens.ContainsKey(w) Then
+                current += tens(w)
+            ElseIf w.StartsWith("cent") Then
+                current += 100
+            ElseIf thousands.ContainsKey(w) Then
+                current = If(current = 0, 1, current)
+                total += current * 1000
+                current = 0
+            Else
+                ' Non è un numero → restituisci testo originale
+                Return text
+            End If
+        Next
+
+        total += current
+        Return total.ToString()
+    End Function
+
+    Public Function NormalizeSpeechInput(input As String) As String
+        'Normalizza le parola con i caratteri corretti.
+        Dim result As String = input
+
+        ' Sostituzione simboli
+        For Each kvp In SymbolMap
+            result = Regex.Replace(
+        result,
+        "\b" & Regex.Escape(kvp.Key) & "\b",
+        kvp.Value,
+        RegexOptions.IgnoreCase)
+        Next
+
+
+        ' Conversione numeri parola → cifra (con supporto per negativi)
+        Dim words = result.Split(" "c)
+        Dim outputWords As New List(Of String)
+        Dim i As Integer = 0
+
+        While i < words.Length
+            If words(i).Equals("meno", StringComparison.OrdinalIgnoreCase) Then
+                ' Numero negativo
+                If i + 1 < words.Length Then
+                    Dim converted = ConvertItalianNumberWordsToNumber(words(i + 1))
+                    outputWords.Add("-" & converted)
+                    i += 2
+                Else
+                    outputWords.Add(words(i))
+                    i += 1
+                End If
+            Else
+                ' Numero normale
+                Dim converted = ConvertItalianNumberWordsToNumber(words(i))
+                outputWords.Add(converted)
+                i += 1
+            End If
+        End While
+
+        'Aggiunge parole
+        result = String.Join(" ", outputWords)
+
+        ' 🔥 Rimuove spazi dopo simboli ; , : . -
+        result = Regex.Replace(result, "([;,:.\-])\s+", "$1")
+
+        Return result
+    End Function
 End Class
 
 Public Class RobotCommand
@@ -1687,8 +1848,37 @@ Public Class RobotDrawer
         End If
     End Sub
 
+    Private Function Punto_OLD(s As String) As Point
+        If s Is Nothing Then Return New Point(0, 0)
+        s = s.TrimStart(" ")
+        s = s.TrimEnd(" ")
+
+        'Se nel punto ci sono coordinate separate da virgola, oppure punto o infine spazio
+        Dim xy() As String = Nothing
+        If s.Contains(",") Then
+            xy = s.Split(","c)
+        End If
+        If s.Contains(".") Then
+            xy = s.Split("."c)
+        End If
+        If s.Contains(" ") Then
+            xy = s.Split(" "c)
+        End If
+
+        Return New Point(CInt(xy(0)), CInt(xy(1)))
+    End Function
+
     Private Function Punto(s As String) As Point
+        If String.IsNullOrWhiteSpace(s) Then
+            Return New Point(0, 0)
+        End If
+
         Dim xy = s.Split(","c)
+
+        If xy.Length <> 2 Then
+            Throw New FormatException("Formato punto non valido: " & s)
+        End If
+
         Return New Point(CInt(xy(0)), CInt(xy(1)))
     End Function
 
