@@ -3,15 +3,15 @@
   "WorkspaceRootPath": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\historyeditorform.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
-      "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:historyeditorform.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|c:\\users\\lordm\\source\\repos2\\paintrobot2\\form2.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:form2.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\historyeditorform.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
-      "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:historyeditorform.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
+      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\form2.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
+      "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:form2.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|c:\\users\\lordm\\source\\repos2\\paintrobot2\\form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
       "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
@@ -31,27 +31,26 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "HistoryEditorForm.vb",
-              "DocumentMoniker": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\HistoryEditorForm.vb",
-              "RelativeDocumentMoniker": "HistoryEditorForm.vb",
-              "ToolTip": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\HistoryEditorForm.vb",
-              "RelativeToolTip": "HistoryEditorForm.vb",
-              "ViewState": "AgIAALsAAAAAAAAAAAAiwM0AAAAlAAAAAAAAAA==",
+              "Title": "Form2.vb",
+              "DocumentMoniker": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\Form2.vb",
+              "RelativeDocumentMoniker": "Form2.vb",
+              "ToolTip": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\Form2.vb",
+              "RelativeToolTip": "Form2.vb",
+              "ViewState": "AgIAACMBAAAAAAAAAAAqwC8BAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2026-01-19T07:57:19.397Z",
+              "WhenOpened": "2026-01-21T09:36:55.118Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "HistoryEditorForm.vb [Progettazione]",
-              "DocumentMoniker": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\HistoryEditorForm.vb",
-              "RelativeDocumentMoniker": "HistoryEditorForm.vb",
-              "ToolTip": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\HistoryEditorForm.vb [Progettazione]",
-              "RelativeToolTip": "HistoryEditorForm.vb [Progettazione]",
+              "Title": "Form2.vb [Progettazione]",
+              "DocumentMoniker": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\Form2.vb",
+              "RelativeDocumentMoniker": "Form2.vb",
+              "ToolTip": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\Form2.vb [Progettazione]",
+              "RelativeToolTip": "Form2.vb [Progettazione]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2026-01-19T07:56:37.554Z",
-              "EditorCaption": " [Progettazione]"
+              "WhenOpened": "2026-01-21T09:36:54.326Z"
             },
             {
               "$type": "Document",
@@ -61,10 +60,9 @@
               "RelativeDocumentMoniker": "Form1.vb",
               "ToolTip": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\Form1.vb",
               "RelativeToolTip": "Form1.vb",
-              "ViewState": "AgIAALsAAAAAAAAAAAAQwNkAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAD8HAAAAAAAAAAAiwEIHAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2026-01-10T18:43:42.134Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-10T18:43:42.134Z"
             },
             {
               "$type": "Document",
@@ -75,8 +73,7 @@
               "ToolTip": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\Form1.vb [Progettazione]",
               "RelativeToolTip": "Form1.vb [Progettazione]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2026-01-10T18:43:34.216Z",
-              "EditorCaption": " [Progettazione]"
+              "WhenOpened": "2026-01-10T18:43:34.216Z"
             }
           ]
         }

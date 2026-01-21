@@ -82,7 +82,6 @@ SCACCHI;100,10;400,310;Blu;Rosso
 TESTO;100,200;Ciao mondo;Rosso;20;Arial;Normal
 POLIGONO;10,10;100,30;80,120;30,90;Verde;PIENO
 GRIGLIA;20;Grigio
-TRASLA;50;100
 SALVA;C:\Temp\foto.jpg;JPG
 INVERTI;Verticale;-50
 RUOTA;-45
@@ -147,7 +146,6 @@ SCACCHI     ; SCACCHI;x1,y1;x2,y2;Colore;Colore2
 TESTO       ; TESTO;x1,y1;x2,y2;Testo;Colore;Dimensione;Font;Stile
 POLIGONO    ; POLIGONO;xN,yN;Colore;Tipo
 GRIGLIA     ; GRIGLIA;Lato;Colore
-TRASLA      ; TRASLA;x1,y1
 SALVA       ; SALVA;Percorso;Formato(PNG,BMP,JPG)
 INVERTI     ; INVERTI;Direzione;-Percentuale
 RUOTA       ; RUOTA;Gradi;-Percentuale
@@ -176,6 +174,99 @@ FRECCIA     ; x1,y1;x2,y2;Colore;Spessore
 STELLA      ; x,y;NumeroPunte;Diametro;Colore;Spessore
 SPIRALE     ; SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione
 SINUSOIDE   ; SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
+```
+
+## 🎨 Colori Italiani Supportati
+
+Il dizionario ColoriItaliani permette di usare nomi in italiano per i colori. L’elenco completo:
+
+```text
+
+[Colori base]
+NERO → Black
+BIANCO → White
+ROSSO → Red
+VERDE → Green
+BLU → Blue
+GIALLO → Yellow
+CIANO → Cyan
+MAGENTA → Magenta
+GRIGIO → Gray
+ARGENTO → Silver
+
+[Colori caldi e naturali]
+MARRONE → Brown
+MARRONECHIARO → Peru
+MARRONESCURO → Sienna
+ARANCIONE → Orange
+ROSSOSCURO → DarkRed
+ROSSOCHIARO → IndianRed
+SALMONE → Salmon
+CORALLO → Coral
+TERRA → SaddleBrown
+SABBIA → SandyBrown
+SENAPE → Goldenrod
+OCRA → RGB(204, 119, 34)
+RUGGINE → RGB(183, 65, 14)
+RAME → RGB(184, 115, 51)
+BRONZO → RGB(205, 127, 50)
+MOGANO → RGB(192, 64, 0)
+CASTAGNO → RGB(205, 92, 92)
+CARBONE → RGB(5, 4, 2)
+
+[Colori freddi]
+AZZURRO → LightBlue
+BLUSCURO → DarkBlue
+BLUCHIARO → LightSkyBlue
+CIELO → SkyBlue
+ACQUA → Aqua
+ACQUAMARINA → RGB(0, 255, 128)
+TURCHESE → Teal
+CERULEO → RGB(0, 123, 167)
+COBALTO → RGB(0, 71, 171)
+INDACO → Indigo
+GHIACCIO → LightCyan
+ARDESIA → RGB(119, 136, 153)
+
+[Verdi e derivati]
+VERDECHIARO → LightGreen
+VERDESCURO → DarkGreen
+LIME → Lime
+OLIVA → Olive
+GIADA → RGB(0, 168, 107)
+CHARTREUSE → RGB(128, 255, 0)
+
+[Viola, rosa e affini]
+VIOLA → Purple
+VIOLACHIARO → Lavender
+VIOLASCURO → MediumPurple
+MELANZANA → DarkViolet
+BORDEAUX → DarkRed
+BORGOGNA → RGB(128, 0, 32)
+PRUGNA → Plum
+FUXIA → Fuchsia
+ROSA → Pink
+MALVA → RGB(224, 176, 255)
+LILLA → RGB(200, 162, 200)
+CILIEGIA → RGB(222, 49, 99)
+CARMINIO → RGB(150, 0, 24)
+GRANATA → RGB(128, 0, 0)
+
+[Toni chiari e neutri]
+BEIGE → Beige
+AVORIO → Ivory
+ZINCO → LightGray
+CACHI → RGB(195, 176, 145)
+CAMOSCIO → RGB(240, 220, 130)
+SANDALO → RGB(209, 182, 113)
+NAPOLI → RGB(247, 232, 159)
+SEPPIA → RGB(62, 48, 35)
+
+[Altri colori]
+LAVANDA → RGB(181, 126, 220)
+MAGGESE → RGB(193, 154, 107)
+POMORODO → RGB(255, 99, 71)
+LIMONE → RGB(253, 255, 0)
 ```
 
 ## ⬇️ Download

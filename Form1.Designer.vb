@@ -51,6 +51,8 @@ Partial Class Form1
         Me.ButtonClose = New System.Windows.Forms.Button()
         Me.PictureBoxPR = New System.Windows.Forms.PictureBox()
         Me.PanelLeft = New System.Windows.Forms.Panel()
+        Me.ButtonColors = New System.Windows.Forms.Button()
+        Me.ButtonRiavvia = New System.Windows.Forms.Button()
         Me.ButtonAttivaListBox = New System.Windows.Forms.Button()
         Me.ButtonScript = New System.Windows.Forms.Button()
         Me.ButtonEditHistory = New System.Windows.Forms.Button()
@@ -59,6 +61,7 @@ Partial Class Form1
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.LstComandi = New System.Windows.Forms.ListBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.ListView1 = New System.Windows.Forms.ListView()
         Me.PanelTop.SuspendLayout()
         CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelLeft.SuspendLayout()
@@ -388,6 +391,8 @@ Partial Class Form1
         'PanelLeft
         '
         Me.PanelLeft.BackColor = System.Drawing.Color.Gray
+        Me.PanelLeft.Controls.Add(Me.ButtonColors)
+        Me.PanelLeft.Controls.Add(Me.ButtonRiavvia)
         Me.PanelLeft.Controls.Add(Me.ButtonAttivaListBox)
         Me.PanelLeft.Controls.Add(Me.ButtonScript)
         Me.PanelLeft.Controls.Add(Me.ButtonEditHistory)
@@ -397,6 +402,30 @@ Partial Class Form1
         Me.PanelLeft.Name = "PanelLeft"
         Me.PanelLeft.Size = New System.Drawing.Size(60, 570)
         Me.PanelLeft.TabIndex = 2
+        '
+        'ButtonColors
+        '
+        Me.ButtonColors.BackColor = System.Drawing.Color.Black
+        Me.ButtonColors.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonColors.ForeColor = System.Drawing.Color.White
+        Me.ButtonColors.Location = New System.Drawing.Point(2, 190)
+        Me.ButtonColors.Name = "ButtonColors"
+        Me.ButtonColors.Size = New System.Drawing.Size(56, 25)
+        Me.ButtonColors.TabIndex = 24
+        Me.ButtonColors.Text = "Colori"
+        Me.ButtonColors.UseVisualStyleBackColor = False
+        '
+        'ButtonRiavvia
+        '
+        Me.ButtonRiavvia.BackColor = System.Drawing.Color.Black
+        Me.ButtonRiavvia.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonRiavvia.ForeColor = System.Drawing.Color.White
+        Me.ButtonRiavvia.Location = New System.Drawing.Point(2, 155)
+        Me.ButtonRiavvia.Name = "ButtonRiavvia"
+        Me.ButtonRiavvia.Size = New System.Drawing.Size(56, 25)
+        Me.ButtonRiavvia.TabIndex = 23
+        Me.ButtonRiavvia.Text = "Reset"
+        Me.ButtonRiavvia.UseVisualStyleBackColor = False
         '
         'ButtonAttivaListBox
         '
@@ -475,11 +504,24 @@ Partial Class Form1
         Me.LstComandi.Size = New System.Drawing.Size(549, 28)
         Me.LstComandi.TabIndex = 4
         '
+        'ListView1
+        '
+        Me.ListView1.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
+        Me.ListView1.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ListView1.HideSelection = False
+        Me.ListView1.Location = New System.Drawing.Point(100, 100)
+        Me.ListView1.Name = "ListView1"
+        Me.ListView1.Size = New System.Drawing.Size(462, 382)
+        Me.ListView1.TabIndex = 25
+        Me.ListView1.UseCompatibleStateImageBehavior = False
+        Me.ListView1.View = System.Windows.Forms.View.Details
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1548, 630)
+        Me.Controls.Add(Me.ListView1)
         Me.Controls.Add(Me.LstComandi)
         Me.Controls.Add(Me.LabelCoord)
         Me.Controls.Add(Me.PanelLeft)
@@ -534,4 +576,7 @@ Partial Class Form1
     Friend WithEvents ButtonScript As Button
     Friend WithEvents ButtonAttivaListBox As Button
     Friend WithEvents ToolTip1 As ToolTip
+    Friend WithEvents ButtonRiavvia As Button
+    Friend WithEvents ButtonColors As Button
+    Friend WithEvents ListView1 As ListView
 End Class

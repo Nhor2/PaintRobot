@@ -124,6 +124,9 @@ Public Class Form1
         'Interfaccia
         CreaInterfaccia()
 
+        'Info Test
+        Debug.WriteLine("Numero Colori Italiani: " & RobotDrawer.ColoriItaliani.Count.ToString)
+
         Dim ofd As OpenFileDialog = New OpenFileDialog
         ofd.FileName = ""
         ofd.Filter = "Files di Testo|*.txt"
@@ -216,6 +219,20 @@ Public Class Form1
         ToolTip1.SetToolTip(ButtonZoomIn, "Aumentare lo Zoom disegno")
         ToolTip1.SetToolTip(ButtonOut, "Diminuire lo Zoom disegno")
 
+        'Colori
+        ListView1.Visible = False
+
+        With ListView1
+            .FullRowSelect = True
+            .GridLines = True
+            .HideSelection = False
+            .OwnerDraw = True
+            .Columns.Clear()
+            .Columns.Add("Colore", 200)
+            .Columns.Add("RGB", 150)
+        End With
+
+        CaricaColori()
     End Sub
 
     Private Sub StartRender()
@@ -460,45 +477,48 @@ Public Class Form1
             Return
         End If
 
-        If TextBoxCommands.Text <> "" Then
-            ' 🔥 1. Normalizza il testo dettato
-            Dim testoNormalizzato As String = NormalizeSpeechInput(TextBoxCommands.Text.Trim)
-            ' 🔥 2. Normalizza le coordinate e rimuove gli spazi
-            ' Ma puoi usare anche NormalizzaStruttura()
-            Dim SpaziNormalizzati As String = NormalizzaCoordinate(testoNormalizzato)
-            testoNormalizzato = SpaziNormalizzati.Replace(" ", "")
+        If TextBoxCommands.Text = "" Then Return
 
-            Comando = testoNormalizzato
-            Execute = True
-            PaintRobotAlted = False
+        ' 🔥 1. Normalizza il testo dettato
+        'Dim testoNormalizzato As String = NormalizeSpeechInput(TextBoxCommands.Text.Trim)
+        ' 🔥 2. Normalizza le coordinate e rimuove gli spazi
+        ' Ma puoi usare anche NormalizzaStruttura()
+        'Dim SpaziNormalizzati As String = NormalizzaCoordinate(TextBoxCommands.Text.Trim)
+        'Dim testoNormalizzato = SpaziNormalizzati.Replace(" ", "")
 
-            ' Crea la lista di RobotCommands
-            Commands = Interpreter.CaricaComandiMultipli(testoNormalizzato)
+        Dim testoNormalizzato = TextBoxCommands.Text.Trim
+        testoNormalizzato = testoNormalizzato.Replace(" ", "")
 
-            ' Inizializza l'indice principale
-            If renderIndex = -1 Then renderIndex = 0
+        Comando = testoNormalizzato
+        Execute = True
+        PaintRobotAlted = False
 
-            ' 🔥 UNDO: elimina il futuro (comandi + stringhe)
-            If renderIndex >= 0 AndAlso renderIndex < History.Count Then
-                History.RemoveRange(renderIndex, History.Count - renderIndex)
-                HistoryString.RemoveRange(renderIndex, HistoryString.Count - renderIndex)
-            End If
+        ' Crea la lista di RobotCommands
+        Commands = Interpreter.CaricaComandiMultipli(testoNormalizzato)
 
-            ' Crea la lista di comandi stringa da visualizzare
-            Dim CommandsStringa As List(Of String) = Interpreter.CaricaComandiStringaMultipli(testoNormalizzato)
-            HistoryString.AddRange(CommandsStringa)
+        ' Inizializza l'indice principale
+        If renderIndex = -1 Then renderIndex = 0
 
-            ' ListBox Comandi
-            AggiornaListaComandiStringa()
-
-            ' Aggiorna la History
-            History.AddRange(Commands)
-
-            If Commands Is Nothing OrElse Commands.Count = 0 Then Return
-
-            ' Renderizza il comando
-            Render(Commands)
+        ' 🔥 UNDO: elimina il futuro (comandi + stringhe)
+        If renderIndex >= 0 AndAlso renderIndex < History.Count Then
+            History.RemoveRange(renderIndex, History.Count - renderIndex)
+            HistoryString.RemoveRange(renderIndex, HistoryString.Count - renderIndex)
         End If
+
+        ' Crea la lista di comandi stringa da visualizzare
+        Dim CommandsStringa As List(Of String) = Interpreter.CaricaComandiStringaMultipli(testoNormalizzato)
+        HistoryString.AddRange(CommandsStringa)
+
+        ' ListBox Comandi
+        AggiornaListaComandiStringa()
+
+        ' Aggiorna la History
+        History.AddRange(Commands)
+
+        If Commands Is Nothing OrElse Commands.Count = 0 Then Return
+
+        ' Renderizza il comando
+        Render(Commands)
     End Sub
 
     Private Function NormalizzaCoordinate(input As String) As String
@@ -1322,6 +1342,65 @@ Public Class Form1
 
         Return result
     End Function
+
+    'RIAVVIA
+    Private Sub ButtonRiavvia_Click(sender As Object, e As EventArgs) Handles ButtonRiavvia.Click
+        Application.Restart()
+    End Sub
+
+    'COLORI
+    Private Sub ButtonColors_Click(sender As Object, e As EventArgs) Handles ButtonColors.Click
+        Dim larghezzaTotale As Integer = 0
+        For Each col As ColumnHeader In ListView1.Columns
+            larghezzaTotale += col.Width
+        Next
+        ListView1.Size = New Size(larghezzaTotale + 40, Me.Height - 200)
+        ListView1.Visible = Not ListView1.Visible
+    End Sub
+
+    Private Sub CaricaColori()
+        ListView1.BeginUpdate()
+        ListView1.Items.Clear()
+
+        For Each kv In RobotDrawer.ColoriItaliani.OrderBy(Function(c) c.Key)
+            Dim item As New ListViewItem(kv.Key)
+            item.SubItems.Add($"{kv.Value.R}, {kv.Value.G}, {kv.Value.B}")
+            item.Tag = kv.Value   ' memorizzo il colore
+            ListView1.Items.Add(item)
+        Next
+
+        ' Aggiorna intestazione con count
+        ListView1.Columns(0).Text = $"Colori ({ListView1.Items.Count})"
+
+        ListView1.EndUpdate()
+    End Sub
+
+    Private Sub ListView1_DrawColumnHeader(sender As Object, e As DrawListViewColumnHeaderEventArgs) Handles ListView1.DrawColumnHeader
+        e.DrawDefault = True
+    End Sub
+
+    Private Sub ListView1_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles ListView1.DrawSubItem
+        If e.ColumnIndex = 0 Then
+            Dim colore As Color = CType(e.Item.Tag, Color)
+
+            Using b As New SolidBrush(colore)
+                e.Graphics.FillRectangle(b,
+                    e.Bounds.Left + 3,
+                    e.Bounds.Top + 3,
+                    20,
+                    e.Bounds.Height - 6)
+            End Using
+
+            e.Graphics.DrawString(
+                e.SubItem.Text,
+                ListView1.Font,
+                Brushes.Black,
+                e.Bounds.Left + 28,
+                e.Bounds.Top + 3)
+        Else
+            e.DrawText()
+        End If
+    End Sub
 End Class
 
 Public Class RobotCommand
@@ -1512,7 +1591,6 @@ Public Class RobotDrawer
     {"TESTO", "TESTO;x1,y1;x2,y2;Testo;Colore;Dimensione;Font;Stile"},
     {"POLIGONO", "POLIGONO;xN,YN;Colore;Tipo"},
     {"GRIGLIA", "GRIGLIA;Lato;Colore"},
-    {"TRASLA", "TRASLA;x1,y1"},
     {"SALVA", "SALVA;Percorso;Formato(PNG,BMP,JPG)"},
     {"INVERTI", "INVERTI;Direzione;-Percentuale"},
     {"RUOTA", "RUOTA;Gradi"},
@@ -1554,7 +1632,8 @@ Public Class RobotDrawer
                 'LINEA;10,10;200,50;Blu;2
                 Linea(comando.Parametri, g)
             Case "RETT"
-                'RETT;50,50;200,150;Nero;PIENO/VUOTO;2
+                'Comando Rettangolo è:
+                'RETT;x1,y1;x2,y2;Colore;Tipo;Spessore con Tipo = PIENO o VUOTO
                 Rettangolo(comando.Parametri, g)
             Case "CERCHIO"
                 'CERCHIO;centroX,centroY;raggio;Colore;PIENO/VUOTO;spessore
@@ -1592,14 +1671,6 @@ Public Class RobotDrawer
             Case "GRIGLIA"
                 'GRIGLIA;20;Grigio
                 Griglia(comando.Parametri, g)
-            Case "TRASLA"
-                'Sposta tutto alla coordinata
-                'TRASLA;50,100
-                'Trasla();100,50	Sposta la bitmap di 100 px a destra e 50 px In basso
-                'Trasla();-50,100	Sposta 50 px a sinistra e 100 px In basso
-                'Trasla();50%,25%	Sposta del 50% della larghezza e 25% dell'altezza
-                'Trasla();-50%,25%	Sposta verso sinistra di metà larghezza e 25% In basso
-                TraslaBitmap(comando.Parametri, g, ctx.Bitmap)
             Case "SALVA"
                 'SALVA;C:\Temp\immagine.png;PNG
                 'SALVA;C:\Temp\immagine.bmp;BMP
@@ -1739,7 +1810,7 @@ Public Class RobotDrawer
     {"VIOLA", Color.Purple},
     {"LIME", Color.Lime},
     {"TURCHESE", Color.Teal},
-    {"ROSACIOCCOLATO", Color.Chocolate},
+    {"CIOCCOLATO", Color.Chocolate},
     {"ROSA", Color.Pink},
     {"BEIGE", Color.Beige},
     {"SALMONE", Color.Salmon},
@@ -1749,7 +1820,7 @@ Public Class RobotDrawer
     {"OLIVA", Color.Olive},
     {"MELANZANA", Color.DarkViolet},
     {"BORDEAUX", Color.DarkRed},
-    {"CIEL", Color.LightBlue},
+    {"AZZURRO", Color.LightBlue},
     {"TERRA", Color.SaddleBrown},
     {"ZINCO", Color.LightGray},
     {"AVORIO", Color.Ivory},
@@ -1768,7 +1839,36 @@ Public Class RobotDrawer
     {"MARRONECHIARO", Color.Peru},
     {"MARRONESCURO", Color.Sienna},
     {"VIOLACHIARO", Color.Lavender},
-    {"VIOLASCURO", Color.MediumPurple}
+    {"VIOLASCURO", Color.MediumPurple},
+    {"SANDALO", Color.FromArgb(209, 182, 113)},
+    {"CAMOSCIO", Color.FromArgb(240, 220, 130)},
+    {"CARBONE", Color.FromArgb(5, 4, 2)},
+    {"CARMINIO", Color.FromArgb(150, 0, 24)},
+    {"CASTAGNO", Color.FromArgb(205, 92, 92)},
+    {"CELESTE", Color.FromArgb(178, 255, 255)},
+    {"CERULEO", Color.FromArgb(0, 123, 167)},
+    {"CHARTREUSE", Color.FromArgb(128, 255, 0)},
+    {"CILIEGIA", Color.FromArgb(222, 49, 99)},
+    {"COBALTO", Color.FromArgb(0, 71, 171)},
+    {"GRANATA", Color.FromArgb(128, 0, 0)},
+    {"ARDESIA", Color.FromArgb(119, 136, 153)},
+    {"NAPOLI", Color.FromArgb(247, 232, 159)},
+    {"SEPPIA", Color.FromArgb(62, 48, 35)},
+    {"LAVANDA", Color.FromArgb(181, 126, 220)},
+    {"ACQUAMARINA", Color.FromArgb(0, 255, 128)},
+    {"POMORODO", Color.FromArgb(255, 99, 71)},
+    {"BRONZO", Color.FromArgb(205, 127, 50)},
+    {"CACHI", Color.FromArgb(195, 176, 145)},
+    {"LIMONE", Color.FromArgb(253, 255, 0)},
+    {"GIADA", Color.FromArgb(0, 168, 107)},
+    {"MAGGESE", Color.FromArgb(193, 154, 107)},
+    {"RUGGINE", Color.FromArgb(183, 65, 14)},
+    {"RAME", Color.FromArgb(184, 115, 51)},
+    {"MOGANO", Color.FromArgb(192, 64, 0)},
+    {"BORGOGNA", Color.FromArgb(128, 0, 32)},
+    {"MALVA", Color.FromArgb(224, 176, 255)},
+    {"LILLA", Color.FromArgb(200, 162, 200)},
+    {"OCRA", Color.FromArgb(204, 119, 34)}
 }
 
     Private Function ColorConv(nome As String) As Color
@@ -1841,7 +1941,7 @@ Public Class RobotDrawer
         Math.Abs(p2.X - p1.X),
         Math.Abs(p2.Y - p1.Y)
     )
-
+        Debug.WriteLine("p1" & p1.ToString & " p2" & p2.ToString & " Colore " & p(2) & " Tipo " & p(3) & " Spessore " & spessore.ToString)
         If pieno Then
             g.FillRectangle(New SolidBrush(colore), rect)
         Else
@@ -1890,36 +1990,11 @@ Public Class RobotDrawer
         End If
     End Sub
 
-    Private Function Punto_OLD(s As String) As Point
+    Private Function Punto(s As String) As Point
         If s Is Nothing Then Return New Point(0, 0)
-        s = s.TrimStart(" ")
-        s = s.TrimEnd(" ")
 
         'Se nel punto ci sono coordinate separate da virgola, oppure punto o infine spazio
-        Dim xy() As String = Nothing
-        If s.Contains(",") Then
-            xy = s.Split(","c)
-        End If
-        If s.Contains(".") Then
-            xy = s.Split("."c)
-        End If
-        If s.Contains(" ") Then
-            xy = s.Split(" "c)
-        End If
-
-        Return New Point(CInt(xy(0)), CInt(xy(1)))
-    End Function
-
-    Private Function Punto(s As String) As Point
-        If String.IsNullOrWhiteSpace(s) Then
-            Return New Point(0, 0)
-        End If
-
         Dim xy = s.Split(","c)
-
-        If xy.Length <> 2 Then
-            Throw New FormatException("Formato punto non valido: " & s)
-        End If
 
         Return New Point(CInt(xy(0)), CInt(xy(1)))
     End Function
@@ -2085,68 +2160,6 @@ Public Class RobotDrawer
             Next
         End Using
     End Sub
-
-    Private Sub Trasla(p As List(Of String), g As Graphics)
-        If p.Count < 2 Then Return
-        g.TranslateTransform(Integer.Parse(p(0)), Integer.Parse(p(1)))
-    End Sub
-
-    Private Sub TraslaBitmap_old(p As List(Of String), g As Graphics, bmp As Bitmap)
-        If p.Count < 1 Then Return
-        If bmp Is Nothing Then Return
-
-        ' p(0) = "100,100"
-        Dim coords() As String = p(0).Split(","c)
-        If coords.Length <> 2 Then Return
-
-        Dim dx As Integer
-        Dim dy As Integer
-        If Not Integer.TryParse(coords(0).Trim(), dx) Then Return
-        If Not Integer.TryParse(coords(1).Trim(), dy) Then Return
-
-        Dim Tbmp As Bitmap = bmp.Clone
-
-        ' Aggiorna canvas visibile
-        g.Clear(Color.White)
-        g.DrawImageUnscaled(Tbmp, dx, dy)
-    End Sub
-
-    Private Sub TraslaBitmap(p As List(Of String), g As Graphics, bmp As Bitmap)
-        If p.Count < 1 Then Return
-        If bmp Is Nothing Then Return
-
-        ' p(0) = "100,100" oppure "-50,25%" ecc.
-        Dim coords() As String = p(0).Split(","c)
-        If coords.Length <> 2 Then Return
-
-        Dim dx As Integer = 0
-        Dim dy As Integer = 0
-
-        ' Funzione helper per leggere pixel o percentuale
-        Dim ParseCoord = Function(s As String, maxVal As Integer) As Integer
-                             Dim str = s.Trim()
-                             If str.EndsWith("%") Then
-                                 Dim perc As Single
-                                 If Single.TryParse(str.TrimEnd("%"c), perc) Then
-                                     Return CInt(maxVal * perc / 100.0F)
-                                 End If
-                             Else
-                                 Dim val As Integer
-                                 If Integer.TryParse(str, val) Then Return val
-                             End If
-                             Return 0
-                         End Function
-
-        dx = ParseCoord(coords(0), bmp.Width)
-        dy = ParseCoord(coords(1), bmp.Height)
-
-        Dim Tbmp As Bitmap = bmp.Clone
-
-        ' Aggiorna canvas visibile
-        g.Clear(Color.White)
-        g.DrawImageUnscaled(Tbmp, dx, dy)
-    End Sub
-
 
     Private Sub SalvaBitmap(p As List(Of String), bmp As Bitmap)
         If p.Count < 2 Then Return
