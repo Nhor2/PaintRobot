@@ -27,6 +27,8 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 - ZOOM e PAN con mouse e pulsanti
 - Guida in App e CHM accessibile con F1
 - Autocompletamento del COMANDO mentre scrivi
+- Macro definibili con DEFINE/END
+- Cicli FOR/END non annidabili
 - Ideale per disegno automatico, generativo o standardizzato
 - Modalità Test: salva un file test.txt con migliaia di comandi casuali
 
@@ -70,6 +72,7 @@ Alcuni Esempi dei comandi grafici presenti in questa versione:
 ```text
 #Un comando alla volta
 STEP;1
+INIZIO
 LINEA;7,10;96,92;Blu;2
 RETT;50,50;200,150;Nero;VUOTO;2
 CERCHIO;200,200;50;Rosso;PIENO;3
@@ -100,9 +103,39 @@ TEXTURE;Texture01;C:\TEXTURE\textures_autocad_45635.gif
 DRAWTEXTURE;Texture01;950,400
 PATTERN;PUNTI;DOT;1000;10;Nero;1
 FILLPATTERN;PUNTI;1000,100;400,300
-INIZIO
-INIZIOMATH;20;10;Blu
-INIZIOCAD;10;Lime
+#INIZIOMATH;20;10;Blu
+#INIZIOCAD;10;Lime
+#
+#MACRO
+#Test Include altro script che crea una marco FRECCIA1
+INCLUDE;C:\Users\user\Desktop\ScriptINCLUDE.txt
+#
+#Disegna le freccie con FRECCIA1
+FRECCIA1;1000;200;80
+FRECCIA1;1000;250;120
+#
+#TEST - Cicli For
+FOR;X;200;300;25
+LINEA;{X},100;{X},200;Blu;1
+END
+#
+#TEST - For+Macro
+FOR;Y;100;300;50
+FRECCIA1;100;{Y};80
+END
+#
+#TEST - Step Negativo
+FOR;X;500;200;-20
+LINEA;{X},10;{X},100;Rosso;1
+END
+
+#ScriptINCLUDE.txt
+DEFINE;FRECCIA1;X;Y;L
+# Crea una freccia
+LINEA;{X},{Y};{X+L},{Y};Nero;3
+LINEA;{X+L},{Y};{X+L-10},{Y-5};Rosso;2
+LINEA;{X+L},{Y};{X+L-10},{Y+5};Verde;2
+END
 ```
 
 ## 👤 A chi è utile
@@ -169,11 +202,18 @@ ADDLIVELLO  ; ADDLIVELLO;NomeLivello
 DELLIVELLO  ; DELLIVELLO;NomeLivello
 RENLIVELLO  ; RENLIVELLO;NomeLivello;NuovoNomeLivello
 STEP        ; STEP;Numero
-GRIGLIAFULL ; Lato;Colore
-FRECCIA     ; x1,y1;x2,y2;Colore;Spessore
-STELLA      ; x,y;NumeroPunte;Diametro;Colore;Spessore
+GRIGLIAFULL ; GRIGLIAFULL;Lato;Colore
+FRECCIA     ; FRECCIA;x1,y1;x2,y2;Colore;Spessore
+STELLA      ; STELLA;x,y;NumeroPunte;Diametro;Colore;Spessore
+DEFINE      ; DEFINE;NomeMacro;Parametri;L
+END         ; END
+FOR         ; FOR;NomeCiclo;Start;End;Step
+INCLUDE     ; INCLUDE;PercorsoFile
 SPIRALE     ; SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione
 SINUSOIDE   ; SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
+
+   Il comando END non ha parametri è il terminatore per DEFINE e FOR.
+   Il comando FOR non supporta Step=0 (Zero).
 ```
 
 ## 🎨 Colori Italiani Supportati

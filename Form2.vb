@@ -57,11 +57,16 @@ RENLIVELLO, RENLIVELLO;NomeLivello;NuovoNomeLivello,
 GRIGLIAFULL;Lato;Colore,
 FRECCIA;x1,y1;x2,y2;Colore;Spessore,
 STELLA;x1,y1;NumeroPunte;Diametro;Colore;Spessore,
+DEFINE;NomeMacro;Parametri;L,
+FOR;NomeCiclo;Start;End;Step,
+END,
+INCLUDE;PercorsoFile,
 SPIRALE, SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione,
 SINUSOIDE, SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
 
 
-6 - Esempi dei Comandi
+6 - Esempi dei Comandi (devono terminare con un ritorno a capo)
+
 L’esempio seguente crea una linea continua dal punto (x,y) (7,10) al punto (96,92) di colore Blu e di spessore 2 pixel.
 
 		LINEA;7,10;96,92;Blu;2
@@ -221,6 +226,31 @@ L’esempio seguente disegna una Freccia dal punto (0,0) al punto (100,100) di c
 L’esempio seguente disegna una Stella a 5 punte dal punto centrale (150,150) di diametro 100 di colore Nero e spessore 2 pixel.
 
 		STELLA;150,150;5;100;Nero;2
+
+L’esempio seguente include un altro file di script con nome ScriptINCLUDE.txt.
+
+		#Test Include altro script
+		INCLUDE;C:\Users\user\Desktop\ScriptINCLUDE.txt
+
+L'esempio seguente definisce una Marco FRECCIA1 per creare freccie.
+
+		DEFINE;FRECCIA1;X;Y;L
+		# Crea una freccia OK
+		LINEA;{X},{Y};{X+L},{Y};Nero;3
+		LINEA;{X+L},{Y};{X+L-10},{Y-5};Rosso;2
+		LINEA;{X+L},{Y};{X+L-10},{Y+5};Verde;2
+		END
+
+L’esempio seguente disegna due freccie con una macro FRECCIA1.
+
+		FRECCIA1;1000;200;80
+		FRECCIA1;1000;250;120
+
+L'esempio seguente utilizza il comano For per disegnare delle freccie.
+
+		FOR;X;200;300;25
+		LINEA;{X},100;{X},200;Blu;1
+		END
 
 
 

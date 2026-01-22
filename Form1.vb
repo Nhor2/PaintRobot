@@ -1,6 +1,7 @@
 ﻿
 Imports System.Diagnostics.Contracts
 Imports System.Drawing.Drawing2D
+Imports System.Globalization
 Imports System.IO
 Imports System.Net.Sockets
 Imports System.Runtime.InteropServices.ComTypes
@@ -135,7 +136,10 @@ Public Class Form1
         If ofd.ShowDialog(Me) = DialogResult.OK Then
             If ofd.FileName <> "" Then
                 ' Disegno tuti i comandi dello script
-                Comandi = Interpreter.CaricaScript(ofd.FileName)
+                'Comandi = Interpreter.CaricaScript(ofd.FileName)
+
+                ' Supporto MACRO
+                Comandi = Interpreter.CaricaScriptConMacro(ofd.FileName)
 
                 History.Clear()
                 History.AddRange(Comandi)
@@ -156,8 +160,6 @@ Public Class Form1
                 ProgressBar1.Value = 0
 
                 StartRender()
-
-                'If DEBUGOK Then MsgBox("Pic size " & PictureBox1.Width.ToString & "," & PictureBox1.Height.ToString)
             End If
         End If
     End Sub
@@ -798,7 +800,12 @@ Public Class Form1
         ofd.Title = "Apri un script testo PaintRobot..."
 
         If ofd.ShowDialog(Me) = DialogResult.OK AndAlso ofd.FileName <> "" Then
-            Dim newCommands = Interpreter.CaricaScript(ofd.FileName)
+            ' Normale
+            'Dim newCommands = Interpreter.CaricaScript(ofd.FileName)
+
+            ' Supporto MACRO
+            Dim newCommands = Interpreter.CaricaScriptConMacro(ofd.FileName)
+
             If newCommands.Count = 0 Then Return
 
             If Comandi Is Nothing Then
@@ -1085,7 +1092,8 @@ Public Class Form1
         ' Esegue lo script di comandi casuali
         If System.IO.File.Exists(testFile) Then
             If FileLen(testFile) > 0 Then
-                ' Disegno tuti i comandi dello script
+                ' Disegno tuti i comandi dello script caricando con
+                ' CaricaScript perche non serve MACRO
                 Comandi = Interpreter.CaricaScript(testFile)
 
                 History.Clear()
@@ -1427,6 +1435,7 @@ Public Class RobotInterpreter
     '✔️ creare i comandi
 
     Public Function CaricaScript(percorso As String) As List(Of RobotCommand)
+        ' Versione 2.0 senza le macro
         Dim comandi As New List(Of RobotCommand)
 
         For Each riga In IO.File.ReadAllLines(percorso)
@@ -1533,6 +1542,347 @@ Public Class RobotInterpreter
         Return lista
     End Function
 
+
+    'MACRO
+    Private Macros As New Dictionary(Of String, MacroDef)
+
+    Public Function CaricaScriptConMacro(percorso As String) As List(Of RobotCommand)
+        ' Carica lo script
+        Dim righe = IO.File.ReadAllLines(percorso).
+                Select(Function(r) r.Trim()).
+                Where(Function(r) r <> "" AndAlso Not r.StartsWith("#")).
+                ToList()
+
+        Dim righeEspanse = EspandiMacro(righe)
+
+        Dim comandi As New List(Of RobotCommand)
+        For Each line In righeEspanse
+            Dim parti = line.Split(";"c)
+            Dim tipo = parti(0).ToUpper()
+            Dim parametri = parti.Skip(1).ToList()
+            comandi.Add(New RobotCommand(tipo, parametri))
+        Next
+
+        Return comandi
+    End Function
+
+    Private Function EspandiMacro_OLD(righe As List(Of String)) As List(Of String)
+        ' Spande il contenuto della macro
+        Dim output As New List(Of String)
+        Dim i As Integer = 0
+
+        While i < righe.Count
+            Dim line = righe(i)
+
+            'DEFINE
+            If line.StartsWith("DEFINE;", StringComparison.OrdinalIgnoreCase) Then
+
+                Dim parti = line.Split(";"c)
+                Dim nomeMacro = parti(1).ToUpper()
+                Dim parametri = parti.Skip(2).Select(Function(p) p.Trim()).ToList()
+
+                Dim corpo As New List(Of String)
+                i += 1
+
+                While i < righe.Count AndAlso righe(i).ToUpper() <> "END"
+                    corpo.Add(righe(i))
+                    i += 1
+                End While
+
+                Macros(nomeMacro) = New MacroDef With {
+                .Nome = nomeMacro,
+                .Parametri = parametri,
+                .Corpo = corpo
+            }
+
+            Else
+                ' Riga normale (o chiamata macro)
+                output.AddRange(EspandiRiga(line))
+            End If
+
+
+
+            'FOR
+            If line.StartsWith("FOR;", StringComparison.OrdinalIgnoreCase) Then
+                output.AddRange(EspandiFor(righe, i))
+                ' EspandiFor aggiorna i
+                Continue While
+            End If
+
+
+
+            ' INCLUDE
+            If line.StartsWith("INCLUDE;", StringComparison.OrdinalIgnoreCase) Then
+                Dim percorsoIncluso = line.Split(";"c)(1).Trim()
+                If IO.File.Exists(percorsoIncluso) Then
+                    Dim righeInclude = IO.File.ReadAllLines(percorsoIncluso).
+                            Select(Function(r) r.Trim()).
+                            Where(Function(r) r <> "" AndAlso Not r.StartsWith("#")).
+                            ToList()
+                    ' Espandi anche eventuali macro/FOR nel file incluso
+                    output.AddRange(EspandiMacro(righeInclude))
+                Else
+                    Debug.WriteLine($"INCLUDE file non trovato: {percorsoIncluso}")
+                End If
+
+                i += 1
+                Continue While
+            End If
+
+
+            i += 1
+        End While
+
+        Return output
+    End Function
+
+    Private Function EspandiMacro(righe As List(Of String)) As List(Of String)
+        ' Espande il contenuto dello script con macro, FOR e INCLUDE
+        Dim output As New List(Of String)
+        Dim i As Integer = 0
+
+        While i < righe.Count
+            Dim line = righe(i).Trim()
+
+            If line = "" OrElse line.StartsWith("#") Then
+                i += 1
+                Continue While
+            End If
+
+            ' --- INCLUDE ---
+            If line.StartsWith("INCLUDE;", StringComparison.OrdinalIgnoreCase) Then
+                Dim percorsoIncluso = line.Split(";"c)(1).Trim()
+                If IO.File.Exists(percorsoIncluso) Then
+                    Dim righeInclude = IO.File.ReadAllLines(percorsoIncluso).
+                        Select(Function(r) r.Trim()).
+                        Where(Function(r) r <> "" AndAlso Not r.StartsWith("#")).
+                        ToList()
+                    ' Espandi anche eventuali macro/FOR nel file incluso
+                    output.AddRange(EspandiMacro(righeInclude))
+                Else
+                    Debug.WriteLine($"INCLUDE file non trovato: {percorsoIncluso}")
+                End If
+
+                i += 1
+                Continue While
+            End If
+
+            ' --- DEFINE Macro ---
+            If line.StartsWith("DEFINE;", StringComparison.OrdinalIgnoreCase) Then
+                Dim parti = line.Split(";"c)
+                Dim nomeMacro = parti(1).ToUpper()
+                Dim parametri = parti.Skip(2).Select(Function(p) p.Trim()).ToList()
+
+                Dim corpo As New List(Of String)
+                i += 1
+
+                While i < righe.Count AndAlso righe(i).ToUpper() <> "END"
+                    corpo.Add(righe(i))
+                    i += 1
+                End While
+
+                Macros(nomeMacro) = New MacroDef With {
+                .Nome = nomeMacro,
+                .Parametri = parametri,
+                .Corpo = corpo
+            }
+
+                i += 1 ' Salta l'END
+                Continue While
+            End If
+
+            ' --- FOR ---
+            If line.StartsWith("FOR;", StringComparison.OrdinalIgnoreCase) Then
+                output.AddRange(EspandiFor(righe, i))
+                ' EspandiFor aggiorna i fino all'END del FOR
+                Continue While
+            End If
+
+            ' --- Riga normale o chiamata macro ---
+            output.AddRange(EspandiRiga(line))
+
+            i += 1
+        End While
+
+        Return output
+    End Function
+
+
+    Private Function EspandiRiga(line As String) As List(Of String)
+        ' Espande il contenuto della riga
+        Dim parti = line.Split(";"c)
+        Dim nome = parti(0).ToUpper()
+
+        If Not Macros.ContainsKey(nome) Then
+            Return New List(Of String) From {line}
+        End If
+
+        Dim macro = Macros(nome)
+        Dim valori = parti.Skip(1).ToList()
+
+        If valori.Count <> macro.Parametri.Count Then
+            Throw New Exception($"Macro {nome}: numero parametri errato")
+        End If
+
+        Dim map As New Dictionary(Of String, String)
+        For i = 0 To macro.Parametri.Count - 1
+            map(macro.Parametri(i)) = valori(i)
+        Next
+
+        Dim espanse As New List(Of String)
+
+        For Each riga In macro.Corpo
+            espanse.Add(SostituisciParametriMACRO(riga, map))
+        Next
+
+        Return espanse
+    End Function
+
+    Private Function SostituisciParametriMACRO(riga As String, vars As Dictionary(Of String, String)) As String
+
+        Dim risultato = riga
+
+        For Each kv In vars
+            risultato = risultato.Replace("{" & kv.Key & "}", kv.Value)
+        Next
+
+        ' Espressioni tipo {X+10}
+        Dim rx As New Regex("\{([^}]+)\}")
+        risultato = rx.Replace(risultato, Function(m)
+                                              Return EvalExpr(m.Groups(1).Value, vars)
+                                          End Function)
+
+        Return risultato
+    End Function
+
+    Private Function EvalExpr(expr As String, vars As Dictionary(Of String, String)) As String
+
+        Dim e = expr
+        For Each kv In vars
+            e = e.Replace(kv.Key, kv.Value)
+        Next
+
+        Dim dt As New DataTable()
+        Dim v = dt.Compute(e, "")
+        Return Convert.ToString(v, Globalization.CultureInfo.InvariantCulture)
+    End Function
+
+
+    'FOR
+    Private Function EspandiFor(righe As List(Of String),
+                            ByRef i As Integer) As List(Of String)
+
+        Dim parti = righe(i).Split(";"c)
+        Dim varName = parti(1)
+        Dim startVal = Double.Parse(parti(2), CultureInfo.InvariantCulture)
+        Dim endVal = Double.Parse(parti(3), CultureInfo.InvariantCulture)
+        Dim stepVal = Double.Parse(parti(4), CultureInfo.InvariantCulture)
+
+        If stepVal = 0 Then
+            Debug.WriteLine($"FOR {varName} saltato: step = 0")
+            Return New List(Of String) 'ritorna vuoto e salta il ciclo
+        End If
+
+
+        Dim corpo As New List(Of String)
+        i += 1
+
+        While i < righe.Count AndAlso righe(i).ToUpper() <> "END"
+            corpo.Add(righe(i))
+            i += 1
+        End While
+
+        Dim espanse As New List(Of String)
+
+        Dim v = startVal
+        If stepVal > 0 Then
+            While v <= endVal
+                espanse.AddRange(EspandiCorpoFor(corpo, varName, v))
+                v += stepVal
+            End While
+        Else
+            While v >= endVal
+                espanse.AddRange(EspandiCorpoFor(corpo, varName, v))
+                v += stepVal
+            End While
+        End If
+
+        Return espanse
+    End Function
+
+    ' Espande il corpo di un FOR
+    Private Function EspandiCorpoFor(corpo As List(Of String),
+                                 varName As String,
+                                 value As Double) As List(Of String)
+
+        Dim vars As New Dictionary(Of String, String) From {
+        {varName, value.ToString(CultureInfo.InvariantCulture)}
+    }
+
+        Dim righeEspanse As New List(Of String)
+
+        For Each r In corpo
+            ' 1️⃣ Sostituisco le variabili FOR
+            Dim rSostituita = SostituisciParametriFOR(r, vars)
+
+            ' 2️⃣ Controllo se è una macro da espandere
+            Dim righeMacro As List(Of String) = Nothing
+            If rSostituita.StartsWith("DEFINE;", StringComparison.OrdinalIgnoreCase) OrElse
+           Macros.ContainsKey(EstraiNomeMacro(rSostituita)) Then
+                ' Espande la macro con i parametri già sostituiti
+                righeMacro = EspandiMacroSingolaRiga(rSostituita)
+            End If
+
+            ' 3️⃣ Aggiungo righe espanse
+            If righeMacro IsNot Nothing Then
+                righeEspanse.AddRange(righeMacro)
+            Else
+                righeEspanse.Add(rSostituita)
+            End If
+        Next
+
+        Return righeEspanse
+    End Function
+
+
+    ' Sostituisce {VAR} con i valori passati
+    Private Function SostituisciParametriFOR(riga As String, vars As Dictionary(Of String, String)) As String
+        Dim result = riga
+        For Each kvp In vars
+            result = result.Replace("{" & kvp.Key.ToUpper() & "}", kvp.Value)
+        Next
+        Return result
+    End Function
+
+    ' Espande una singola riga di macro
+    Private Function EspandiMacroSingolaRiga(riga As String) As List(Of String)
+        Dim nomeMacro = EstraiNomeMacro(riga)
+        If Not Macros.ContainsKey(nomeMacro) Then Return New List(Of String) From {riga}
+
+        Dim parametriRiga = riga.Split(";"c).Skip(1).ToList()
+        Dim macro = Macros(nomeMacro)
+
+        ' Sostituisci i parametri della macro
+        Dim sostDict As New Dictionary(Of String, String)
+        For i = 0 To macro.Parametri.Count - 1
+            If i < parametriRiga.Count Then
+                sostDict(macro.Parametri(i).ToUpper()) = parametriRiga(i)
+            End If
+        Next
+
+        Dim righeFinali As New List(Of String)
+        For Each r In macro.Corpo
+            righeFinali.Add(SostituisciParametriMACRO(r, sostDict))
+        Next
+
+        Return righeFinali
+    End Function
+
+    ' Estrae il nome della macro da una riga
+    Private Function EstraiNomeMacro(riga As String) As String
+        Return riga.Split(";"c)(0).ToUpper()
+    End Function
+
 End Class
 
 Public Class RobotContext 'Contesto g e bitmap
@@ -1577,6 +1927,21 @@ Public Class PatternDef
 End Class
 
 
+
+Public Class MacroDef
+    'Le macro vengono espulse in comandi normali (LINEA, CERCHIO, …)
+
+    Public Property Nome As String
+    Public Property Parametri As List(Of String)
+    Public Property Corpo As List(Of String)
+End Class
+
+
+
+
+
+
+
 Public Class RobotDrawer
 
     ' Lista dei comandi e descrizione
@@ -1617,6 +1982,10 @@ Public Class RobotDrawer
     {"GRIGLIAFULL", "GRIGLIAFULL;Lato;Colore"},
     {"FRECCIA", "FRECCIA;x1,y1;x2,y2;Colore;Spessore"},
     {"STELLA", "STELLA;x1,y1;NumeroPunte;Diametro;Colore;Spessore"},
+    {"DEFINE", "DEFINE;NomeMacro;Parametri;L"},
+    {"FOR", "FOR;NomeCiclo;Start;End;Step"},
+    {"END", "END"},
+    {"INCLUDE", "INCLUDE;PercorsoFile"},
     {"SPIRALE", "SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione"},
     {"SINUSOIDE", "SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore"}
 }
@@ -3291,7 +3660,8 @@ Public Class RobotDrawer
         ctx.OrdineLivelli.Add(nome)
         ctx.LivelloCorrente = nome
 
-        g.Clear(Color.White)
+        ' Concettualmente dovresti cancellare in TRASPARENTE
+        'g.Clear(Color.White)
     End Sub
 
     Private Sub DelLivello(p As List(Of String), g As Graphics, ctx As RobotContext)
