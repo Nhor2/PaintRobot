@@ -107,7 +107,7 @@ Partial Class Form1
         Me.ButtonCentroMondo.BackColor = System.Drawing.Color.White
         Me.ButtonCentroMondo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonCentroMondo.ForeColor = System.Drawing.Color.Black
-        Me.ButtonCentroMondo.Location = New System.Drawing.Point(995, 5)
+        Me.ButtonCentroMondo.Location = New System.Drawing.Point(1204, 5)
         Me.ButtonCentroMondo.Name = "ButtonCentroMondo"
         Me.ButtonCentroMondo.Size = New System.Drawing.Size(25, 25)
         Me.ButtonCentroMondo.TabIndex = 23
@@ -119,7 +119,7 @@ Partial Class Form1
         Me.ButtonRenderRemain.BackColor = System.Drawing.Color.Green
         Me.ButtonRenderRemain.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonRenderRemain.ForeColor = System.Drawing.Color.White
-        Me.ButtonRenderRemain.Location = New System.Drawing.Point(720, 32)
+        Me.ButtonRenderRemain.Location = New System.Drawing.Point(965, 32)
         Me.ButtonRenderRemain.Name = "ButtonRenderRemain"
         Me.ButtonRenderRemain.Size = New System.Drawing.Size(80, 25)
         Me.ButtonRenderRemain.TabIndex = 22
@@ -132,7 +132,7 @@ Partial Class Form1
         Me.ButtonHistory.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(192, Byte), Integer))
         Me.ButtonHistory.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonHistory.ForeColor = System.Drawing.Color.White
-        Me.ButtonHistory.Location = New System.Drawing.Point(1094, 32)
+        Me.ButtonHistory.Location = New System.Drawing.Point(1303, 32)
         Me.ButtonHistory.Name = "ButtonHistory"
         Me.ButtonHistory.Size = New System.Drawing.Size(153, 25)
         Me.ButtonHistory.TabIndex = 21
@@ -144,7 +144,7 @@ Partial Class Form1
         Me.ButtonContinueRendering.BackColor = System.Drawing.Color.Green
         Me.ButtonContinueRendering.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonContinueRendering.ForeColor = System.Drawing.Color.White
-        Me.ButtonContinueRendering.Location = New System.Drawing.Point(634, 32)
+        Me.ButtonContinueRendering.Location = New System.Drawing.Point(879, 32)
         Me.ButtonContinueRendering.Name = "ButtonContinueRendering"
         Me.ButtonContinueRendering.Size = New System.Drawing.Size(80, 25)
         Me.ButtonContinueRendering.TabIndex = 20
@@ -157,7 +157,7 @@ Partial Class Form1
         Me.ButtonTest.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(255, Byte), Integer))
         Me.ButtonTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonTest.ForeColor = System.Drawing.Color.White
-        Me.ButtonTest.Location = New System.Drawing.Point(1191, 5)
+        Me.ButtonTest.Location = New System.Drawing.Point(1400, 5)
         Me.ButtonTest.Name = "ButtonTest"
         Me.ButtonTest.Size = New System.Drawing.Size(56, 25)
         Me.ButtonTest.TabIndex = 18
@@ -170,7 +170,7 @@ Partial Class Form1
         Me.ButtonSavePaintRobot.BackColor = System.Drawing.Color.White
         Me.ButtonSavePaintRobot.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonSavePaintRobot.ForeColor = System.Drawing.Color.Black
-        Me.ButtonSavePaintRobot.Location = New System.Drawing.Point(1094, 5)
+        Me.ButtonSavePaintRobot.Location = New System.Drawing.Point(1303, 5)
         Me.ButtonSavePaintRobot.Name = "ButtonSavePaintRobot"
         Me.ButtonSavePaintRobot.Size = New System.Drawing.Size(80, 25)
         Me.ButtonSavePaintRobot.TabIndex = 17
@@ -181,7 +181,7 @@ Partial Class Form1
         '
         Me.LabelEseguiti.AutoSize = True
         Me.LabelEseguiti.ForeColor = System.Drawing.Color.White
-        Me.LabelEseguiti.Location = New System.Drawing.Point(975, 38)
+        Me.LabelEseguiti.Location = New System.Drawing.Point(1201, 38)
         Me.LabelEseguiti.Name = "LabelEseguiti"
         Me.LabelEseguiti.Size = New System.Drawing.Size(88, 13)
         Me.LabelEseguiti.TabIndex = 16
@@ -191,7 +191,7 @@ Partial Class Form1
         '
         Me.LabelNumCmds.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LabelNumCmds.ForeColor = System.Drawing.Color.White
-        Me.LabelNumCmds.Location = New System.Drawing.Point(866, 32)
+        Me.LabelNumCmds.Location = New System.Drawing.Point(1092, 32)
         Me.LabelNumCmds.Name = "LabelNumCmds"
         Me.LabelNumCmds.Size = New System.Drawing.Size(103, 25)
         Me.LabelNumCmds.TabIndex = 15
@@ -226,7 +226,7 @@ Partial Class Form1
         Me.ButtonOut.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonOut.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ButtonOut.ForeColor = System.Drawing.Color.Black
-        Me.ButtonOut.Location = New System.Drawing.Point(1058, 5)
+        Me.ButtonOut.Location = New System.Drawing.Point(1267, 5)
         Me.ButtonOut.Name = "ButtonOut"
         Me.ButtonOut.Size = New System.Drawing.Size(25, 25)
         Me.ButtonOut.TabIndex = 13
@@ -239,7 +239,7 @@ Partial Class Form1
         Me.ButtonZoomIn.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonZoomIn.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ButtonZoomIn.ForeColor = System.Drawing.Color.Black
-        Me.ButtonZoomIn.Location = New System.Drawing.Point(1033, 5)
+        Me.ButtonZoomIn.Location = New System.Drawing.Point(1242, 5)
         Me.ButtonZoomIn.Name = "ButtonZoomIn"
         Me.ButtonZoomIn.Size = New System.Drawing.Size(25, 25)
         Me.ButtonZoomIn.TabIndex = 12
@@ -251,7 +251,7 @@ Partial Class Form1
         Me.ButtonOrigin.BackColor = System.Drawing.Color.White
         Me.ButtonOrigin.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonOrigin.ForeColor = System.Drawing.Color.Black
-        Me.ButtonOrigin.Location = New System.Drawing.Point(970, 5)
+        Me.ButtonOrigin.Location = New System.Drawing.Point(1179, 5)
         Me.ButtonOrigin.Name = "ButtonOrigin"
         Me.ButtonOrigin.Size = New System.Drawing.Size(25, 25)
         Me.ButtonOrigin.TabIndex = 11
@@ -263,7 +263,7 @@ Partial Class Form1
         Me.ButtonRight.BackColor = System.Drawing.Color.White
         Me.ButtonRight.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonRight.ForeColor = System.Drawing.Color.Black
-        Me.ButtonRight.Location = New System.Drawing.Point(929, 4)
+        Me.ButtonRight.Location = New System.Drawing.Point(1138, 4)
         Me.ButtonRight.Name = "ButtonRight"
         Me.ButtonRight.Size = New System.Drawing.Size(25, 25)
         Me.ButtonRight.TabIndex = 10
@@ -275,7 +275,7 @@ Partial Class Form1
         Me.ButtonDown.BackColor = System.Drawing.Color.White
         Me.ButtonDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonDown.ForeColor = System.Drawing.Color.Black
-        Me.ButtonDown.Location = New System.Drawing.Point(902, 4)
+        Me.ButtonDown.Location = New System.Drawing.Point(1111, 4)
         Me.ButtonDown.Name = "ButtonDown"
         Me.ButtonDown.Size = New System.Drawing.Size(25, 25)
         Me.ButtonDown.TabIndex = 9
@@ -287,7 +287,7 @@ Partial Class Form1
         Me.ButtonUp.BackColor = System.Drawing.Color.White
         Me.ButtonUp.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonUp.ForeColor = System.Drawing.Color.Black
-        Me.ButtonUp.Location = New System.Drawing.Point(875, 4)
+        Me.ButtonUp.Location = New System.Drawing.Point(1084, 4)
         Me.ButtonUp.Name = "ButtonUp"
         Me.ButtonUp.Size = New System.Drawing.Size(25, 25)
         Me.ButtonUp.TabIndex = 8
@@ -299,7 +299,7 @@ Partial Class Form1
         Me.ButtonLeft.BackColor = System.Drawing.Color.White
         Me.ButtonLeft.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonLeft.ForeColor = System.Drawing.Color.Black
-        Me.ButtonLeft.Location = New System.Drawing.Point(848, 4)
+        Me.ButtonLeft.Location = New System.Drawing.Point(1057, 4)
         Me.ButtonLeft.Name = "ButtonLeft"
         Me.ButtonLeft.Size = New System.Drawing.Size(25, 25)
         Me.ButtonLeft.TabIndex = 7
@@ -311,9 +311,9 @@ Partial Class Form1
         Me.ButtonStop.BackColor = System.Drawing.Color.Maroon
         Me.ButtonStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonStop.ForeColor = System.Drawing.Color.White
-        Me.ButtonStop.Location = New System.Drawing.Point(535, 32)
+        Me.ButtonStop.Location = New System.Drawing.Point(816, 33)
         Me.ButtonStop.Name = "ButtonStop"
-        Me.ButtonStop.Size = New System.Drawing.Size(80, 25)
+        Me.ButtonStop.Size = New System.Drawing.Size(57, 24)
         Me.ButtonStop.TabIndex = 6
         Me.ButtonStop.Text = "Stop"
         Me.ButtonStop.UseVisualStyleBackColor = False
@@ -322,15 +322,15 @@ Partial Class Form1
         '
         Me.LabelCommands.AutoSize = True
         Me.LabelCommands.ForeColor = System.Drawing.Color.White
-        Me.LabelCommands.Location = New System.Drawing.Point(740, 10)
+        Me.LabelCommands.Location = New System.Drawing.Point(985, 10)
         Me.LabelCommands.Name = "LabelCommands"
-        Me.LabelCommands.Size = New System.Drawing.Size(89, 13)
+        Me.LabelCommands.Size = New System.Drawing.Size(59, 13)
         Me.LabelCommands.TabIndex = 5
-        Me.LabelCommands.Text = "% Comandi Script"
+        Me.LabelCommands.Text = "% Comandi"
         '
         'ProgressBar1
         '
-        Me.ProgressBar1.Location = New System.Drawing.Point(634, 12)
+        Me.ProgressBar1.Location = New System.Drawing.Point(879, 12)
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(100, 10)
         Me.ProgressBar1.TabIndex = 4
@@ -338,9 +338,9 @@ Partial Class Form1
         'TextBoxCommands
         '
         Me.TextBoxCommands.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxCommands.Location = New System.Drawing.Point(39, 5)
+        Me.TextBoxCommands.Location = New System.Drawing.Point(23, 5)
         Me.TextBoxCommands.Name = "TextBoxCommands"
-        Me.TextBoxCommands.Size = New System.Drawing.Size(480, 31)
+        Me.TextBoxCommands.Size = New System.Drawing.Size(774, 31)
         Me.TextBoxCommands.TabIndex = 3
         '
         'ButtonCmd
@@ -348,9 +348,9 @@ Partial Class Form1
         Me.ButtonCmd.BackColor = System.Drawing.Color.Green
         Me.ButtonCmd.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonCmd.ForeColor = System.Drawing.Color.White
-        Me.ButtonCmd.Location = New System.Drawing.Point(535, 4)
+        Me.ButtonCmd.Location = New System.Drawing.Point(816, 5)
         Me.ButtonCmd.Name = "ButtonCmd"
-        Me.ButtonCmd.Size = New System.Drawing.Size(80, 25)
+        Me.ButtonCmd.Size = New System.Drawing.Size(57, 24)
         Me.ButtonCmd.TabIndex = 2
         Me.ButtonCmd.Text = "Esegui"
         Me.ButtonCmd.UseVisualStyleBackColor = False
@@ -382,7 +382,7 @@ Partial Class Form1
         'PictureBoxPR
         '
         Me.PictureBoxPR.Image = Global.PaintRobot.My.Resources.Resources.PaintRobot
-        Me.PictureBoxPR.Location = New System.Drawing.Point(1259, -10)
+        Me.PictureBoxPR.Location = New System.Drawing.Point(1500, -10)
         Me.PictureBoxPR.Name = "PictureBoxPR"
         Me.PictureBoxPR.Size = New System.Drawing.Size(670, 86)
         Me.PictureBoxPR.TabIndex = 19

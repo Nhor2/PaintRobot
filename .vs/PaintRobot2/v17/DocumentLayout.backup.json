@@ -3,19 +3,19 @@
   "WorkspaceRootPath": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\form2.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|c:\\users\\lordm\\source\\repos2\\paintrobot2\\form2.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
       "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:form2.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|c:\\users\\lordm\\source\\repos2\\paintrobot2\\form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
-      "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
       "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\form2.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
+      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|c:\\users\\lordm\\source\\repos2\\paintrobot2\\form2.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
       "RelativeMoniker": "D:0:0:{D71A8371-4F63-4C1A-9125-1CDBE32D24A3}|PaintRobot.vbproj|solutionrelative:form2.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
     }
   ],
@@ -36,9 +36,9 @@
               "RelativeDocumentMoniker": "Form2.vb",
               "ToolTip": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\Form2.vb",
               "RelativeToolTip": "Form2.vb",
-              "ViewState": "AgIAAOkAAAAAAAAAAAAqwEQAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAO8AAAAAAAAAAAAawAQBAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2026-01-21T09:36:55.118Z",
+              "WhenOpened": "2026-01-22T15:09:23.132Z",
               "EditorCaption": ""
             },
             {
@@ -50,25 +50,25 @@
               "ToolTip": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\Form2.vb [Progettazione]",
               "RelativeToolTip": "Form2.vb [Progettazione]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2026-01-21T09:36:54.326Z",
+              "WhenOpened": "2026-01-22T15:09:21.832Z",
               "EditorCaption": " [Progettazione]"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Form1.vb",
               "DocumentMoniker": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\Form1.vb",
               "RelativeDocumentMoniker": "Form1.vb",
               "ToolTip": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\Form1.vb",
               "RelativeToolTip": "Form1.vb",
-              "ViewState": "AgIAAOQGAAAAAAAAAAAAAPgGAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAGgIAAAAAAAAAAAawHEIAABRAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
               "WhenOpened": "2026-01-10T18:43:42.134Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "Form1.vb [Progettazione]",
               "DocumentMoniker": "C:\\Users\\lordm\\source\\repos2\\PaintRobot2\\Form1.vb",
               "RelativeDocumentMoniker": "Form1.vb",

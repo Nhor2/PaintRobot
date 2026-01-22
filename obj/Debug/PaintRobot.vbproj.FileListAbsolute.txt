@@ -26,7 +26,6 @@ C:\Users\lordm\source\repos2\PaintRobot2\obj\Debug\PaintRobot.pdb
 C:\Users\lordm\source\repos2\PaintRobot2\obj\Debug\PaintRobot.Form2.resources
 C:\Users\lordm\source\repos2\PaintRobot2\obj\Debug\PaintRobot.FormTitoloAutore.resources
 C:\Users\lordm\source\repos2\PaintRobot2\obj\Debug\PaintRobot.HistoryEditorForm.resources
-C:\Users\lordm\source\repos2\PaintRobot2\obj\Debug\PaintRobot.exe.config
 E:\repos_bck\PaintRobot2\bin\Debug\PaintRobot.exe.config
 E:\repos_bck\PaintRobot2\bin\Debug\PaintRobot.exe
 E:\repos_bck\PaintRobot2\bin\Debug\PaintRobot.pdb
@@ -43,3 +42,4 @@ E:\repos_bck\PaintRobot2\obj\Debug\PaintRobot.vbproj.CoreCompileInputs.cache
 E:\repos_bck\PaintRobot2\obj\Debug\PaintRobot.exe
 E:\repos_bck\PaintRobot2\obj\Debug\PaintRobot.xml
 E:\repos_bck\PaintRobot2\obj\Debug\PaintRobot.pdb
+C:\Users\lordm\source\repos2\PaintRobot2\obj\Debug\PaintRobot.exe.config

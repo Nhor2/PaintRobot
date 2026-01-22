@@ -61,6 +61,8 @@ DEFINE;NomeMacro;Parametri;L,
 FOR;NomeCiclo;Start;End;Step,
 END,
 INCLUDE;PercorsoFile,
+MATRICE;x1,y1;x2,y2;x3,y3;...;PASSOX,PASSOY;Tipo;Colore;Spessore,
+MATRICEQ;x1,y1;x2,y2;PASSOX,PASSOY;Tipo;Colore;Spessore,
 SPIRALE, SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione,
 SINUSOIDE, SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
 
@@ -229,13 +231,13 @@ L’esempio seguente disegna una Stella a 5 punte dal punto centrale (150,150) d
 
 L’esempio seguente include un altro file di script con nome ScriptINCLUDE.txt.
 
-		#Test Include altro script
+		#Include un altro script da qui in poi
 		INCLUDE;C:\Users\user\Desktop\ScriptINCLUDE.txt
 
 L'esempio seguente definisce una Marco FRECCIA1 per creare freccie.
 
 		DEFINE;FRECCIA1;X;Y;L
-		# Crea una freccia OK
+		# Crea una freccia con coordinate relative
 		LINEA;{X},{Y};{X+L},{Y};Nero;3
 		LINEA;{X+L},{Y};{X+L-10},{Y-5};Rosso;2
 		LINEA;{X+L},{Y};{X+L-10},{Y+5};Verde;2
@@ -246,11 +248,19 @@ L’esempio seguente disegna due freccie con una macro FRECCIA1.
 		FRECCIA1;1000;200;80
 		FRECCIA1;1000;250;120
 
-L'esempio seguente utilizza il comano For per disegnare delle freccie.
+L'esempio seguente utilizza il comano For per disegnare delle linee.
 
 		FOR;X;200;300;25
 		LINEA;{X},100;{X},200;Blu;1
 		END
+
+L'esempio seguente utilizza il comando Matrice per disegnare un Trapezio colore Malva e riempirlo di Punti (Punti,Quadrati,Corci,X) con passo 20, spessore 2 pixel. 
+
+		MATRICE;100,200;300,200;250,350;150,350;20,20;Punti;Malva;2
+
+L'esempio seguente utilizza il comando MatriceQ per disegnare un Rettangolo Verde e riempirlo di Quadrati (Punti,Quadrati,Croci,X) passo 10, spessore 2 pixel.
+
+		MATRICEQ;800,400;1000,700;10,10;Quadrati;Verde;2
 
 
 

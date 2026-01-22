@@ -103,6 +103,9 @@ TEXTURE;Texture01;C:\TEXTURE\textures_autocad_45635.gif
 DRAWTEXTURE;Texture01;950,400
 PATTERN;PUNTI;DOT;1000;10;Nero;1
 FILLPATTERN;PUNTI;1000,100;400,300
+MATRICE;100,200;300,200;250,350;150,350;20,20;punti;Malva;2
+MATRICE;500,200;700,200;650,350;550,350;20,20;punti;Rosso;2
+MATRICEQ;800,400;1000,700;10,10;Quadrati;Verde;2
 #INIZIOMATH;20;10;Blu
 #INIZIOCAD;10;Lime
 #
@@ -209,6 +212,8 @@ DEFINE      ; DEFINE;NomeMacro;Parametri;L
 END         ; END
 FOR         ; FOR;NomeCiclo;Start;End;Step
 INCLUDE     ; INCLUDE;PercorsoFile
+MATRICE     ; MATRICE;x1,y1;x2,y2,xN,yN;PassoX,PassoY;Tipo;Spessore
+MATRICEQ    ; MATRICEQ;x1,y1;x2,y2;PASSOX,PASSOY;Tipo;Colore;Spessore
 SPIRALE     ; SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione
 SINUSOIDE   ; SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
 

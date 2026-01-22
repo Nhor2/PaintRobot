@@ -9,6 +9,7 @@ Imports System.Runtime.Remoting
 Imports System.Security.Cryptography
 Imports System.Text.RegularExpressions
 Imports System.Threading
+Imports System.Web
 Imports Microsoft.SqlServer
 
 Public Class Form1
@@ -1707,7 +1708,6 @@ Public Class RobotInterpreter
         Return output
     End Function
 
-
     Private Function EspandiRiga(line As String) As List(Of String)
         ' Espande il contenuto della riga
         Dim parti = line.Split(";"c)
@@ -1769,8 +1769,7 @@ Public Class RobotInterpreter
 
 
     'FOR
-    Private Function EspandiFor(righe As List(Of String),
-                            ByRef i As Integer) As List(Of String)
+    Private Function EspandiFor(righe As List(Of String), ByRef i As Integer) As List(Of String)
 
         Dim parti = righe(i).Split(";"c)
         Dim varName = parti(1)
@@ -1811,9 +1810,7 @@ Public Class RobotInterpreter
     End Function
 
     ' Espande il corpo di un FOR
-    Private Function EspandiCorpoFor(corpo As List(Of String),
-                                 varName As String,
-                                 value As Double) As List(Of String)
+    Private Function EspandiCorpoFor(corpo As List(Of String), varName As String, value As Double) As List(Of String)
 
         Dim vars As New Dictionary(Of String, String) From {
         {varName, value.ToString(CultureInfo.InvariantCulture)}
@@ -1986,6 +1983,8 @@ Public Class RobotDrawer
     {"FOR", "FOR;NomeCiclo;Start;End;Step"},
     {"END", "END"},
     {"INCLUDE", "INCLUDE;PercorsoFile"},
+    {"MATRICE", "MATRICE;x1,y1;x2,y2;xN,yN;PassoX,PassoY;Tipo;Colore;Spessore"},
+    {"MATRICEQ", "MATRICEQ;x1,y1;x2,y2;PassoX,PassoY;Tipo;Colore;Spessore"},
     {"SPIRALE", "SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione"},
     {"SINUSOIDE", "SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore"}
 }
@@ -2157,6 +2156,20 @@ Public Class RobotDrawer
                 'INVERTI;Direzione;-Percentuale
                 InvertiBitmap(comando.Parametri, g, ctx.Bitmap)
 
+            Case "MATRICE"
+                'Trapezio
+                'MATRICE;100,200;300,200;250,350;150,350;20,20;Punti;Malva;2
+                'MATRICE;x1,y1;x2,y2;x3,y3;...;PASSOX,PASSOY;Tipo;Colore;Spessore
+                ' Tipo = Punti, Quadrati, Croci, X
+                MatricePoligono(comando.Parametri, g)
+
+            Case "MATRICEQ"
+                'Quadrato
+                'MATRICEQ;400,400;700,700;20,20;Punti;Beige;2
+                'MATRICEQ;x1,y1;x2,y2;PASSOX,PASSOY;Tipo;Colore;Spessore
+                ' Tipo = Punti, Quadrati, Croci, X
+                MatriceQuadrata(comando.Parametri, g)
+
             Case Else
                 Debug.WriteLine($"Comando sconosciuto: {comando.Tipo}")
 
@@ -2280,7 +2293,17 @@ Public Class RobotDrawer
 
 
 
+
+
     'Disegno
+    Private Function Punto(s As String) As Point
+        If s Is Nothing Then Return New Point(0, 0)
+
+        'Se nel punto ci sono coordinate separate da virgola, oppure punto o infine spazio
+        Dim xy = s.Split(","c)
+
+        Return New Point(CInt(xy(0)), CInt(xy(1)))
+    End Function
 
     Private Sub Linea(p As List(Of String), g As Graphics)
         If p.Count < 3 Then Return
@@ -2358,15 +2381,6 @@ Public Class RobotDrawer
             End Using
         End If
     End Sub
-
-    Private Function Punto(s As String) As Point
-        If s Is Nothing Then Return New Point(0, 0)
-
-        'Se nel punto ci sono coordinate separate da virgola, oppure punto o infine spazio
-        Dim xy = s.Split(","c)
-
-        Return New Point(CInt(xy(0)), CInt(xy(1)))
-    End Function
 
     Private Sub Pulisci(p As List(Of String), g As Graphics)
         If p.Count < 1 Then Return
@@ -3713,45 +3727,6 @@ Public Class RobotDrawer
         End If
     End Sub
 
-    Private Sub Matrice(p As List(Of String), g As Graphics)
-        ' Metrice Quadrata
-        'Significato
-        'x1, y1 → punto iniziale
-        'x2, y2 → passo (distanza tra elementi)
-        'xN, yN → dimensioni totali (oppure punto finale)
-        'tipo → come disegnare ogni cella
-        'spessore → dimensione del simbolo
-
-        If p.Count < 5 Then Return
-
-        Dim start = Punto(p(0))
-        Dim passo = Punto(p(1))
-        Dim fine = Punto(p(2))
-        Dim tipo = p(3).ToUpper()
-        Dim spessore = Integer.Parse(p(4))
-
-        For x = start.X To fine.X Step passo.X
-            For y = start.Y To fine.Y Step passo.Y
-                Select Case tipo
-                    Case "PUNTI"
-                        g.FillEllipse(Brushes.Black, x - spessore, y - spessore, spessore * 2, spessore * 2)
-
-                    Case "QUADRATI"
-                        g.DrawRectangle(Pens.Black, x - spessore, y - spessore, spessore * 2, spessore * 2)
-
-                    Case "CROCI"
-                        g.DrawLine(Pens.Black, x - spessore, y, x + spessore, y)
-                        g.DrawLine(Pens.Black, x, y - spessore, x, y + spessore)
-
-                    Case "X"
-                        g.DrawLine(Pens.Black, x - spessore, y - spessore, x + spessore, y + spessore)
-                        g.DrawLine(Pens.Black, x - spessore, y + spessore, x + spessore, y - spessore)
-                End Select
-            Next
-        Next
-    End Sub
-
-
     Private Sub GrigliaFull(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 2 Then Return
 
@@ -3829,26 +3804,70 @@ Public Class RobotDrawer
         g.DrawPolygon(New Pen(colore1, spessore), pts.ToArray())
     End Sub
 
-    Private Sub MatricePoligono(p As List(Of String), g As Graphics)
-        'MATRICE;x1,y1;x2,y2;x3,y3;...;PASSOX,PASSOY;Tipo;Spessore
-        'esempio TRAPEZIO
-        'MATRICE;100,100;300,100;250,250;150,250;20,20;punti;2
+    Private Sub MatriceQuadrata(p As List(Of String), g As Graphics)
+        ' Metrice Quadrata
+        'Significato
+        'x1, y1 → punto iniziale
+        'x2, y2 → passo (distanza tra elementi)
+        'xN, yN → dimensioni totali (oppure punto finale)
+        'tipo → come disegnare ogni cella
+        'colore
+        'spessore → dimensione del simbolo
 
         If p.Count < 5 Then Return
 
-        ' --- 1. Leggi punti poligono ---
-        Dim punti As New List(Of PointF)
-        Dim i As Integer = 0
+        Dim start = Punto(p(0))
+        Dim fine = Punto(p(1))
+        Dim passo = Punto(p(2))
+        Dim tipo As String = p(3).ToUpper()
+        Dim colore As Color = ColorConv(p(4).ToUpper())
+        Dim s As Integer = Integer.Parse(p(5)) 'spessore
 
-        While i < p.Count AndAlso p(i).Contains(",")
+        'Debug.WriteLine("MATRICE QUADRATA " & start.ToString & fine.ToString & passo.ToString & tipo.ToString & s.ToString)
+
+        For x = start.X To fine.X Step passo.X
+            For y = start.Y To fine.Y Step passo.Y
+                Select Case tipo
+                    Case "PUNTI"
+                        g.FillEllipse(New SolidBrush(colore), x - s, y - s, s * 2, s * 2)
+
+                    Case "QUADRATI"
+                        g.DrawRectangle(New Pen(colore, 1), x - s, y - s, s * 2, s * 2)
+
+                    Case "CROCI"
+                        g.DrawLine(New Pen(colore, 1), x - s, y, x + s, y)
+                        g.DrawLine(New Pen(colore, 1), x, y - s, x, y + s)
+
+                    Case "X"
+                        g.DrawLine(New Pen(colore, 1), x - s, y - s, x + s, y + s)
+                        g.DrawLine(New Pen(colore, 1), x - s, y + s, x + s, y - s)
+                End Select
+            Next
+        Next
+    End Sub
+
+    Private Sub MatricePoligono(p As List(Of String), g As Graphics)
+        'MATRICE;x1,y1;x2,y2;x3,y3;...;PASSOX,PASSOY;Tipo;Colore;Spessore
+        'esempio TRAPEZIO
+        'MATRICE;100,200;300,200;250,350;150,350;20,20;punti;Malva;2
+
+        ' Servono almeno:
+        ' 3 punti + passo + tipo + colore + spessore = 7
+        If p.Count < 7 Then Return
+
+        ' --- 1. Leggi SOLO i punti del poligono ---
+        Dim punti As New List(Of PointF)
+        Dim numPunti As Integer = p.Count - 4   ' <-- FONDAMENTALE
+
+        For i As Integer = 0 To numPunti - 1
             punti.Add(Punto(p(i)))
-            i += 1
-        End While
+        Next
 
         ' --- 2. Parametri ---
-        Dim passo = Punto(p(i)) : i += 1
-        Dim tipo = p(i).ToUpper() : i += 1
-        Dim spessore = Integer.Parse(p(i))
+        Dim passo As Point = Punto(p(numPunti))
+        Dim tipo As String = p(numPunti + 1).ToUpper()
+        Dim colore As Color = ColorConv(p(numPunti + 2).ToUpper())
+        Dim spessore As Integer = Integer.Parse(p(numPunti + 3))
 
         ' --- 3. Bounding box ---
         Dim minX, minY, maxX, maxY As Single
@@ -3862,7 +3881,7 @@ Public Class RobotDrawer
             ' --- 5. Disegno matrice ---
             For x = minX To maxX Step passo.X
                 For y = minY To maxY Step passo.Y
-                    DisegnaSimbolo(g, tipo, x, y, spessore)
+                    DisegnaSimbolo(g, tipo, x, y, colore, spessore)
                 Next
             Next
 
@@ -3887,23 +3906,22 @@ Public Class RobotDrawer
         maxY = punti.Max(Function(p) p.Y)
     End Sub
 
-    Private Sub DisegnaSimbolo(g As Graphics, tipo As String, x As Single, y As Single, s As Integer)
-
+    Private Sub DisegnaSimbolo(g As Graphics, tipo As String, x As Single, y As Single, colore As Color, s As Integer)
+        'Solo per il disegno della matrice poligono
         Select Case tipo
             Case "PUNTI"
-                g.FillEllipse(Brushes.Black, x - s, y - s, s * 2, s * 2)
+                g.FillEllipse(New SolidBrush(colore), x - s, y - s, s * 2, s * 2)
 
             Case "QUADRATI"
-                g.DrawRectangle(Pens.Black, x - s, y - s, s * 2, s * 2)
+                g.DrawRectangle(New Pen(colore, 1), x - s, y - s, s * 2, s * 2)
 
             Case "CROCI"
-                g.DrawLine(Pens.Black, x - s, y, x + s, y)
-                g.DrawLine(Pens.Black, x, y - s, x, y + s)
+                g.DrawLine(New Pen(colore, 1), x - s, y, x + s, y)
+                g.DrawLine(New Pen(colore, 1), x, y - s, x, y + s)
 
             Case "X"
-                g.DrawLine(Pens.Black, x - s, y - s, x + s, y + s)
-                g.DrawLine(Pens.Black, x - s, y + s, x + s, y - s)
+                g.DrawLine(New Pen(colore, 1), x - s, y - s, x + s, y + s)
+                g.DrawLine(New Pen(colore, 1), x - s, y + s, x + s, y - s)
         End Select
     End Sub
-
 End Class
