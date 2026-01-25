@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Form1
     Inherits System.Windows.Forms.Form
 
     'Form esegue l'override del metodo Dispose per pulire l'elenco dei componenti.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,11 +20,12 @@ Partial Class Form1
     'NOTA: la procedura che segue è richiesta da Progettazione Windows Form
     'Può essere modificata in Progettazione Windows Form.  
     'Non modificarla mediante l'editor del codice.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.PanelTop = New System.Windows.Forms.Panel()
+        Me.ButtonAdapt = New System.Windows.Forms.Button()
         Me.ButtonCentroMondo = New System.Windows.Forms.Button()
         Me.ButtonRenderRemain = New System.Windows.Forms.Button()
         Me.ButtonHistory = New System.Windows.Forms.Button()
@@ -51,6 +52,7 @@ Partial Class Form1
         Me.ButtonClose = New System.Windows.Forms.Button()
         Me.PictureBoxPR = New System.Windows.Forms.PictureBox()
         Me.PanelLeft = New System.Windows.Forms.Panel()
+        Me.ButtonSVG = New System.Windows.Forms.Button()
         Me.ButtonColors = New System.Windows.Forms.Button()
         Me.ButtonRiavvia = New System.Windows.Forms.Button()
         Me.ButtonAttivaListBox = New System.Windows.Forms.Button()
@@ -59,18 +61,24 @@ Partial Class Form1
         Me.ButtonHelp = New System.Windows.Forms.Button()
         Me.LabelCoord = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
+        Me.Menu1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.AdattaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.LstComandi = New System.Windows.Forms.ListBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.ListView1 = New System.Windows.Forms.ListView()
+        Me.__PAINTROBOT__ = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.PanelTop.SuspendLayout()
         CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelLeft.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.Menu1.SuspendLayout()
         Me.SuspendLayout()
         '
         'PanelTop
         '
         Me.PanelTop.BackColor = System.Drawing.Color.Black
+        Me.PanelTop.Controls.Add(Me.ButtonAdapt)
         Me.PanelTop.Controls.Add(Me.ButtonCentroMondo)
         Me.PanelTop.Controls.Add(Me.ButtonRenderRemain)
         Me.PanelTop.Controls.Add(Me.ButtonHistory)
@@ -102,12 +110,24 @@ Partial Class Form1
         Me.PanelTop.Size = New System.Drawing.Size(1548, 60)
         Me.PanelTop.TabIndex = 1
         '
+        'ButtonAdapt
+        '
+        Me.ButtonAdapt.BackColor = System.Drawing.Color.White
+        Me.ButtonAdapt.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonAdapt.ForeColor = System.Drawing.Color.Black
+        Me.ButtonAdapt.Location = New System.Drawing.Point(1220, 5)
+        Me.ButtonAdapt.Name = "ButtonAdapt"
+        Me.ButtonAdapt.Size = New System.Drawing.Size(25, 25)
+        Me.ButtonAdapt.TabIndex = 24
+        Me.ButtonAdapt.Text = "X"
+        Me.ButtonAdapt.UseVisualStyleBackColor = False
+        '
         'ButtonCentroMondo
         '
         Me.ButtonCentroMondo.BackColor = System.Drawing.Color.White
         Me.ButtonCentroMondo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonCentroMondo.ForeColor = System.Drawing.Color.Black
-        Me.ButtonCentroMondo.Location = New System.Drawing.Point(1204, 5)
+        Me.ButtonCentroMondo.Location = New System.Drawing.Point(1195, 5)
         Me.ButtonCentroMondo.Name = "ButtonCentroMondo"
         Me.ButtonCentroMondo.Size = New System.Drawing.Size(25, 25)
         Me.ButtonCentroMondo.TabIndex = 23
@@ -132,9 +152,9 @@ Partial Class Form1
         Me.ButtonHistory.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(192, Byte), Integer))
         Me.ButtonHistory.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonHistory.ForeColor = System.Drawing.Color.White
-        Me.ButtonHistory.Location = New System.Drawing.Point(1303, 32)
+        Me.ButtonHistory.Location = New System.Drawing.Point(1314, 32)
         Me.ButtonHistory.Name = "ButtonHistory"
-        Me.ButtonHistory.Size = New System.Drawing.Size(153, 25)
+        Me.ButtonHistory.Size = New System.Drawing.Size(142, 25)
         Me.ButtonHistory.TabIndex = 21
         Me.ButtonHistory.Text = "Render History"
         Me.ButtonHistory.UseVisualStyleBackColor = False
@@ -170,7 +190,7 @@ Partial Class Form1
         Me.ButtonSavePaintRobot.BackColor = System.Drawing.Color.White
         Me.ButtonSavePaintRobot.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonSavePaintRobot.ForeColor = System.Drawing.Color.Black
-        Me.ButtonSavePaintRobot.Location = New System.Drawing.Point(1303, 5)
+        Me.ButtonSavePaintRobot.Location = New System.Drawing.Point(1314, 5)
         Me.ButtonSavePaintRobot.Name = "ButtonSavePaintRobot"
         Me.ButtonSavePaintRobot.Size = New System.Drawing.Size(80, 25)
         Me.ButtonSavePaintRobot.TabIndex = 17
@@ -226,7 +246,7 @@ Partial Class Form1
         Me.ButtonOut.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonOut.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ButtonOut.ForeColor = System.Drawing.Color.Black
-        Me.ButtonOut.Location = New System.Drawing.Point(1267, 5)
+        Me.ButtonOut.Location = New System.Drawing.Point(1283, 5)
         Me.ButtonOut.Name = "ButtonOut"
         Me.ButtonOut.Size = New System.Drawing.Size(25, 25)
         Me.ButtonOut.TabIndex = 13
@@ -239,7 +259,7 @@ Partial Class Form1
         Me.ButtonZoomIn.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonZoomIn.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ButtonZoomIn.ForeColor = System.Drawing.Color.Black
-        Me.ButtonZoomIn.Location = New System.Drawing.Point(1242, 5)
+        Me.ButtonZoomIn.Location = New System.Drawing.Point(1258, 5)
         Me.ButtonZoomIn.Name = "ButtonZoomIn"
         Me.ButtonZoomIn.Size = New System.Drawing.Size(25, 25)
         Me.ButtonZoomIn.TabIndex = 12
@@ -251,7 +271,7 @@ Partial Class Form1
         Me.ButtonOrigin.BackColor = System.Drawing.Color.White
         Me.ButtonOrigin.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonOrigin.ForeColor = System.Drawing.Color.Black
-        Me.ButtonOrigin.Location = New System.Drawing.Point(1179, 5)
+        Me.ButtonOrigin.Location = New System.Drawing.Point(1170, 5)
         Me.ButtonOrigin.Name = "ButtonOrigin"
         Me.ButtonOrigin.Size = New System.Drawing.Size(25, 25)
         Me.ButtonOrigin.TabIndex = 11
@@ -263,7 +283,7 @@ Partial Class Form1
         Me.ButtonRight.BackColor = System.Drawing.Color.White
         Me.ButtonRight.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonRight.ForeColor = System.Drawing.Color.Black
-        Me.ButtonRight.Location = New System.Drawing.Point(1138, 4)
+        Me.ButtonRight.Location = New System.Drawing.Point(1135, 4)
         Me.ButtonRight.Name = "ButtonRight"
         Me.ButtonRight.Size = New System.Drawing.Size(25, 25)
         Me.ButtonRight.TabIndex = 10
@@ -275,7 +295,7 @@ Partial Class Form1
         Me.ButtonDown.BackColor = System.Drawing.Color.White
         Me.ButtonDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonDown.ForeColor = System.Drawing.Color.Black
-        Me.ButtonDown.Location = New System.Drawing.Point(1111, 4)
+        Me.ButtonDown.Location = New System.Drawing.Point(1108, 4)
         Me.ButtonDown.Name = "ButtonDown"
         Me.ButtonDown.Size = New System.Drawing.Size(25, 25)
         Me.ButtonDown.TabIndex = 9
@@ -287,7 +307,7 @@ Partial Class Form1
         Me.ButtonUp.BackColor = System.Drawing.Color.White
         Me.ButtonUp.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonUp.ForeColor = System.Drawing.Color.Black
-        Me.ButtonUp.Location = New System.Drawing.Point(1084, 4)
+        Me.ButtonUp.Location = New System.Drawing.Point(1081, 4)
         Me.ButtonUp.Name = "ButtonUp"
         Me.ButtonUp.Size = New System.Drawing.Size(25, 25)
         Me.ButtonUp.TabIndex = 8
@@ -299,7 +319,7 @@ Partial Class Form1
         Me.ButtonLeft.BackColor = System.Drawing.Color.White
         Me.ButtonLeft.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonLeft.ForeColor = System.Drawing.Color.Black
-        Me.ButtonLeft.Location = New System.Drawing.Point(1057, 4)
+        Me.ButtonLeft.Location = New System.Drawing.Point(1054, 4)
         Me.ButtonLeft.Name = "ButtonLeft"
         Me.ButtonLeft.Size = New System.Drawing.Size(25, 25)
         Me.ButtonLeft.TabIndex = 7
@@ -390,7 +410,8 @@ Partial Class Form1
         '
         'PanelLeft
         '
-        Me.PanelLeft.BackColor = System.Drawing.Color.Gray
+        Me.PanelLeft.BackColor = System.Drawing.Color.Black
+        Me.PanelLeft.Controls.Add(Me.ButtonSVG)
         Me.PanelLeft.Controls.Add(Me.ButtonColors)
         Me.PanelLeft.Controls.Add(Me.ButtonRiavvia)
         Me.PanelLeft.Controls.Add(Me.ButtonAttivaListBox)
@@ -402,6 +423,18 @@ Partial Class Form1
         Me.PanelLeft.Name = "PanelLeft"
         Me.PanelLeft.Size = New System.Drawing.Size(60, 570)
         Me.PanelLeft.TabIndex = 2
+        '
+        'ButtonSVG
+        '
+        Me.ButtonSVG.BackColor = System.Drawing.Color.Black
+        Me.ButtonSVG.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonSVG.ForeColor = System.Drawing.Color.White
+        Me.ButtonSVG.Location = New System.Drawing.Point(2, 225)
+        Me.ButtonSVG.Name = "ButtonSVG"
+        Me.ButtonSVG.Size = New System.Drawing.Size(56, 25)
+        Me.ButtonSVG.TabIndex = 25
+        Me.ButtonSVG.Text = "SVG"
+        Me.ButtonSVG.UseVisualStyleBackColor = False
         '
         'ButtonColors
         '
@@ -488,11 +521,28 @@ Partial Class Form1
         'PictureBox1
         '
         Me.PictureBox1.BackColor = System.Drawing.Color.White
+        Me.PictureBox1.ContextMenuStrip = Me.Menu1
         Me.PictureBox1.Location = New System.Drawing.Point(60, 60)
         Me.PictureBox1.Name = "PictureBox1"
         Me.PictureBox1.Size = New System.Drawing.Size(1214, 570)
         Me.PictureBox1.TabIndex = 0
         Me.PictureBox1.TabStop = False
+        '
+        'Menu1
+        '
+        Me.Menu1.BackColor = System.Drawing.Color.Black
+        Me.Menu1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.__PAINTROBOT__, Me.ToolStripSeparator1, Me.AdattaToolStripMenuItem})
+        Me.Menu1.Name = "ContextMenuOptions"
+        Me.Menu1.Size = New System.Drawing.Size(184, 76)
+        Me.Menu1.Text = "___________________________"
+        '
+        'AdattaToolStripMenuItem
+        '
+        Me.AdattaToolStripMenuItem.BackColor = System.Drawing.Color.Black
+        Me.AdattaToolStripMenuItem.ForeColor = System.Drawing.Color.White
+        Me.AdattaToolStripMenuItem.Name = "AdattaToolStripMenuItem"
+        Me.AdattaToolStripMenuItem.Size = New System.Drawing.Size(183, 22)
+        Me.AdattaToolStripMenuItem.Text = "Adatta Allo Schermo"
         '
         'LstComandi
         '
@@ -506,7 +556,7 @@ Partial Class Form1
         '
         'ListView1
         '
-        Me.ListView1.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
+        Me.ListView1.BackColor = System.Drawing.Color.Black
         Me.ListView1.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ListView1.HideSelection = False
         Me.ListView1.Location = New System.Drawing.Point(100, 100)
@@ -515,6 +565,18 @@ Partial Class Form1
         Me.ListView1.TabIndex = 25
         Me.ListView1.UseCompatibleStateImageBehavior = False
         Me.ListView1.View = System.Windows.Forms.View.Details
+        '
+        '__PAINTROBOT__
+        '
+        Me.__PAINTROBOT__.ForeColor = System.Drawing.Color.White
+        Me.__PAINTROBOT__.Name = "__PAINTROBOT__"
+        Me.__PAINTROBOT__.Size = New System.Drawing.Size(183, 22)
+        Me.__PAINTROBOT__.Text = "__PAINTROBOT__"
+        '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(180, 6)
         '
         'Form1
         '
@@ -536,6 +598,7 @@ Partial Class Form1
         CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).EndInit()
         Me.PanelLeft.ResumeLayout(False)
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.Menu1.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -579,4 +642,10 @@ Partial Class Form1
     Friend WithEvents ButtonRiavvia As Button
     Friend WithEvents ButtonColors As Button
     Friend WithEvents ListView1 As ListView
+    Friend WithEvents ButtonSVG As Button
+    Friend WithEvents ButtonAdapt As Button
+    Friend WithEvents Menu1 As ContextMenuStrip
+    Friend WithEvents AdattaToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents __PAINTROBOT__ As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
 End Class

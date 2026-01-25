@@ -160,6 +160,20 @@
         RefreshList()
     End Sub
 
+    Private Sub LabelCopia_Click(sender As Object, e As EventArgs) Handles LabelCopia.Click
+        'Copia gli elementi in HistoryString
+        Dim copyString As String = ""
+        For i = 0 To EditedHistoryString.Count - 1
+            ' Non numerata
+            copyString &= ($"{EditedHistoryString(i)}") & vbCrLf
+        Next
+
+        If copyString IsNot Nothing Then
+            Clipboard.SetText(copyString)
+            MsgBox("History Copiata in Appunti.", MsgBoxStyle.Information, "\\(*_*//  PaintRobot")
+        End If
+    End Sub
+
     Private Sub LabelClose_Click(sender As Object, e As EventArgs) Handles LabelClose.Click
         Me.DialogResult = DialogResult.Cancel
         Me.Close()

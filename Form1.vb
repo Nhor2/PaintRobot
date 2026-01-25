@@ -4,12 +4,14 @@ Imports System.Drawing.Drawing2D
 Imports System.Globalization
 Imports System.IO
 Imports System.Net.Sockets
+Imports System.Net.WebRequestMethods
 Imports System.Runtime.InteropServices.ComTypes
 Imports System.Runtime.Remoting
 Imports System.Security.Cryptography
 Imports System.Text.RegularExpressions
 Imports System.Threading
 Imports System.Web
+Imports System.Windows.Forms.AxHost
 Imports Microsoft.SqlServer
 
 Public Class Form1
@@ -147,8 +149,16 @@ Public Class Form1
 
                 ' Linee Script
                 Dim ComandiStringa As List(Of String) = Interpreter.CaricaLineeScript(ofd.FileName)
+
                 HistoryString.Clear()
-                HistoryString.AddRange(ComandiStringa)
+                For Each cmd In Comandi
+                    Dim s As String = cmd.Tipo
+                    If cmd.Parametri IsNot Nothing AndAlso cmd.Parametri.Count > 0 Then
+                        s &= ";" & String.Join(";", cmd.Parametri)
+                    End If
+
+                    HistoryString.Add(s)
+                Next
 
                 ' ListBox Comandi
                 AggiornaListaComandiStringa()
@@ -496,7 +506,7 @@ Public Class Form1
         Execute = True
         PaintRobotAlted = False
 
-        ' Crea la lista di RobotCommands
+        ' Crea la lista di RobotCommands senza Marco, FOR etc.
         Commands = Interpreter.CaricaComandiMultipli(testoNormalizzato)
 
         ' Inizializza l'indice principale
@@ -720,11 +730,20 @@ Public Class Form1
     End Sub
 
     Private Sub CenterOnDrawing(min As PointF, max As PointF)
-        'Passando i valoi disegnando
-        Dim w = max.X - min.X
-        Dim h = max.Y - min.Y
+        ' Dimensioni del disegno
+        Dim w As Single = max.X - min.X
+        Dim h As Single = max.Y - min.Y
 
-        View.Origine = New PointF(min.X + w / 2 - PictureBox1.Width / (2 * View.Zoom), min.Y + h / 2 - PictureBox1.Height / (2 * View.Zoom))
+        ' Centro del disegno
+        Dim cx As Single = min.X + w / 2
+        Dim cy As Single = min.Y + h / 2
+
+        ' Sposta la vista in modo che il centro del disegno sia al centro della PictureBox
+        View.Origine = New PointF(
+        cx - (PictureBox1.Width / 2.0F) / View.Zoom,
+        cy - (PictureBox1.Height / 2.0F) / View.Zoom)
+
+        RedrawViewport()
     End Sub
 
     Private Sub PictureBox1_MouseWheel(sender As Object, e As MouseEventArgs) Handles PictureBox1.MouseWheel
@@ -864,13 +883,47 @@ Public Class Form1
 
     Private Sub ButtonCentroMondo_Click(sender As Object, e As EventArgs) Handles ButtonCentroMondo.Click
         'Vai al centro del mondo PaintRobot 5000,5000
-        ZoomOrigin(1.0, New PointF(5000, 5000))
+        CenterViewOnPoint(New PointF(5000, 5000))
         RedrawViewport()
 
         'Visibile
         ButtonOrigin.BackColor = Color.White
         ButtonCentroMondo.BackColor = Color.Green
     End Sub
+
+    Private Sub ButtonAdapt_Click(sender As Object, e As EventArgs) Handles ButtonAdapt.Click
+        'Centra il disegno
+        Dim minX As Single = Single.MaxValue
+        Dim minY As Single = Single.MaxValue
+        Dim maxX As Single = Single.MinValue
+        Dim maxY As Single = Single.MinValue
+
+        For Each cmd In Comandi
+            For Each param In cmd.Parametri
+                If param.Contains(",") Then
+                    Dim xy = param.Split(","c)
+                    Dim x = CSng(xy(0))
+                    Dim y = CSng(xy(1))
+
+                    minX = Math.Min(minX, x)
+                    minY = Math.Min(minY, y)
+                    maxX = Math.Max(maxX, x)
+                    maxY = Math.Max(maxY, y)
+                End If
+            Next
+        Next
+
+        CenterOnDrawing(New PointF(minX, minY), New PointF(maxX, maxY))
+    End Sub
+
+    Private Sub CenterViewOnPoint(p As PointF)
+        View.Origine = New PointF(
+        p.X - (PictureBox1.Width / 2.0F) / View.Zoom,
+        p.Y - (PictureBox1.Height / 2.0F) / View.Zoom
+    )
+        RedrawViewport()
+    End Sub
+
 
     'PAN mouse
     Private isPanning As Boolean = False
@@ -1410,6 +1463,83 @@ Public Class Form1
             e.DrawText()
         End If
     End Sub
+
+    'SVG
+    Private Sub ButtonSVG_Click(sender As Object, e As EventArgs) Handles ButtonSVG.Click
+        Dim sfd As New SaveFileDialog With {
+    .Title = "Salva SVG PaintRobot...",
+    .FileName = "PaintRobot.svg",
+    .Filter = "Files Disegno SVG|*.svg"
+}
+
+        If sfd.ShowDialog(Me) = DialogResult.OK AndAlso sfd.FileName <> "" Then
+            Dim percorso As String = sfd.FileName
+            Dim estensione As String = System.IO.Path.GetExtension(percorso).TrimStart("."c).ToUpperInvariant()
+
+            Dim svg = New SvgDrawer().GeneraSVG(HistoryString, LarghezzaPaginaPixel, AltezzaPaginaPixel)
+            System.IO.File.WriteAllText(percorso, svg)
+
+            If System.IO.File.Exists(percorso) AndAlso FileLen(percorso) > 0 Then
+                MsgBox("File salvato in " & percorso,, "\\(*_*)//  PaintRobot")
+            End If
+        End If
+    End Sub
+
+    'TASTO DESTRO
+    ' Devi associare nella proprietà della Picturebox1 "ContextMenuStrip" il ContextMenuOptions.
+
+    Private Sub AdattaAlSchermo()
+        ' 1. Calcola bounding box
+        Dim minX As Single = Single.MaxValue
+        Dim minY As Single = Single.MaxValue
+        Dim maxX As Single = Single.MinValue
+        Dim maxY As Single = Single.MinValue
+
+        If Comandi IsNot Nothing Then
+            For Each cmd In Comandi
+                For Each param In cmd.Parametri
+                    If param.Contains(",") Then
+                        Dim xy = param.Split(","c)
+                        Dim x = CSng(xy(0))
+                        Dim y = CSng(xy(1))
+
+                        minX = Math.Min(minX, x)
+                        minY = Math.Min(minY, y)
+                        maxX = Math.Max(maxX, x)
+                        maxY = Math.Max(maxY, y)
+                    End If
+                Next
+            Next
+
+            ' 2. Dimensioni del disegno
+            Dim w = maxX - minX
+            Dim h = maxY - minY
+
+            ' 3. Calcola zoom per farlo entrare
+            Dim zoomX = PictureBox1.Width / w
+            Dim zoomY = PictureBox1.Height / h
+            Dim zoomFinale = Math.Min(zoomX, zoomY) * 0.9F ' margine 10%
+
+            View.Zoom = zoomFinale
+
+            ' 4. Centra il disegno
+            Dim cx = minX + w / 2
+            Dim cy = minY + h / 2
+
+            View.Origine = New PointF(
+            cx - (PictureBox1.Width / 2.0F) / View.Zoom,
+            cy - (PictureBox1.Height / 2.0F) / View.Zoom
+        )
+
+            RedrawViewport()
+
+        End If
+    End Sub
+
+    Private Sub AdattaToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AdattaToolStripMenuItem.Click
+        AdattaAlSchermo()
+    End Sub
+
 End Class
 
 Public Class RobotCommand
@@ -1567,75 +1697,6 @@ Public Class RobotInterpreter
         Return comandi
     End Function
 
-    Private Function EspandiMacro_OLD(righe As List(Of String)) As List(Of String)
-        ' Spande il contenuto della macro
-        Dim output As New List(Of String)
-        Dim i As Integer = 0
-
-        While i < righe.Count
-            Dim line = righe(i)
-
-            'DEFINE
-            If line.StartsWith("DEFINE;", StringComparison.OrdinalIgnoreCase) Then
-
-                Dim parti = line.Split(";"c)
-                Dim nomeMacro = parti(1).ToUpper()
-                Dim parametri = parti.Skip(2).Select(Function(p) p.Trim()).ToList()
-
-                Dim corpo As New List(Of String)
-                i += 1
-
-                While i < righe.Count AndAlso righe(i).ToUpper() <> "END"
-                    corpo.Add(righe(i))
-                    i += 1
-                End While
-
-                Macros(nomeMacro) = New MacroDef With {
-                .Nome = nomeMacro,
-                .Parametri = parametri,
-                .Corpo = corpo
-            }
-
-            Else
-                ' Riga normale (o chiamata macro)
-                output.AddRange(EspandiRiga(line))
-            End If
-
-
-
-            'FOR
-            If line.StartsWith("FOR;", StringComparison.OrdinalIgnoreCase) Then
-                output.AddRange(EspandiFor(righe, i))
-                ' EspandiFor aggiorna i
-                Continue While
-            End If
-
-
-
-            ' INCLUDE
-            If line.StartsWith("INCLUDE;", StringComparison.OrdinalIgnoreCase) Then
-                Dim percorsoIncluso = line.Split(";"c)(1).Trim()
-                If IO.File.Exists(percorsoIncluso) Then
-                    Dim righeInclude = IO.File.ReadAllLines(percorsoIncluso).
-                            Select(Function(r) r.Trim()).
-                            Where(Function(r) r <> "" AndAlso Not r.StartsWith("#")).
-                            ToList()
-                    ' Espandi anche eventuali macro/FOR nel file incluso
-                    output.AddRange(EspandiMacro(righeInclude))
-                Else
-                    Debug.WriteLine($"INCLUDE file non trovato: {percorsoIncluso}")
-                End If
-
-                i += 1
-                Continue While
-            End If
-
-
-            i += 1
-        End While
-
-        Return output
-    End Function
 
     Private Function EspandiMacro(righe As List(Of String)) As List(Of String)
         ' Espande il contenuto dello script con macro, FOR e INCLUDE
@@ -1673,6 +1734,19 @@ Public Class RobotInterpreter
                 Dim parti = line.Split(";"c)
                 Dim nomeMacro = parti(1).ToUpper()
                 Dim parametri = parti.Skip(2).Select(Function(p) p.Trim()).ToList()
+
+                If Macros.ContainsKey(nomeMacro) Then
+                    'Aggiunge un numero casuale alla marco per distinguerla e non perderla
+                    If Macros.ContainsKey(nomeMacro) Then
+                        Dim r As New Random
+                        Dim newNomeMacro As String = ""
+                        Do
+                            newNomeMacro = nomeMacro & r.Next(1, 9999).ToString
+                        Loop Until nomeMacro <> newNomeMacro
+                        ' Assegna il nuovo nome alla macro
+                        nomeMacro = newNomeMacro
+                    End If
+                End If
 
                 Dim corpo As New List(Of String)
                 i += 1
@@ -1998,17 +2072,17 @@ Public Class RobotDrawer
         Select Case comando.Tipo
             Case "LINEA"
                 'LINEA;10,10;200,50;Blu;2
-                Linea(comando.Parametri, g)
+                Linea(comando.Parametri, g, ctx)
             Case "RETT"
                 'Comando Rettangolo è:
                 'RETT;x1,y1;x2,y2;Colore;Tipo;Spessore con Tipo = PIENO o VUOTO
-                Rettangolo(comando.Parametri, g)
+                Rettangolo(comando.Parametri, g, ctx)
             Case "CERCHIO"
                 'CERCHIO;centroX,centroY;raggio;Colore;PIENO/VUOTO;spessore
-                Cerchio(comando.Parametri, g)
+                Cerchio(comando.Parametri, g, ctx)
             Case "TRIANG"
                 'TRIANG;x1,y1;x2,y2;x3,y3;Red;PIENO/VUOTO;3
-                Triangolo(comando.Parametri, g)
+                Triangolo(comando.Parametri, g, ctx)
             Case "PULISCI"
                 'PULISCI;Colore
                 Debug.WriteLine($"Pulisci colore: {If(comando.Parametri.Count > 0, comando.Parametri(0), "nessuno")}")
@@ -2022,23 +2096,23 @@ Public Class RobotDrawer
                 'Spessore → opzionale, Default 1
                 'StartAngle → angolo iniziale (gradi)
                 'SweepAngle → ampiezza dell'arco (gradi)
-                Arco(comando.Parametri, g)
+                Arco(comando.Parametri, g, ctx)
             Case "SCACCHI"
                 'SCACCHI;x,y;x2,y2;Colore1;Colore2
                 'SCACCHI;100,10;400,310;Blu;Rosso
                 If comando.Parametri.Count >= 4 Then
                     Debug.WriteLine($"Scacchiera: ({comando.Parametri(0)}) → ({comando.Parametri(1)}), colori: {comando.Parametri(2)}/{comando.Parametri(3)}")
                 End If
-                Scacchiera(comando.Parametri, g)
+                Scacchiera(comando.Parametri, g, ctx)
             Case "TESTO"
                 'TESTO;100,200;Ciao mondo;Rosso;20;Arial;Normal
-                Testo(comando.Parametri, g)
+                Testo(comando.Parametri, g, ctx)
             Case "POLIGONO"
                 'POLIGONO;10,10;100,30;80,120;30,90;Verde;PIENO
-                Poligono(comando.Parametri, g)
+                Poligono(comando.Parametri, g, ctx)
             Case "GRIGLIA"
                 'GRIGLIA;20;Grigio
-                Griglia(comando.Parametri, g)
+                Griglia(comando.Parametri, g, ctx)
             Case "SALVA"
                 'SALVA;C:\Temp\immagine.png;PNG
                 'SALVA;C:\Temp\immagine.bmp;BMP
@@ -2057,7 +2131,7 @@ Public Class RobotDrawer
                 'INCOLLA;10,10               # incolla immagine dagli appunti alle coordinate 10,10
                 'INCOLLA;50,100              # incolla ad altre coordinate
                 If comando.Parametri.Count >= 1 Then
-                    IncollaAppunti(ctx.Bitmap, comando.Parametri(0))
+                    IncollaAppunti(ctx.Bitmap, comando.Parametri(0), ctx)
                 End If
             Case "RIDIMENSIONA"
                 'RIDIMENSIONA;Appunti;400,400       # ridimensiona immagine negli appunti a 400x400
@@ -2067,29 +2141,29 @@ Public Class RobotDrawer
                 End If
             Case "SPLINE"
                 'SPLINE;x1,y1;x2,y2;x3,y3;...;Colore;Spessore
-                Spline(comando.Parametri, g)
+                Spline(comando.Parametri, g, ctx)
             Case "SPLINE2"
                 'SPLINE2;x1,y1;x2,y2;...;Colore;Spessore;Tensione
                 'SPLINE2;10,10;50,80;100,50;150,120;Blu;2;0.7
-                SplineAvanzata(comando.Parametri, g)
+                SplineAvanzata(comando.Parametri, g, ctx)
             Case "SPIRALE"
                 'SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione
                 'SPIRALE;400,300;10;150;5;Blu;2;Oraria → spirale che parte da raggio 10 fino a 150, 5 giri, colore blu, spessore 2, direzione oraria
                 'SPIRALE;400,300;150;10;5;Rosso;1;Antioraria → spirale inversa (si avvita verso l'interno)
-                Spirale(comando.Parametri, g)
+                Spirale(comando.Parametri, g, ctx)
 
             Case "SINUSOIDE"
                 'SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
                 'SINUSOIDE;600,200;700,200;50;25;Blu;2
-                Sinusoide(comando.Parametri, g)
+                Sinusoide(comando.Parametri, g, ctx)
 
             Case "CROCE"
                 'CROCE;x1,y1;x2,y2;Colore;Spessore
-                Croce(comando.Parametri, g)
+                Croce(comando.Parametri, g, ctx)
 
             Case "BEZIER"
                 'BEZIER;x1,y1;x2,y2;x3,y3;x4,y4;Colore;Spessore
-                Bezier(comando.Parametri, g)
+                Bezier(comando.Parametri, g, ctx)
 
             Case "TEXTURE"
                 'TEXTURE;Nome;Percorso
@@ -2142,11 +2216,11 @@ Public Class RobotDrawer
 
             Case "FRECCIA"
                 'FRECCIA;x1,y1;x2,y2;Colore;Spessore
-                Freccia(comando.Parametri, g)
+                Freccia(comando.Parametri, g, ctx)
 
             Case "STELLA"
                 'STELLA;x1,y1;NumeroPunte;Diametro;Colore;Spessore
-                Stella(comando.Parametri, g)
+                Stella(comando.Parametri, g, ctx)
 
             Case "RUOTA"
                 'RUOTA;Gradi
@@ -2161,14 +2235,14 @@ Public Class RobotDrawer
                 'MATRICE;100,200;300,200;250,350;150,350;20,20;Punti;Malva;2
                 'MATRICE;x1,y1;x2,y2;x3,y3;...;PASSOX,PASSOY;Tipo;Colore;Spessore
                 ' Tipo = Punti, Quadrati, Croci, X
-                MatricePoligono(comando.Parametri, g)
+                MatricePoligono(comando.Parametri, g, ctx)
 
             Case "MATRICEQ"
                 'Quadrato
                 'MATRICEQ;400,400;700,700;20,20;Punti;Beige;2
                 'MATRICEQ;x1,y1;x2,y2;PASSOX,PASSOY;Tipo;Colore;Spessore
                 ' Tipo = Punti, Quadrati, Croci, X
-                MatriceQuadrata(comando.Parametri, g)
+                MatriceQuadrata(comando.Parametri, g, ctx)
 
             Case Else
                 Debug.WriteLine($"Comando sconosciuto: {comando.Tipo}")
@@ -2294,6 +2368,21 @@ Public Class RobotDrawer
 
 
 
+    'TRASFORMAZIONE MONDO SCHERMO
+    Private Function ToScreen(p As PointF, ctx As RobotContext) As PointF
+        Return New PointF(
+        (p.X - ctx.View.Origine.X) * ctx.View.Zoom,
+        (p.Y - ctx.View.Origine.Y) * ctx.View.Zoom
+    )
+    End Function
+
+    Private Function ToWorld(p As PointF, ctx As RobotContext) As PointF
+        Return New PointF(
+        p.X / ctx.View.Zoom + ctx.View.Origine.X,
+        p.Y / ctx.View.Zoom + ctx.View.Origine.Y
+    )
+    End Function
+
 
     'Disegno
     Private Function Punto(s As String) As Point
@@ -2305,7 +2394,7 @@ Public Class RobotDrawer
         Return New Point(CInt(xy(0)), CInt(xy(1)))
     End Function
 
-    Private Sub Linea(p As List(Of String), g As Graphics)
+    Private Sub Linea(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 3 Then Return
 
         Dim p1 = Punto(p(0))
@@ -2314,12 +2403,15 @@ Public Class RobotDrawer
         Dim spessore = If(p.Count >= 4, Integer.Parse(p(3)), 1)
 
         Using pen As New Pen(colore, spessore)
-            g.DrawLine(pen, p1, p2)
+            Dim a = ToScreen(p1, ctx)
+            Dim b = ToScreen(p2, ctx)
+            g.DrawLine(pen, a, b)
+            'g.DrawLine(pen, p1, p2)
         End Using
     End Sub
 
 
-    Private Sub Rettangolo(p As List(Of String), g As Graphics)
+    Private Sub Rettangolo(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 4 Then Return
         Dim p1 = Punto(p(0))
         Dim p2 = Punto(p(1))
@@ -2327,13 +2419,16 @@ Public Class RobotDrawer
         Dim pieno As Boolean = p(3).ToUpper() = "PIENO"
         Dim spessore = If(p.Count > 4, Integer.Parse(p(4)), 1)
 
+        Dim a = ToScreen(p1, ctx)
+        Dim b = ToScreen(p2, ctx)
+
         Dim rect As New Rectangle(
-        Math.Min(p1.X, p2.X),
-        Math.Min(p1.Y, p2.Y),
-        Math.Abs(p2.X - p1.X),
-        Math.Abs(p2.Y - p1.Y)
+        Math.Min(a.X, b.X),
+        Math.Min(a.Y, b.Y),
+        Math.Abs(b.X - a.X),
+        Math.Abs(b.Y - a.Y)
     )
-        Debug.WriteLine("p1" & p1.ToString & " p2" & p2.ToString & " Colore " & p(2) & " Tipo " & p(3) & " Spessore " & spessore.ToString)
+        'Debug.WriteLine("p1" & p1.ToString & " p2" & p2.ToString & " Colore " & p(2) & " Tipo " & p(3) & " Spessore " & spessore.ToString)
         If pieno Then
             g.FillRectangle(New SolidBrush(colore), rect)
         Else
@@ -2343,7 +2438,7 @@ Public Class RobotDrawer
         End If
     End Sub
 
-    Private Sub Cerchio(p As List(Of String), g As Graphics)
+    Private Sub Cerchio(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 4 Then Return
         Dim centro = Punto(p(0))
         Dim raggio = Integer.Parse(p(1))
@@ -2351,7 +2446,9 @@ Public Class RobotDrawer
         Dim pieno As Boolean = p(3).ToUpper() = "PIENO"
         Dim spessore = If(p.Count > 4, Integer.Parse(p(4)), 1)
 
-        Dim rect As New Rectangle(centro.X - raggio, centro.Y - raggio, raggio * 2, raggio * 2)
+        Dim a = ToScreen(centro, ctx)
+
+        Dim rect As New Rectangle(a.X - raggio, a.Y - raggio, raggio * 2, raggio * 2)
 
         If pieno Then
             g.FillEllipse(New SolidBrush(colore), rect)
@@ -2362,7 +2459,7 @@ Public Class RobotDrawer
         End If
     End Sub
 
-    Private Sub Triangolo(p As List(Of String), g As Graphics)
+    Private Sub Triangolo(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 5 Then Return
         Dim p1 = Punto(p(0))
         Dim p2 = Punto(p(1))
@@ -2371,7 +2468,11 @@ Public Class RobotDrawer
         Dim pieno As Boolean = p(4).ToUpper() = "PIENO"
         Dim spessore = If(p.Count > 5, Integer.Parse(p(5)), 1)
 
-        Dim punti() As Point = {p1, p2, p3}
+        Dim a = ToScreen(p1, ctx)
+        Dim b = ToScreen(p2, ctx)
+        Dim c = ToScreen(p3, ctx)
+
+        Dim punti() As PointF = {a, b, c}
 
         If pieno Then
             g.FillPolygon(New SolidBrush(colore), punti)
@@ -2388,7 +2489,7 @@ Public Class RobotDrawer
         g.Clear(colore)
     End Sub
 
-    Private Sub Arco(p As List(Of String), g As Graphics)
+    Private Sub Arco(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 7 Then Return
 
         Dim p1 = Punto(p(0))   ' angolo alto a sinistra
@@ -2399,11 +2500,14 @@ Public Class RobotDrawer
         Dim startAngle = Integer.Parse(p(5))
         Dim sweepAngle = Integer.Parse(p(6))
 
+        Dim a = ToScreen(p1, ctx)
+        Dim b = ToScreen(p2, ctx)
+
         Dim rect As New Rectangle(
-            Math.Min(p1.X, p2.X),
-            Math.Min(p1.Y, p2.Y),
-            Math.Abs(p2.X - p1.X),
-            Math.Abs(p2.Y - p1.Y)
+            Math.Min(a.X, b.X),
+            Math.Min(a.Y, b.Y),
+            Math.Abs(b.X - a.X),
+            Math.Abs(b.Y - a.Y)
         )
 
         If pieno Then
@@ -2415,7 +2519,7 @@ Public Class RobotDrawer
         End If
     End Sub
 
-    Private Sub Scacchiera(p As List(Of String), g As Graphics)
+    Private Sub Scacchiera(p As List(Of String), g As Graphics, ctx As RobotContext)
         ' Controllo parametri
         If p.Count < 4 Then Return
 
@@ -2423,15 +2527,18 @@ Public Class RobotDrawer
         Dim angolo1 = Punto(p(0))
         Dim angolo2 = Punto(p(1))
 
+        Dim a = ToScreen(angolo1, ctx)
+        Dim b = ToScreen(angolo2, ctx)
+
         ' Colori
         Dim colore1 = ColorConv(p(2))
         Dim colore2 = ColorConv(p(3))
 
         ' Calcolo angoli reali e dimensioni
-        Dim xMin = Math.Min(angolo1.X, angolo2.X)
-        Dim yMin = Math.Min(angolo1.Y, angolo2.Y)
-        Dim larghezzaTot = Math.Abs(angolo2.X - angolo1.X)
-        Dim altezzaTot = Math.Abs(angolo2.Y - angolo1.Y)
+        Dim xMin = Math.Min(a.X, b.X)
+        Dim yMin = Math.Min(a.Y, b.Y)
+        Dim larghezzaTot = Math.Abs(b.X - a.X)
+        Dim altezzaTot = Math.Abs(b.Y - a.Y)
 
         Dim largCasella = larghezzaTot / 8
         Dim altCasella = altezzaTot / 8
@@ -2450,7 +2557,7 @@ Public Class RobotDrawer
         Next
     End Sub
 
-    Private Sub Testo(p As List(Of String), g As Graphics)
+    Private Sub Testo(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 4 Then Return
 
         Dim pos = Punto(p(0))
@@ -2458,12 +2565,14 @@ Public Class RobotDrawer
         Dim colore = ColorConv(p(2))
         Dim size As Single = CSng(p(3))
 
+        Dim a = ToScreen(pos, ctx)
+
         Dim fontName As String = If(p.Count > 4, p(4), "Arial")
         Dim stile As FontStyle = If(p.Count > 5, ParseFontStyle(p(5)), FontStyle.Regular)
 
         Using f As Font = FontSicuro(fontName, size, stile)
             Using b As New SolidBrush(colore)
-                g.DrawString(testo, f, b, pos)
+                g.DrawString(testo, f, b, a)
             End Using
         End Using
     End Sub
@@ -2504,14 +2613,17 @@ Public Class RobotDrawer
         End Select
     End Function
 
-    Private Sub Poligono(p As List(Of String), g As Graphics)
+    Private Sub Poligono(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 4 Then Return
 
-        Dim punti As New List(Of Point)
+        Dim punti As New List(Of PointF)
 
         Dim i As Integer = 0
         While i < p.Count AndAlso p(i).Contains(",")
-            punti.Add(Punto(p(i)))
+            Dim p1 = Punto(p(i))
+            Dim a = ToScreen(p1, ctx)
+
+            punti.Add(a)
             i += 1
         End While
 
@@ -2528,7 +2640,7 @@ Public Class RobotDrawer
         End If
     End Sub
 
-    Private Sub Griglia(p As List(Of String), g As Graphics)
+    Private Sub Griglia(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 2 Then Return
 
         Dim passo = Integer.Parse(p(0))
@@ -2706,35 +2818,6 @@ Public Class RobotDrawer
         Next
     End Sub
 
-    Private Sub RuotaBitmap_old(p As List(Of String), g As Graphics, bmp As Bitmap)
-
-        If p.Count < 1 Then Return
-
-        Dim angolo As Single
-        If Not Single.TryParse(p(0), angolo) Then Return
-
-        Dim w As Integer = bmp.Width
-        Dim h As Integer = bmp.Height
-
-        ' Bitmap buffer
-        Dim temp As Bitmap = bmp.Clone
-        Using temp
-            Using gTemp As Graphics = Graphics.FromImage(temp)
-                gTemp.Clear(Color.White) ' o sfondo CAD
-
-                gTemp.TranslateTransform(w / 2.0F, h / 2.0F)
-                gTemp.RotateTransform(angolo)
-                gTemp.TranslateTransform(-w / 2.0F, -h / 2.0F)
-
-                gTemp.DrawImage(bmp, 0, 0, w, h)
-                gTemp.ResetTransform()
-            End Using
-
-            ' Copia finale → bmp
-            g.DrawImage(temp, 0, 0)
-        End Using
-    End Sub
-
     Private Sub RuotaBitmap(p As List(Of String), g As Graphics, bmp As Bitmap)
 
         If p.Count < 1 Then Return
@@ -2759,7 +2842,6 @@ Public Class RobotDrawer
             g.ResetTransform()
         End Using
     End Sub
-
 
     Private Sub SfumaBitmap(p As List(Of String), bmp As Bitmap)
         If p.Count < 3 Then Return
@@ -2858,7 +2940,6 @@ Public Class RobotDrawer
             Next
         Next
     End Sub
-
 
     Private Sub SaturazioneBitmap(p As List(Of String), bmp As Bitmap)
         If p.Count < 1 Then Return
@@ -2964,17 +3045,19 @@ Public Class RobotDrawer
         End Try
     End Sub
 
-    Private Sub IncollaAppunti(bmp As Bitmap, coord As String)
+    Private Sub IncollaAppunti(bmp As Bitmap, coord As String, ctx As RobotContext)
         Try
             If My.Computer.Clipboard.ContainsImage Then
                 Dim img As Image = My.Computer.Clipboard.GetImage()
                 Dim p As Point = Punto(coord)
 
+                Dim a = ToScreen(p, ctx)
+
                 Using g As Graphics = Graphics.FromImage(bmp)
-                    g.DrawImage(img, p.X, p.Y, img.Width, img.Height)
+                    g.DrawImage(img, a.X, a.Y, img.Width, img.Height)
                 End Using
 
-                Debug.WriteLine($"Immagine incollata agli appunti a: {p.X},{p.Y}")
+                Debug.WriteLine($"Immagine incollata agli appunti a: {a.X},{a.Y}")
             Else
                 Debug.WriteLine("Nessuna immagine negli appunti.")
             End If
@@ -3038,7 +3121,7 @@ Public Class RobotDrawer
     End Sub
 
 
-    Private Sub Spline(p As List(Of String), g As Graphics)
+    Private Sub Spline(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 4 Then Return ' almeno 3 punti + colore
 
         ' Leggi colore
@@ -3054,9 +3137,12 @@ Public Class RobotDrawer
         End If
 
         ' Leggi punti
-        Dim punti As New List(Of Point)
+        Dim punti As New List(Of PointF)
         For i = 0 To p.Count - 3
-            punti.Add(Punto(p(i)))
+            Dim p1 = Punto(p(i))
+            Dim a = ToScreen(p1, ctx)
+
+            punti.Add(a)
         Next
 
         ' Se meno di 3 punti non possiamo fare spline
@@ -3068,7 +3154,7 @@ Public Class RobotDrawer
         End Using
     End Sub
 
-    Private Sub SplineAvanzata(p As List(Of String), g As Graphics)
+    Private Sub SplineAvanzata(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 4 Then Return ' almeno 3 punti + colore
 
         ' Leggi colore
@@ -3084,10 +3170,13 @@ Public Class RobotDrawer
         tension = Math.Max(0F, Math.Min(1.0F, tension))
 
         ' Leggi punti: tutti tranne gli ultimi 3 parametri
-        Dim punti As New List(Of Point)
+        Dim punti As New List(Of PointF)
         For i = 0 To p.Count - 4
             Try
-                punti.Add(Punto(p(i)))
+                Dim p1 = Punto(p(i))
+                Dim a = ToScreen(p1, ctx)
+
+                punti.Add(a)
             Catch ex As Exception
                 Debug.WriteLine($"Errore parsing punto: {p(i)} - {ex.Message}")
             End Try
@@ -3125,7 +3214,6 @@ Public Class RobotDrawer
         End Try
     End Sub
 
-
     Private Sub RemoveColore2(coloreDaRimuovere As String, coloreSfondo As String, bmp As Bitmap)
         Dim rgb1 = coloreDaRimuovere.Split(","c)
         Dim rgb2 = coloreSfondo.Split(","c)
@@ -3162,7 +3250,6 @@ Public Class RobotDrawer
         System.Runtime.InteropServices.Marshal.Copy(pixels, 0, ptr, byteCount)
         bmp.UnlockBits(bmpData)
     End Sub
-
 
     Private Sub Sfumatura(p As List(Of String), bmp As Bitmap)
         If p.Count < 4 Then Return
@@ -3209,7 +3296,6 @@ Public Class RobotDrawer
 
         Debug.WriteLine($"Sfumatura {tipo} da {p(0)} a {p(1)} direzione {p(3)} applicata.")
     End Sub
-
 
     Private Sub SfumaturaP(p As List(Of String), bmp As Bitmap)
         If p.Count < 4 Then Return
@@ -3275,8 +3361,7 @@ Public Class RobotDrawer
         Debug.WriteLine($"Sfumatura {tipo} da {p(0)} a {p(1)} direzione {p(3)} applicata su {percentuale}% della bitmap.")
     End Sub
 
-
-    Private Sub Spirale(param As List(Of String), g As Graphics)
+    Private Sub Spirale(param As List(Of String), g As Graphics, ctx As RobotContext)
         Try
             If param.Count < 7 Then
                 Debug.WriteLine("SPIRALE: parametri insufficienti")
@@ -3292,6 +3377,8 @@ Public Class RobotDrawer
             Dim spessore = CInt(param(5))
             Dim direzione = param(6).ToUpper()
 
+            Dim a = ToScreen(centro, ctx)
+
             'Calcolo numero totale di punti
             Dim puntiTotali = CInt(360 * giri)
             Dim penna As New Pen(colore, spessore)
@@ -3302,8 +3389,8 @@ Public Class RobotDrawer
             Dim angoloStep = 2 * Math.PI / 360 '1 grado in radianti
             Dim theta = 0.0
             Dim raggio = raggioIniziale
-            Dim x0 = centro.X + raggio * Math.Cos(theta)
-            Dim y0 = centro.Y + raggio * Math.Sin(theta)
+            Dim x0 = a.X + raggio * Math.Cos(theta)
+            Dim y0 = a.Y + raggio * Math.Sin(theta)
 
             For i = 1 To puntiTotali
                 'Aggiorno l'angolo
@@ -3312,8 +3399,8 @@ Public Class RobotDrawer
                 raggio += deltaRaggio
 
                 'Nuovo punto
-                Dim x1 = centro.X + raggio * Math.Cos(theta)
-                Dim y1 = centro.Y + raggio * Math.Sin(theta)
+                Dim x1 = a.X + raggio * Math.Cos(theta)
+                Dim y1 = a.Y + raggio * Math.Sin(theta)
 
                 'Disegno linea tra punti
                 g.DrawLine(penna, CSng(x0), CSng(y0), CSng(x1), CSng(y1))
@@ -3324,13 +3411,13 @@ Public Class RobotDrawer
             Next
 
             penna.Dispose()
-            Debug.WriteLine($"SPIRALE disegnata: centro({centro.X},{centro.Y}), raggio {raggioIniziale}->{raggioFinale}, giri {giri}, colore {colore.Name}")
+            Debug.WriteLine($"SPIRALE disegnata: centro({a.X},{a.Y}), raggio {raggioIniziale}->{raggioFinale}, giri {giri}, colore {colore.Name}")
         Catch ex As Exception
             Debug.WriteLine("Errore SPIRALE: " & ex.Message)
         End Try
     End Sub
 
-    Private Sub Sinusoide(param As List(Of String), g As Graphics)
+    Private Sub Sinusoide(param As List(Of String), g As Graphics, ctx As RobotContext)
         Try
             If param.Count < 6 Then
                 Debug.WriteLine("SINUSOIDE: parametri insufficienti")
@@ -3344,11 +3431,14 @@ Public Class RobotDrawer
             Dim colore = ColorConv(param(4))
             Dim spessore = CInt(param(5))
 
+            Dim a = ToScreen(startP, ctx)
+            Dim b = ToScreen(endP, ctx)
+
             Dim penna As New Pen(colore, spessore)
 
             'Calcolo lunghezza totale
-            Dim dx = endP.X - startP.X
-            Dim dy = endP.Y - startP.Y
+            Dim dx = b.X - a.X
+            Dim dy = b.Y - a.Y
             Dim lunghezza = Math.Sqrt(dx * dx + dy * dy)
 
             'Numero di punti (un punto per pixel in X)
@@ -3360,18 +3450,18 @@ Public Class RobotDrawer
             Dim sinA = Math.Sin(angle)
 
             'Punto precedente
-            Dim x0 = startP.X
-            Dim y0 = startP.Y
+            Dim x0 = a.X
+            Dim y0 = a.Y
 
             For i = 1 To puntiTotali
                 Dim t = i / puntiTotali 'progressione 0→1
-                Dim x = startP.X + t * dx
+                Dim x = a.X + t * dx
                 'y = sin(2π * (x / freq)) * amp
-                Dim y = startP.Y + Math.Sin(2 * Math.PI * (i / freq)) * amp
+                Dim y = a.Y + Math.Sin(2 * Math.PI * (i / freq)) * amp
 
                 'Ruotiamo la curva se dy <> 0
-                Dim xr = startP.X + t * dx
-                Dim yr = startP.Y + Math.Sin(2 * Math.PI * (i / freq)) * amp
+                Dim xr = a.X + t * dx
+                Dim yr = a.Y + Math.Sin(2 * Math.PI * (i / freq)) * amp
 
                 'Linee tra punti
                 g.DrawLine(penna, CSng(x0), CSng(y0), CSng(xr), CSng(yr))
@@ -3381,25 +3471,28 @@ Public Class RobotDrawer
             Next
 
             penna.Dispose()
-            Debug.WriteLine($"SINUSOIDE disegnata: {startP.X},{startP.Y} → {endP.X},{endP.Y}, ampiezza {amp}, freq {freq}, colore {colore.Name}")
+            Debug.WriteLine($"SINUSOIDE disegnata: {a.X},{a.Y} → {b.X},{b.Y}, ampiezza {amp}, freq {freq}, colore {colore.Name}")
         Catch ex As Exception
             Debug.WriteLine("Errore SINUSOIDE: " & ex.Message)
         End Try
     End Sub
 
-    Private Sub Croce(p As List(Of String), g As Graphics)
+    Private Sub Croce(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 2 Then Return
 
         Dim p1 = Punto(p(0))
         Dim p2 = Punto(p(1))
 
+        Dim a = ToScreen(p1, ctx)
+        Dim b = ToScreen(p2, ctx)
+
         Dim colore As Color = If(p.Count > 2, ColorConv(p(2)), Color.Black)
         Dim spessore As Single = If(p.Count > 3, CSng(p(3)), 1)
 
-        Dim minX = Math.Min(p1.X, p2.X)
-        Dim maxX = Math.Max(p1.X, p2.X)
-        Dim minY = Math.Min(p1.Y, p2.Y)
-        Dim maxY = Math.Max(p1.Y, p2.Y)
+        Dim minX = Math.Min(a.X, b.X)
+        Dim maxX = Math.Max(a.X, b.X)
+        Dim minY = Math.Min(a.Y, b.Y)
+        Dim maxY = Math.Max(a.Y, b.Y)
 
         Dim cx As Single = (minX + maxX) / 2.0F
         Dim cy As Single = (minY + maxY) / 2.0F
@@ -3410,7 +3503,7 @@ Public Class RobotDrawer
         End Using
     End Sub
 
-    Private Sub Bezier(p As List(Of String), g As Graphics)
+    Private Sub Bezier(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 4 Then Return
 
         Dim p1 = Punto(p(0))
@@ -3418,11 +3511,16 @@ Public Class RobotDrawer
         Dim p3 = Punto(p(2))
         Dim p4 = Punto(p(3))
 
+        Dim a = ToScreen(p1, ctx)
+        Dim b = ToScreen(p2, ctx)
+        Dim c = ToScreen(p3, ctx)
+        Dim d = ToScreen(p4, ctx)
+
         Dim colore As Color = If(p.Count > 4, ColorConv(p(4)), Color.Black)
         Dim spessore As Single = If(p.Count > 5, CSng(p(5)), 1)
 
         Using pen As New Pen(colore, spessore)
-            g.DrawBezier(pen, p1, p2, p3, p4)
+            g.DrawBezier(pen, a, b, c, d)
         End Using
     End Sub
 
@@ -3449,7 +3547,6 @@ Public Class RobotDrawer
         End Using
     End Sub
 
-
     Private Sub TextureDraw(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 2 Then Return
 
@@ -3457,13 +3554,15 @@ Public Class RobotDrawer
         If Not ctx.Textures.ContainsKey(nome) Then Return
 
         Dim pos = Punto(p(1))
+        Dim a = ToScreen(pos, ctx)
+
         Dim scala As Single = If(p.Count > 2, CSng(p(2)), 1.0F)
 
         Dim bmp = ctx.Textures(nome)
         Dim w = bmp.Width * scala
         Dim h = bmp.Height * scala
 
-        g.DrawImage(bmp, pos.X, pos.Y, w, h)
+        g.DrawImage(bmp, a.X, a.Y, w, h)
     End Sub
 
     Private Sub PatternCreate(p As List(Of String), ctx As RobotContext)
@@ -3520,11 +3619,14 @@ Public Class RobotDrawer
         Dim p1 = Punto(p(1))
         Dim p2 = Punto(p(2))
 
+        Dim a = ToScreen(p1, ctx)
+        Dim b = ToScreen(p2, ctx)
+
         Dim rect As New RectangleF(
-        Math.Min(p1.X, p2.X),
-        Math.Min(p1.Y, p2.Y),
-        Math.Abs(p2.X - p1.X),
-        Math.Abs(p2.Y - p1.Y)
+        Math.Min(a.X, b.X),
+        Math.Min(a.Y, b.Y),
+        Math.Abs(b.X - a.X),
+        Math.Abs(b.Y - a.Y)
     )
 
         Using pen As New Pen(pat.Colore, pat.Spessore)
@@ -3746,7 +3848,7 @@ Public Class RobotDrawer
         End Using
     End Sub
 
-    Private Sub Freccia(p As List(Of String), g As Graphics)
+    Private Sub Freccia(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 3 Then Return
 
         Dim p1 = Punto(p(0))
@@ -3754,10 +3856,13 @@ Public Class RobotDrawer
         Dim colore = ColorConv(p(2))
         Dim spessore = Integer.Parse(p(3))
 
-        Using pen As New Pen(colore, spessore)
-            g.DrawLine(pen, p1, p2)
+        Dim a = ToScreen(p1, ctx)
+        Dim b = ToScreen(p2, ctx)
 
-            Dim angolo = Math.Atan2(p1.Y - p2.Y, p1.X - p2.X)
+        Using pen As New Pen(colore, spessore)
+            g.DrawLine(pen, a, b)
+
+            Dim angolo = Math.Atan2(a.Y - b.Y, a.X - b.X)
             Dim lung = 10 + spessore * 2
 
             Dim a1 = angolo + Math.PI / 6
@@ -3771,12 +3876,12 @@ Public Class RobotDrawer
             p2.X + lung * Math.Cos(a2),
             p2.Y + lung * Math.Sin(a2))
 
-            g.DrawLine(pen, p2, pA)
-            g.DrawLine(pen, p2, pB)
+            g.DrawLine(pen, b, pA)
+            g.DrawLine(pen, b, pB)
         End Using
     End Sub
 
-    Private Sub Stella(p As List(Of String), g As Graphics)
+    Private Sub Stella(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 4 Then Return
 
         Dim centro = Punto(p(0))
@@ -3785,6 +3890,8 @@ Public Class RobotDrawer
         ' Colori
         Dim colore1 = ColorConv(p(3))
         Dim spessore = Integer.Parse(p(4))
+
+        Dim a = ToScreen(centro, ctx)
 
         Dim rEst = diametro / 2
         Dim rInt = rEst / 2
@@ -3797,14 +3904,14 @@ Public Class RobotDrawer
             Dim ang = i * stepAng - Math.PI / 2
 
             pts.Add(New PointF(
-            centro.X + r * Math.Cos(ang),
-            centro.Y + r * Math.Sin(ang)))
+            a.X + r * Math.Cos(ang),
+            a.Y + r * Math.Sin(ang)))
         Next
 
         g.DrawPolygon(New Pen(colore1, spessore), pts.ToArray())
     End Sub
 
-    Private Sub MatriceQuadrata(p As List(Of String), g As Graphics)
+    Private Sub MatriceQuadrata(p As List(Of String), g As Graphics, ctx As RobotContext)
         ' Metrice Quadrata
         'Significato
         'x1, y1 → punto iniziale
@@ -3823,10 +3930,14 @@ Public Class RobotDrawer
         Dim colore As Color = ColorConv(p(4).ToUpper())
         Dim s As Integer = Integer.Parse(p(5)) 'spessore
 
+        Dim a = ToScreen(start, ctx)
+        Dim b = ToScreen(fine, ctx)
+        Dim c = ToScreen(passo, ctx)
+
         'Debug.WriteLine("MATRICE QUADRATA " & start.ToString & fine.ToString & passo.ToString & tipo.ToString & s.ToString)
 
-        For x = start.X To fine.X Step passo.X
-            For y = start.Y To fine.Y Step passo.Y
+        For x = a.X To b.X Step c.X
+            For y = a.Y To b.Y Step c.Y
                 Select Case tipo
                     Case "PUNTI"
                         g.FillEllipse(New SolidBrush(colore), x - s, y - s, s * 2, s * 2)
@@ -3846,7 +3957,7 @@ Public Class RobotDrawer
         Next
     End Sub
 
-    Private Sub MatricePoligono(p As List(Of String), g As Graphics)
+    Private Sub MatricePoligono(p As List(Of String), g As Graphics, ctx As RobotContext)
         'MATRICE;x1,y1;x2,y2;x3,y3;...;PASSOX,PASSOY;Tipo;Colore;Spessore
         'esempio TRAPEZIO
         'MATRICE;100,200;300,200;250,350;150,350;20,20;punti;Malva;2
@@ -3860,11 +3971,15 @@ Public Class RobotDrawer
         Dim numPunti As Integer = p.Count - 4   ' <-- FONDAMENTALE
 
         For i As Integer = 0 To numPunti - 1
-            punti.Add(Punto(p(i)))
+            Dim p1 = Punto(p(i))
+            Dim a = ToScreen(p1, ctx)
+            punti.Add(a)
         Next
 
         ' --- 2. Parametri ---
         Dim passo As Point = Punto(p(numPunti))
+        Dim b = ToScreen(passo, ctx)
+
         Dim tipo As String = p(numPunti + 1).ToUpper()
         Dim colore As Color = ColorConv(p(numPunti + 2).ToUpper())
         Dim spessore As Integer = Integer.Parse(p(numPunti + 3))
@@ -3879,8 +3994,8 @@ Public Class RobotDrawer
             g.SetClip(path)
 
             ' --- 5. Disegno matrice ---
-            For x = minX To maxX Step passo.X
-                For y = minY To maxY Step passo.Y
+            For x = minX To maxX Step b.X
+                For y = minY To maxY Step b.Y
                     DisegnaSimbolo(g, tipo, x, y, colore, spessore)
                 Next
             Next
@@ -3924,4 +4039,307 @@ Public Class RobotDrawer
                 g.DrawLine(New Pen(colore, 1), x - s, y + s, x + s, y - s)
         End Select
     End Sub
+End Class
+
+
+
+
+Public Class SvgDrawer
+
+    ' Tiene traccia del livello corrente, gruppo
+    Private livelloCorrente As String = Nothing
+
+
+    ' Mappa colori italiani → CSS
+    Private Shared Function ColorToCss(nome As String) As String
+        Dim key = nome.ToUpper().Trim()
+
+        If RobotDrawer.ColoriItaliani.ContainsKey(key) Then
+            Dim c = RobotDrawer.ColoriItaliani(key)
+            Return $"rgb({c.R},{c.G},{c.B})"
+        End If
+
+        ' fallback: prova nome inglese
+        Return nome
+    End Function
+
+
+    ' Funzione principale
+    Public Function GeneraSVG(history As List(Of String),
+                              width As Integer,
+                              height As Integer) As String
+
+        Dim sb As New Text.StringBuilder()
+
+        ' Header SVG
+        sb.AppendLine($"<svg xmlns=""http://www.w3.org/2000/svg"" width=""{width}"" height=""{height}"" viewBox=""0 0 {width} {height}"">")
+
+        ' Corpo
+        For Each line In history
+            Dim parti = line.Split(";"c)
+            Dim tipo = parti(0).ToUpper()
+
+            ' --- Gestione livelli ---
+            If tipo = "ADDLIVELLO" Then
+                ' Chiudi gruppo precedente
+                If livelloCorrente IsNot Nothing Then
+                    sb.AppendLine("  </g>")
+                End If
+
+                ' Apri nuovo gruppo
+                livelloCorrente = parti(1)
+                sb.AppendLine($"  <g id=""{livelloCorrente}"">")
+                Continue For
+            End If
+
+            ' --- Comandi normali ---
+            Dim svg = ConvertiRiga(line)
+            If svg IsNot Nothing Then
+                sb.AppendLine("    " & svg)
+            End If
+        Next
+
+        ' Chiudi ultimo gruppo
+        If livelloCorrente IsNot Nothing Then
+            sb.AppendLine("  </g>")
+        End If
+
+        ' Footer
+        sb.AppendLine("</svg>")
+
+        Return sb.ToString()
+    End Function
+
+
+
+    ' Converte una singola riga CAD in SVG
+    Private Function ConvertiRiga(riga As String) As String
+        If String.IsNullOrWhiteSpace(riga) Then Return Nothing
+        If riga.StartsWith("#") Then Return Nothing
+
+        Dim parti = riga.Split(";"c)
+        Dim tipo = parti(0).ToUpper()
+
+        ' Esce se trova ADDLIVELLO
+        If tipo = "ADDLIVELLO" Then Return Nothing
+
+        Select Case tipo
+
+            Case "LINEA"
+                Return SvgLinea(parti)
+
+            Case "CERCHIO"
+                Return SvgCerchio(parti)
+
+            Case "RETT"
+                Return SvgRett(parti)
+
+            Case "POLIGONO"
+                Return SvgPoligono(parti)
+
+            Case "TESTO"
+                Return SvgTesto(parti)
+
+            Case "ARCO"
+                Return SvgArco(parti)
+
+            Case "BEZIER"
+                Return SvgBezier(parti)
+
+            Case "SPLINE", "SPLINE2"
+                Return SvgSpline(parti)
+
+            Case "GRIGLIA"
+                Return SvgGriglia(parti)
+
+            Case "GRIGLIAFULL"
+                Return SvgGrigliaFull(parti)
+
+
+            Case Else
+                ' Comandi non vettoriali → ignorati
+                Return Nothing
+        End Select
+    End Function
+
+
+
+    ' -------------------------
+    '   SVG PRIMITIVE
+    ' -------------------------
+
+    Private Function Punto(s As String) As PointF
+        Dim xy = s.Split(","c)
+        Return New PointF(CSng(xy(0)), CSng(xy(1)))
+    End Function
+
+
+    ' LINEA;x1,y1;x2,y2;Colore;Spessore
+    Private Function SvgLinea(p() As String) As String
+        If p.Length < 4 Then Return Nothing
+
+        Dim a = Punto(p(1))
+        Dim b = Punto(p(2))
+        Dim colore = ColorToCss(p(3))
+        Dim spessore = If(p.Length > 4, p(4), "1")
+
+        Return $"<line x1=""{a.X}"" y1=""{a.Y}"" x2=""{b.X}"" y2=""{b.Y}"" stroke=""{colore}"" stroke-width=""{spessore}"" />"
+    End Function
+
+
+    ' CERCHIO;x,y;raggio;Colore;PIENO/VUOTO;spessore
+    Private Function SvgCerchio(p() As String) As String
+        If p.Length < 4 Then Return Nothing
+
+        Dim c = Punto(p(1))
+        Dim r = p(2)
+        Dim colore = ColorToCss(p(3))
+        Dim pieno = If(p.Length > 4 AndAlso p(4).ToUpper() = "PIENO", colore, "none")
+        Dim bordo = If(p.Length > 4 AndAlso p(4).ToUpper() = "PIENO", "none", colore)
+        Dim spessore = If(p.Length > 5, p(5), "1")
+
+        Return $"<circle cx=""{c.X}"" cy=""{c.Y}"" r=""{r}"" fill=""{pieno}"" stroke=""{bordo}"" stroke-width=""{spessore}"" />"
+    End Function
+
+
+    ' RETT;x1,y1;x2,y2;Colore;PIENO/VUOTO;Spessore
+    Private Function SvgRett(p() As String) As String
+        If p.Length < 4 Then Return Nothing
+
+        Dim a = Punto(p(1))
+        Dim b = Punto(p(2))
+        Dim colore = ColorToCss(p(3))
+        Dim pieno = If(p.Length > 4 AndAlso p(4).ToUpper() = "PIENO", colore, "none")
+        Dim bordo = If(p.Length > 4 AndAlso p(4).ToUpper() = "PIENO", "none", colore)
+        Dim spessore = If(p.Length > 5, p(5), "1")
+
+        Dim x = Math.Min(a.X, b.X)
+        Dim y = Math.Min(a.Y, b.Y)
+        Dim w = Math.Abs(b.X - a.X)
+        Dim h = Math.Abs(b.Y - a.Y)
+
+        Return $"<rect x=""{x}"" y=""{y}"" width=""{w}"" height=""{h}"" fill=""{pieno}"" stroke=""{bordo}"" stroke-width=""{spessore}"" />"
+    End Function
+
+
+    ' POLIGONO;...;Colore;PIENO/VUOTO;Spessore
+    Private Function SvgPoligono(p() As String) As String
+        If p.Length < 4 Then Return Nothing
+
+        Dim punti As New List(Of String)
+        Dim i As Integer = 1
+
+        While i < p.Length AndAlso p(i).Contains(",")
+            Dim pt = Punto(p(i))
+            punti.Add($"{pt.X},{pt.Y}")
+            i += 1
+        End While
+
+        Dim colore = ColorToCss(p(i))
+        Dim pieno = If(p(i + 1).ToUpper() = "PIENO", colore, "none")
+        Dim bordo = If(p(i + 1).ToUpper() = "PIENO", "none", colore)
+        Dim spessore = If(p.Length > i + 2, p(i + 2), "1")
+
+        Return $"<polygon points=""{String.Join(" ", punti)}"" fill=""{pieno}"" stroke=""{bordo}"" stroke-width=""{spessore}"" />"
+    End Function
+
+
+    ' TESTO;x,y;Testo;Colore;Size;Font;Stile
+    Private Function SvgTesto(p() As String) As String
+        If p.Length < 4 Then Return Nothing
+
+        Dim pos = Punto(p(1))
+        Dim testo = p(2)
+        Dim colore = ColorToCss(p(3))
+        Dim size = If(p.Length > 4, p(4), "16")
+        Dim font = If(p.Length > 5, p(5), "Arial")
+
+        Return $"<text x=""{pos.X}"" y=""{pos.Y}"" fill=""{colore}"" font-size=""{size}"" font-family=""{font}"">{testo}</text>"
+    End Function
+
+
+    ' ARCO → convertito in path SVG
+    Private Function SvgArco(p() As String) As String
+        If p.Length < 7 Then Return Nothing
+
+        Dim a = Punto(p(1))
+        Dim b = Punto(p(2))
+        Dim colore = ColorToCss(p(3))
+        Dim spessore = If(p.Length > 5, p(5), "1")
+        Dim startAngle = CSng(p(5))
+        Dim sweepAngle = CSng(p(6))
+
+        ' bounding box
+        Dim x = Math.Min(a.X, b.X)
+        Dim y = Math.Min(a.Y, b.Y)
+        Dim w = Math.Abs(b.X - a.X)
+        Dim h = Math.Abs(b.Y - a.Y)
+
+        ' SVG arc → path
+        Return $"<path d=""M {x},{y} A {w / 2},{h / 2} 0 0,1 {x + w},{y + h}"" stroke=""{colore}"" fill=""none"" stroke-width=""{spessore}"" />"
+    End Function
+
+
+    ' BEZIER;x1,y1;x2,y2;x3,y3;x4,y4;Colore;Spessore
+    Private Function SvgBezier(p() As String) As String
+        If p.Length < 6 Then Return Nothing
+
+        Dim p1 = Punto(p(1))
+        Dim p2 = Punto(p(2))
+        Dim p3 = Punto(p(3))
+        Dim p4 = Punto(p(4))
+        Dim colore = ColorToCss(p(5))
+        Dim spessore = If(p.Length > 6, p(6), "1")
+
+        Return $"<path d=""M {p1.X},{p1.Y} C {p2.X},{p2.Y} {p3.X},{p3.Y} {p4.X},{p4.Y}"" stroke=""{colore}"" fill=""none"" stroke-width=""{spessore}"" />"
+    End Function
+
+
+    ' SPLINE → convertita in polyline
+    Private Function SvgSpline(p() As String) As String
+        Dim punti As New List(Of String)
+        Dim i As Integer = 1
+
+        While i < p.Length AndAlso p(i).Contains(",")
+            Dim pt = Punto(p(i))
+            punti.Add($"{pt.X},{pt.Y}")
+            i += 1
+        End While
+
+        If punti.Count < 2 Then Return Nothing
+
+        Dim colore = ColorToCss(p(i))
+        Dim spessore = If(p.Length > i + 1, p(i + 1), "1")
+
+        Return $"<polyline points=""{String.Join(" ", punti)}"" fill=""none"" stroke=""{colore}"" stroke-width=""{spessore}"" />"
+    End Function
+
+    ' GRIGLIA → convertita in polyline
+    Private Function SvgGriglia(p() As String) As String
+        If p.Length < 3 Then Return Nothing
+
+        Dim passo As Integer = Integer.Parse(p(1))
+        Dim colore = ColorToCss(p(2))
+
+        Dim sb As New Text.StringBuilder()
+
+        ' Linee verticali
+        For x = 0 To 10000 Step passo
+            sb.AppendLine($"<line x1=""{x}"" y1=""0"" x2=""{x}"" y2=""10000"" stroke=""{colore}"" stroke-width=""1"" />")
+        Next
+
+        ' Linee orizzontali
+        For y = 0 To 10000 Step passo
+            sb.AppendLine($"<line x1=""0"" y1=""{y}"" x2=""10000"" y2=""{y}"" stroke=""{colore}"" stroke-width=""1"" />")
+        Next
+
+        Return sb.ToString()
+    End Function
+
+    ' GRIGLIAFULL → convertita in polyline
+    Private Function SvgGrigliaFull(p() As String) As String
+        ' Per ora identica a GRIGLIA
+        Return SvgGriglia(p)
+    End Function
+
 End Class

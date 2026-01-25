@@ -27,9 +27,10 @@ Partial Class HistoryEditorForm
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.LabelClose = New System.Windows.Forms.Label()
-        Me.LabelSave = New System.Windows.Forms.Label()
-        Me.PictureBoxHistory = New System.Windows.Forms.PictureBox()
         Me.LabelTitle = New System.Windows.Forms.Label()
+        Me.LabelCopia = New System.Windows.Forms.Label()
+        Me.PictureBoxHistory = New System.Windows.Forms.PictureBox()
+        Me.LabelSave = New System.Windows.Forms.Label()
         CType(Me.PictureBoxHistory, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -90,27 +91,6 @@ Partial Class HistoryEditorForm
         Me.LabelClose.TabIndex = 4
         Me.LabelClose.Text = "X"
         '
-        'LabelSave
-        '
-        Me.LabelSave.BackColor = System.Drawing.Color.White
-        Me.LabelSave.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.LabelSave.ForeColor = System.Drawing.Color.White
-        Me.LabelSave.Image = Global.PaintRobot.My.Resources.Resources.FloppyS
-        Me.LabelSave.Location = New System.Drawing.Point(12, 295)
-        Me.LabelSave.Name = "LabelSave"
-        Me.LabelSave.Size = New System.Drawing.Size(53, 47)
-        Me.LabelSave.TabIndex = 5
-        Me.LabelSave.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-        '
-        'PictureBoxHistory
-        '
-        Me.PictureBoxHistory.BackColor = System.Drawing.Color.White
-        Me.PictureBoxHistory.Location = New System.Drawing.Point(87, 363)
-        Me.PictureBoxHistory.Name = "PictureBoxHistory"
-        Me.PictureBoxHistory.Size = New System.Drawing.Size(672, 286)
-        Me.PictureBoxHistory.TabIndex = 6
-        Me.PictureBoxHistory.TabStop = False
-        '
         'LabelTitle
         '
         Me.LabelTitle.AutoSize = True
@@ -122,12 +102,46 @@ Partial Class HistoryEditorForm
         Me.LabelTitle.TabIndex = 7
         Me.LabelTitle.Text = "Storico Comandi - History Commands"
         '
+        'LabelCopia
+        '
+        Me.LabelCopia.BackColor = System.Drawing.Color.White
+        Me.LabelCopia.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LabelCopia.ForeColor = System.Drawing.Color.White
+        Me.LabelCopia.Image = Global.PaintRobot.My.Resources.Resources.CopiaRTF
+        Me.LabelCopia.Location = New System.Drawing.Point(12, 283)
+        Me.LabelCopia.Name = "LabelCopia"
+        Me.LabelCopia.Size = New System.Drawing.Size(53, 47)
+        Me.LabelCopia.TabIndex = 8
+        Me.LabelCopia.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'PictureBoxHistory
+        '
+        Me.PictureBoxHistory.BackColor = System.Drawing.Color.White
+        Me.PictureBoxHistory.Location = New System.Drawing.Point(87, 363)
+        Me.PictureBoxHistory.Name = "PictureBoxHistory"
+        Me.PictureBoxHistory.Size = New System.Drawing.Size(672, 286)
+        Me.PictureBoxHistory.TabIndex = 6
+        Me.PictureBoxHistory.TabStop = False
+        '
+        'LabelSave
+        '
+        Me.LabelSave.BackColor = System.Drawing.Color.White
+        Me.LabelSave.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LabelSave.ForeColor = System.Drawing.Color.White
+        Me.LabelSave.Image = Global.PaintRobot.My.Resources.Resources.FloppyS
+        Me.LabelSave.Location = New System.Drawing.Point(12, 423)
+        Me.LabelSave.Name = "LabelSave"
+        Me.LabelSave.Size = New System.Drawing.Size(53, 47)
+        Me.LabelSave.TabIndex = 5
+        Me.LabelSave.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
         'HistoryEditorForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.ClientSize = New System.Drawing.Size(798, 661)
+        Me.Controls.Add(Me.LabelCopia)
         Me.Controls.Add(Me.LabelTitle)
         Me.Controls.Add(Me.PictureBoxHistory)
         Me.Controls.Add(Me.LabelSave)
@@ -153,4 +167,5 @@ Partial Class HistoryEditorForm
     Friend WithEvents LabelSave As Label
     Friend WithEvents PictureBoxHistory As PictureBox
     Friend WithEvents LabelTitle As Label
+    Friend WithEvents LabelCopia As Label
 End Class

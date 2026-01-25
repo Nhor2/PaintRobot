@@ -29,6 +29,7 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 - Autocompletamento del COMANDO mentre scrivi
 - Macro definibili con DEFINE/END
 - Cicli FOR/END non annidabili
+- Esportazione in SVG
 - Ideale per disegno automatico, generativo o standardizzato
 - Modalità Test: salva un file test.txt con migliaia di comandi casuali
 

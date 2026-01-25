@@ -160,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="PaintRobot_icon_64.ico" />
+    <None Include="Resources\CopiaRTF.png" />
     <None Include="Resources\FloppyS.png" />
     <None Include="Resources\PaintRobotFirma.png" />
   </ItemGroup>
