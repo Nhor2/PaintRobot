@@ -29,6 +29,7 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 - Autocompletamento del COMANDO mentre scrivi
 - Macro definibili con DEFINE/END
 - Cicli FOR/END non annidabili
+- Concetti di Punto Iniziale e Ultimo Punto (FROM / LAST)
 - Esportazione in SVG
 - Ideale per disegno automatico, generativo o standardizzato
 - Modalità Test: salva un file test.txt con migliaia di comandi casuali
@@ -140,6 +141,13 @@ LINEA;{X},{Y};{X+L},{Y};Nero;3
 LINEA;{X+L},{Y};{X+L-10},{Y-5};Rosso;2
 LINEA;{X+L},{Y};{X+L-10},{Y+5};Verde;2
 END
+
+#Poligono manuale
+MUOVI;100,100
+Linea;FROM;200,100;Blu;2
+Linea;LAST;200,200;Blu;2
+Linea;LAST;100,200;Rosso;2
+CHIUDI;100,100;Rosso;2
 ```
 
 ## 👤 A chi è utile
@@ -215,6 +223,8 @@ FOR         ; FOR;NomeCiclo;Start;End;Step
 INCLUDE     ; INCLUDE;PercorsoFile
 MATRICE     ; MATRICE;x1,y1;x2,y2,xN,yN;PassoX,PassoY;Tipo;Spessore
 MATRICEQ    ; MATRICEQ;x1,y1;x2,y2;PASSOX,PASSOY;Tipo;Colore;Spessore
+MUOVI       ; MUOVI;x,y
+CHIUDI      ; CHIUDI;x,y;Colore;Spessore
 SPIRALE     ; SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione
 SINUSOIDE   ; SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
 

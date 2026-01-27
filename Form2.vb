@@ -262,6 +262,26 @@ L'esempio seguente utilizza il comando MatriceQ per disegnare un Rettangolo Verd
 
 		MATRICEQ;800,400;1000,700;10,10;Quadrati;Verde;2
 
+L'esempio seguente crea un quadrato usando i comandi MUOVI e linea con le clausole LAST e FROM. Due lati Rosso e due Blu.
+
+		#Poligono manuale
+		MUOVI;100,100
+		Linea;FROM;200,100;Blu;2
+		Linea;LAST;200,200;Blu;2
+		Linea;LAST;100,200;Rosso;2
+		Linea;LAST;FROM;Rosso;2
+
+L'esempio seguente identico al precedente crea un quadrato usando i comandi Linea E CHIUDI con le clausole LAST e FFROM. Due lati Rosso e due Blu.
+
+		#Poligono manuale
+		Muovi;100,100
+		Linea;FROM;200,100;Blu;2
+		Linea;LAST;200,200;Blu;2
+		Linea;LAST;100,200;Rosso;2
+		CHIUDI;100,100;Rosso;2
+
+
+
 
 
 Colori Italiani Supportati

@@ -1975,6 +1975,12 @@ Public Class RobotContext 'Contesto g e bitmap
     ' Stato della "penna"
     Public Property ColoreCorrente As Color = Color.Black
     Public Property SpessoreCorrente As Integer = 1
+
+    ' Ultimo punto disegnato
+    Public LastPoint As PointF? = Nothing
+
+    ' Primo punto disegnato
+    Public StartPoint As PointF? = Nothing
 End Class
 
 
@@ -2059,6 +2065,8 @@ Public Class RobotDrawer
     {"INCLUDE", "INCLUDE;PercorsoFile"},
     {"MATRICE", "MATRICE;x1,y1;x2,y2;xN,yN;PassoX,PassoY;Tipo;Colore;Spessore"},
     {"MATRICEQ", "MATRICEQ;x1,y1;x2,y2;PassoX,PassoY;Tipo;Colore;Spessore"},
+    {"MUOVI", "MUOVI;x,y"},
+    {"CHIUDI", "CHIUDI;x,y;Colore;Spessore"},
     {"SPIRALE", "SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione"},
     {"SINUSOIDE", "SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore"}
 }
@@ -2072,7 +2080,26 @@ Public Class RobotDrawer
         Select Case comando.Tipo
             Case "LINEA"
                 'LINEA;10,10;200,50;Blu;2
+                'Linea Accetta anche la clausola LAST come ultimo punto e FROM come start point
                 Linea(comando.Parametri, g, ctx)
+            Case "MUOVI"
+                'MUOVI;x,y
+                '#Poligono “manuale”
+                'MUOVI;100,100
+                'Linea;FROM;200,100;Blu;2
+                'Linea;LAST;200,200;Blu;2
+                'Linea;LAST;100,200;Rosso;2
+                'Linea;LAST;FROM;Rosso;2
+                MoveCommand(comando.Parametri, ctx)
+            Case "CHIUDI"
+                'CHIUDI;x,y;Colore;Spessore
+                '#Poligono “manuale”
+                'MUOVI;100,100
+                'Linea;FROM;200,100;Blu;2
+                'Linea;LAST;200,200;Blu;2
+                'Linea;LAST;100,200;Rosso;2
+                'Chiudi;100,100;Rosso;2
+                CloseCommand(comando.Parametri, g, ctx)
             Case "RETT"
                 'Comando Rettangolo è:
                 'RETT;x1,y1;x2,y2;Colore;Tipo;Spessore con Tipo = PIENO o VUOTO
@@ -2385,31 +2412,91 @@ Public Class RobotDrawer
 
 
     'Disegno
-    Private Function Punto(s As String) As Point
-        If s Is Nothing Then Return New Point(0, 0)
+    Private Function Punto(s As String) As PointF
+        ' fallback legacy: mondo puro
+        If String.IsNullOrWhiteSpace(s) Then Return New PointF(0, 0)
 
         'Se nel punto ci sono coordinate separate da virgola, oppure punto o infine spazio
         Dim xy = s.Split(","c)
 
-        Return New Point(CInt(xy(0)), CInt(xy(1)))
+        Return New PointF(CInt(xy(0)), CInt(xy(1)))
+    End Function
+
+    ' Punto con LAST e @
+    Private Function Punto(s As String, ctx As RobotContext) As PointF
+        If String.IsNullOrWhiteSpace(s) Then Return New PointF(0, 0)
+
+        s = s.Trim().ToUpper()
+
+        ' LAST / @
+        If s = "LAST" Or s = "@" Then
+            If ctx.LastPoint.HasValue Then
+                Return ctx.LastPoint.Value
+            Else
+                Throw New Exception("LASTPOINT non definito")
+            End If
+        End If
+
+        ' FROM / START / ^
+        If s = "FROM" Or s = "START" Or s = "^" Then
+            If ctx.StartPoint.HasValue Then
+                Return ctx.StartPoint.Value
+            Else
+                Throw New Exception("STARTPOINT non definito")
+            End If
+        End If
+
+        Dim xy = s.Split(","c)
+        Return New PointF(CSng(xy(0)), CSng(xy(1)))
     End Function
 
     Private Sub Linea(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 3 Then Return
 
-        Dim p1 = Punto(p(0))
-        Dim p2 = Punto(p(1))
-        Dim colore = ColorConv(p(2))
-        Dim spessore = If(p.Count >= 4, Integer.Parse(p(3)), 1)
+        Dim w1 = Punto(p(0), ctx)
+        Dim w2 = Punto(p(1), ctx)
+
+        Dim colore = If(p.Count > 2, ColorConv(p(2)), ctx.ColoreCorrente)
+        Dim spessore = If(p.Count >= 4, Integer.Parse(p(3)), ctx.SpessoreCorrente)
 
         Using pen As New Pen(colore, spessore)
-            Dim a = ToScreen(p1, ctx)
-            Dim b = ToScreen(p2, ctx)
-            g.DrawLine(pen, a, b)
-            'g.DrawLine(pen, p1, p2)
+            g.DrawLine(pen, ToScreen(w1, ctx), ToScreen(w2, ctx))
         End Using
+
+        ' se è la prima linea del percorso
+        If Not ctx.StartPoint.HasValue Then
+            ctx.StartPoint = w1
+        End If
+
+        ctx.LastPoint = w2
     End Sub
 
+    Private Sub MoveCommand(p As List(Of String), ctx As RobotContext)
+        'MUOVI;100,100
+        Dim pt = Punto(p(0), ctx)
+        ctx.StartPoint = pt
+        ctx.LastPoint = pt
+    End Sub
+
+    Private Sub CloseCommand(p As List(Of String), g As Graphics, ctx As RobotContext)
+        'CHIUDI chiude il cerchio, poligono, struttura
+        'CHIUDI;x,y;Colore;Spessore
+        If p.Count < 3 Then Return
+
+        Dim colore = If(p.Count > 1, ColorConv(p(1)), ctx.ColoreCorrente)
+        Dim spessore = If(p.Count >= 2, Integer.Parse(p(2)), ctx.SpessoreCorrente)
+
+        'Debug.WriteLine("CLOSE " & p(1) & " " & p(2))
+
+        If ctx.LastPoint.HasValue AndAlso ctx.StartPoint.HasValue Then
+            Using pen As New Pen(colore, spessore)
+                g.DrawLine(pen,
+                ToScreen(ctx.LastPoint.Value, ctx),
+                ToScreen(ctx.StartPoint.Value, ctx))
+            End Using
+            ctx.LastPoint = ctx.StartPoint
+        End If
+    End Sub
 
     Private Sub Rettangolo(p As List(Of String), g As Graphics, ctx As RobotContext)
         If p.Count < 4 Then Return
@@ -3049,7 +3136,7 @@ Public Class RobotDrawer
         Try
             If My.Computer.Clipboard.ContainsImage Then
                 Dim img As Image = My.Computer.Clipboard.GetImage()
-                Dim p As Point = Punto(coord)
+                Dim p As PointF = Punto(coord)
 
                 Dim a = ToScreen(p, ctx)
 
@@ -3718,6 +3805,10 @@ Public Class RobotDrawer
         Dim cx = w \ 2
         Dim cy = h \ 2
 
+        ' Origine nota
+        ctx.StartPoint = New PointF(0, 0)
+        ctx.LastPoint = New PointF(0, 0)
+
         ' Griglia
         Using penGrid As New Pen(Color.LightGray, 1)
             For x = 0 To w Step stepX
@@ -3977,7 +4068,7 @@ Public Class RobotDrawer
         Next
 
         ' --- 2. Parametri ---
-        Dim passo As Point = Punto(p(numPunti))
+        Dim passo As PointF = Punto(p(numPunti))
         Dim b = ToScreen(passo, ctx)
 
         Dim tipo As String = p(numPunti + 1).ToUpper()
