@@ -440,7 +440,7 @@ TESTO;1040,300;BAGNO;Nero;14;Arial;Bold
 ![PaintRobot Appartamento](Appartamento.png)
 
 
-# 🌳 Giardino Minimo 400x400
+## 🌳 Giardino Minimo 400x400
 
 ```text
 
@@ -463,7 +463,7 @@ CERCHIO;300,300;30;VerdeScuro;Vuoto
 
 ```
 
-# ⚙️ Ingranaggio vista dall'alto 300x300
+## ⚙️ Ingranaggio vista dall'alto 300x300
 
 ```text
 
