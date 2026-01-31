@@ -52,6 +52,7 @@ Partial Class Form1
         Me.ButtonClose = New System.Windows.Forms.Button()
         Me.PictureBoxPR = New System.Windows.Forms.PictureBox()
         Me.PanelLeft = New System.Windows.Forms.Panel()
+        Me.ButtonReload = New System.Windows.Forms.Button()
         Me.ButtonRighe = New System.Windows.Forms.Button()
         Me.ButtonSVG = New System.Windows.Forms.Button()
         Me.ButtonColors = New System.Windows.Forms.Button()
@@ -412,6 +413,7 @@ Partial Class Form1
         'PanelLeft
         '
         Me.PanelLeft.BackColor = System.Drawing.Color.Black
+        Me.PanelLeft.Controls.Add(Me.ButtonReload)
         Me.PanelLeft.Controls.Add(Me.ButtonRighe)
         Me.PanelLeft.Controls.Add(Me.ButtonSVG)
         Me.PanelLeft.Controls.Add(Me.ButtonColors)
@@ -426,12 +428,24 @@ Partial Class Form1
         Me.PanelLeft.Size = New System.Drawing.Size(60, 570)
         Me.PanelLeft.TabIndex = 2
         '
+        'ButtonReload
+        '
+        Me.ButtonReload.BackColor = System.Drawing.Color.Black
+        Me.ButtonReload.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonReload.ForeColor = System.Drawing.Color.White
+        Me.ButtonReload.Location = New System.Drawing.Point(2, 190)
+        Me.ButtonReload.Name = "ButtonReload"
+        Me.ButtonReload.Size = New System.Drawing.Size(56, 25)
+        Me.ButtonReload.TabIndex = 27
+        Me.ButtonReload.Text = "Ricarica"
+        Me.ButtonReload.UseVisualStyleBackColor = False
+        '
         'ButtonRighe
         '
         Me.ButtonRighe.BackColor = System.Drawing.Color.Black
         Me.ButtonRighe.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonRighe.ForeColor = System.Drawing.Color.White
-        Me.ButtonRighe.Location = New System.Drawing.Point(2, 260)
+        Me.ButtonRighe.Location = New System.Drawing.Point(2, 295)
         Me.ButtonRighe.Name = "ButtonRighe"
         Me.ButtonRighe.Size = New System.Drawing.Size(56, 25)
         Me.ButtonRighe.TabIndex = 26
@@ -443,7 +457,7 @@ Partial Class Form1
         Me.ButtonSVG.BackColor = System.Drawing.Color.Black
         Me.ButtonSVG.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonSVG.ForeColor = System.Drawing.Color.White
-        Me.ButtonSVG.Location = New System.Drawing.Point(2, 225)
+        Me.ButtonSVG.Location = New System.Drawing.Point(2, 260)
         Me.ButtonSVG.Name = "ButtonSVG"
         Me.ButtonSVG.Size = New System.Drawing.Size(56, 25)
         Me.ButtonSVG.TabIndex = 25
@@ -455,7 +469,7 @@ Partial Class Form1
         Me.ButtonColors.BackColor = System.Drawing.Color.Black
         Me.ButtonColors.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonColors.ForeColor = System.Drawing.Color.White
-        Me.ButtonColors.Location = New System.Drawing.Point(2, 190)
+        Me.ButtonColors.Location = New System.Drawing.Point(2, 225)
         Me.ButtonColors.Name = "ButtonColors"
         Me.ButtonColors.Size = New System.Drawing.Size(56, 25)
         Me.ButtonColors.TabIndex = 24
@@ -663,4 +677,5 @@ Partial Class Form1
     Friend WithEvents __PAINTROBOT__ As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents ButtonRighe As Button
+    Friend WithEvents ButtonReload As Button
 End Class

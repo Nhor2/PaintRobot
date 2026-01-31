@@ -39,7 +39,7 @@ Public Class Form1
     Private OrigineF As PointF = New PointF(0, 0)
 
     'Mondo 10K, disegno e snapshot 0
-    Private PaintRobotBMP As Bitmap = New Bitmap(LarghezzaPaginaPixel, AltezzaPaginaPixel)
+    Private PaintRobotBMP As Bitmap = Nothing
     Private picbmp As Bitmap = Nothing
     Private BgSnapshot As Bitmap = Nothing
 
@@ -48,7 +48,6 @@ Public Class Form1
 
     'Controllo
     Private PaintRobotAlted As Boolean = False
-    Private currentCmdIndex As Integer = 0
     Private redrawInProgress As Boolean = False
     Const BATCH_SIZE As Integer = 50
 
@@ -87,6 +86,9 @@ Public Class Form1
     'Firma
     Private firmaImg As Bitmap = My.Resources.PaintRobotFirma
 
+    'File
+    Private FileScript As String = ""
+
     'PaintRobot
     Private Comandi As List(Of RobotCommand) 'Da script
     Private Commands As List(Of RobotCommand) 'Interfaccia
@@ -114,9 +116,6 @@ Public Class Form1
         ButtonClose.Location = New Point(Me.Width - 30, 3)
         ButtonMinimize.Location = New Point(Me.Width - 60, 3)
 
-        'Bitmap
-        picbmp = New Bitmap(PictureBox1.Width, PictureBox1.Height)
-
         'Casting comandi a Maiuscolo
         TextBoxCommands.CharacterCasing = CharacterCasing.Upper
 
@@ -141,6 +140,7 @@ Public Class Form1
             If ofd.FileName <> "" Then
                 ' Disegno tuti i comandi dello script
                 'Comandi = Interpreter.CaricaScript(ofd.FileName)
+                FileScript = ofd.FileName
 
                 ' Supporto MACRO
                 Comandi = Interpreter.CaricaScriptConMacro(ofd.FileName)
@@ -260,6 +260,69 @@ Public Class Form1
     ' Corregge il PictrureBox1.DockStyle.Fill che manda la pic a 0,0
     Public Shared ReadOnly WorldOffset As PointF = New PointF(PanelLeftWidth, PanelTopHeight)
 
+    Private Sub ButtonReload_Click(sender As Object, e As EventArgs) Handles ButtonReload.Click
+        'Ricarica script
+        If String.IsNullOrEmpty(FileScript) Then Return
+
+        ' Ferma il rendering se in corso
+        StopRender()
+        RenderTimer.Stop()
+        renderIndex = 0
+
+        ' Dispone in sicurezza oggetti grafici precedenti
+        If renderGraphics IsNot Nothing Then
+            renderGraphics.Dispose()
+            renderGraphics = Nothing
+        End If
+
+        If PaintRobotBMP IsNot Nothing Then
+            PictureBox1.Image = Nothing
+            PaintRobotBMP.Dispose()
+            PaintRobotBMP = Nothing
+        End If
+
+        If BgSnapshot IsNot Nothing Then
+            BgSnapshot.Dispose()
+            BgSnapshot = Nothing
+        End If
+
+        If picbmp IsNot Nothing Then
+            picbmp.Dispose()
+            picbmp = Nothing
+        End If
+
+        renderCtx = Nothing
+        PaintRobotAlted = False
+        waitForContinue = False
+
+        ' Carica script + macro
+        Comandi = Interpreter.CaricaScriptConMacro(FileScript)
+
+        History.Clear()
+        History.AddRange(Comandi)
+
+        HistoryString.Clear()
+        For Each cmd In Comandi
+            Dim s As String = cmd.Tipo
+            If cmd.Parametri IsNot Nothing AndAlso cmd.Parametri.Count > 0 Then
+                s &= ";" & String.Join(";", cmd.Parametri)
+            End If
+            HistoryString.Add(s)
+        Next
+
+        AggiornaListaComandiStringa()
+
+        ' Reset progress bar
+        numComandi = Comandi.Count - 1
+        ProgressBar1.Minimum = 0
+        ProgressBar1.Maximum = numComandi
+        ProgressBar1.Value = 0
+
+        ZoomStart()
+
+        ' Avvia nuovo rendering
+        StartRender()
+    End Sub
 
     Private Sub StartRender()
         ' avvio del timer Rendering
@@ -268,6 +331,11 @@ Public Class Form1
         PaintRobotAlted = False
         rendering = True
         renderIndex = 0
+
+        ' Crea bitmap nuova per il rendering
+        PaintRobotBMP = New Bitmap(LarghezzaPaginaPixel, AltezzaPaginaPixel)
+        picbmp = New Bitmap(PictureBox1.Width * 2, PictureBox1.Height * 2)
+        PictureBox1.Image = picbmp
 
         ' Misura
         If inTest Then swRender.Start()
@@ -306,8 +374,6 @@ Public Class Form1
     })
 
         renderCtx.OrdineLivelli.Add("BackGround") 'Aggiunge all'indice OrdineLivelli
-
-        PictureBox1.Image = picbmp
 
         ' Versione timer-driven Rendering
         RenderTimer.Start()
@@ -868,6 +934,7 @@ Public Class Form1
         If ofd.ShowDialog(Me) = DialogResult.OK AndAlso ofd.FileName <> "" Then
             ' Normale
             'Dim newCommands = Interpreter.CaricaScript(ofd.FileName)
+            FileScript = ofd.FileName
 
             ' Supporto MACRO
             Dim newCommands = Interpreter.CaricaScriptConMacro(ofd.FileName)
@@ -1679,6 +1746,8 @@ Public Class Form1
         draggingRuler = False
         draggedRuler = Nothing
     End Sub
+
+
 End Class
 
 Public Class TransparentRuler

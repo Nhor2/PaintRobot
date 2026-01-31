@@ -330,6 +330,117 @@ POMORODO → RGB(255, 99, 71)
 LIMONE → RGB(253, 255, 0)
 ```
 
+
+## Pratica
+
+Un esempio di Appartamento realizzato in PaintRobotScript
+
+```text
+# ===============================
+# PIANTA APPARTAMENTO 1000x400
+# Con muri esterni, interni, porte, finestre e arredi base
+# ===============================
+
+INIZIO
+#ADDLIVELLO;LIVELLO1
+PULISCI;BIANCO
+GRIGLIAFULL;10;Grigio
+
+# --- CORNICE ESTERNA (25 px)
+#RETT;120,120;1160,540;Nero;Vuoto;35
+RETT;320,120;1140,610;Nero;Vuoto;30
+
+# --- MURI ESTERNI (30 px)
+RETT;120,120;320,510;Nero;Vuoto;30
+
+# ===============================
+# MURI INTERNI VERTICALI (15 px)
+# ===============================
+ADDLIVELLO;LIVELLO2
+LINEA;320,130;320,510;Nero;15
+LINEA;620,130;620,510;Nero;15
+LINEA;820,130;820,510;Nero;15
+LINEA;1020,130;1020,510;Nero;15
+
+# MURI INTERNI ORIZZONTALI (15 px)
+LINEA;320,510;620,510;Nero;15
+LINEA;820,510;1020,510;Nero;15
+LINEA;1020,510;1140,510;Nero;15
+
+# ===============================
+# PORTE INTERNE (80 px)
+# ===============================
+LINEA;320,280;320,360;Bianco;15
+LINEA;620,280;620,360;Bianco;15
+LINEA;820,280;820,360;Bianco;15
+LINEA;1020,280;1020,360;Bianco;15
+
+# --- Porte con apertura a battente (semicerchio) ---
+ARC;320,280;40;Nero;Vuoto;180;270
+ARC;620,280;40;Nero;Vuoto;180;270
+
+# ===============================
+# PORTA INGRESSO APPARTAMENTO (100 px)
+# ===============================
+LINEA;120,270;120,370;Bianco;30
+
+# ===============================
+# FINESTRE (60 px)
+# ===============================
+# Ingresso
+LINEA;200,120;260,120;Blu;6
+
+# Soggiorno (2)
+LINEA;420,120;480,120;Blu;6
+LINEA;500,120;560,120;Blu;6
+
+# Cucina
+LINEA;700,120;760,120;Blu;6
+LINEA;500,610;560,610;Blu;6
+
+# Camera
+LINEA;880,120;940,120;Blu;6
+
+# Bagno
+LINEA;1050,120;1110,120;Blu;6
+LINEA;880,610;940,610;Blu;6
+
+# ===============================
+# ARREDI BASE
+# ===============================
+ADDLIVELLO;LIVELLO4
+# Divano soggiorno
+RETT;350,420;580,490;Marrone;Vuoto;15
+
+# Tavolo cucina
+RETT;640,180;800,260;Grigio;Vuoto;10
+
+# Letto camera
+RETT;840,350;1000,490;Rosso;Vuoto;15
+
+# Lavello bagno
+RETT;1040,360;1100,400;BluChiaro;Vuoto;10
+
+# ===============================
+# TESTI
+# ===============================
+ADDLIVELLO;LIVELLO5
+TESTO;180,300;INGRESSO;Nero;14;Arial;Bold
+TESTO;400,300;SOGGIORNO;Nero;14;Arial;Bold
+TESTO;680,300;CUCINA;Nero;14;Arial;Bold
+TESTO;860,300;CAMERA;Nero;14;Arial;Bold
+TESTO;1040,300;BAGNO;Nero;14;Arial;Bold
+
+# ===============================
+# FINE APPARTAMENTO
+# ===============================
+
+```
+
+![PaintRobot Appartamento](Appartamento.png)
+
+
+
 ## ⬇️ Download
 
 Puoi scaricare il codice sorgente direttamente da GitHub:
