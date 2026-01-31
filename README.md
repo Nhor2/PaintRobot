@@ -440,6 +440,51 @@ TESTO;1040,300;BAGNO;Nero;14;Arial;Bold
 ![PaintRobot Appartamento](Appartamento.png)
 
 
+# 🌳 Giardino Minimo 400x400
+
+```text
+
+INIZIO
+PULISCI;VerdeChiaro
+GRIGLIAFULL;50;Verde
+
+# Vialetto centrale 30 px
+RETT;150,0;250,400;Marrone;Vuoto;30
+
+# Aiule
+RETT;0,0;150,150;VerdeScuro;Vuoto;10
+RETT;250,0;400,150;VerdeScuro;Vuoto;10
+RETT;0,250;150,400;VerdeScuro;Vuoto;10
+RETT;250,250;400,400;VerdeScuro;Vuoto;10
+
+# Alberi (cerchi)
+CERCHIO;200,50;20;VerdeScuro;Vuoto
+CERCHIO;300,300;30;VerdeScuro;Vuoto
+
+```
+
+# ⚙️ Ingranaggio vista dall'alto 300x300
+
+```text
+
+INIZIO
+PULISCI;BIANCO
+GRIGLIAFULL;10;GrigioChiaro
+
+# Cerchio centrale
+CERCHIO;150,150;50;Grigio;Vuoto
+
+# Denti semplici (8 denti)
+LINEA;150,100;150,80;Nero;4
+LINEA;200,150;220,150;Nero;4
+LINEA;150,200;150,220;Nero;4
+LINEA;100,150;80,150;Nero;4
+LINEA;180,120;190,110;Nero;4
+LINEA;180,180;190,190;Nero;4
+LINEA;120,180;110,190;Nero;4
+LINEA;120,120;110,110;Nero;4
+
+```
 
 ## ⬇️ Download
 
