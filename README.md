@@ -13,7 +13,7 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 
 ![PaintRobot Screenshot2](ScreenShot2.png)
 
-![PaintRobot Screenshot3](ScreenShot3.png)
+![PaintRobot Screenshot3](Screenshot3.png)
 
 ---
 
