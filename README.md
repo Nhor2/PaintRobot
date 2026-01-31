@@ -331,7 +331,7 @@ LIMONE → RGB(253, 255, 0)
 ```
 
 
-## Pratica
+## 💡 Pratica
 
 Un esempio di Appartamento realizzato in PaintRobotScript
 
