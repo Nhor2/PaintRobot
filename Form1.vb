@@ -74,6 +74,10 @@ Public Class Form1
     'Mondo
     Private View As New Viewport()
 
+    'Pannelli
+    Public Const PanelLeftWidth As Integer = 60
+    Public Const PanelTopHeight As Integer = 60
+
     'Test
     Private inTest As Boolean = False
 
@@ -109,9 +113,6 @@ Public Class Form1
 
         ButtonClose.Location = New Point(Me.Width - 30, 3)
         ButtonMinimize.Location = New Point(Me.Width - 60, 3)
-
-        'Picturebox sempre grande
-        PictureBox1.Size = New Size(Me.Size)
 
         'Bitmap
         picbmp = New Bitmap(PictureBox1.Width, PictureBox1.Height)
@@ -195,7 +196,10 @@ Public Class Form1
 
         ' Layout principale
         PanelTop.Dock = DockStyle.Top
+        PanelTop.Height = PanelTopHeight
+
         PanelLeft.Dock = DockStyle.Left
+        PanelLeft.Width = PanelLeftWidth
 
         LstComandi.Dock = DockStyle.Bottom
         LstComandi.Height = 60
@@ -203,6 +207,10 @@ Public Class Form1
         'LstComandi.ItemHeight = 30   ' altezza riga
 
         PictureBox1.Dock = DockStyle.Fill
+
+        'PictureBox sempre grande
+        'PictureBox1.Size = New Size(LarghezzaPaginaPixel, AltezzaPaginaPixel)
+        'PictureBox1.Location = New Point(60, 60)
 
         ToolTip1.IsBalloon = True
         ToolTip1.ToolTipIcon = ToolTipIcon.Info
@@ -248,6 +256,11 @@ Public Class Form1
         CaricaColori()
     End Sub
 
+    ' World Offset CAD
+    ' Corregge il PictrureBox1.DockStyle.Fill che manda la pic a 0,0
+    Public Shared ReadOnly WorldOffset As PointF = New PointF(PanelLeftWidth, PanelTopHeight)
+
+
     Private Sub StartRender()
         ' avvio del timer Rendering
         If rendering Then Return
@@ -270,6 +283,8 @@ Public Class Form1
         renderGraphics.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
         renderGraphics.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
 
+        ' 🔥 Offset mondo CAD
+        renderGraphics.TranslateTransform(WorldOffset.X, WorldOffset.Y)
 
         renderCtx = New RobotContext With {
         .Graphics = renderGraphics,
@@ -402,11 +417,20 @@ Public Class Form1
                 Exit For
             End If
 
-            Drawer.Esegui(Comandi(renderIndex), renderCtx)
-
+            ' Evidenziazione mentre disegna
             If ListaComandiStringa Then EvidenziaComando(renderIndex)
 
+            ' Comando
+            Dim cmd = Comandi(renderIndex)
+            If cmd.Tipo.Contains("VAI") Then
+                Dim newrenderindex As Integer = GestisciVAI(cmd)
+                renderIndex = newrenderindex
+            End If
+
+            Drawer.Esegui(cmd, renderCtx)
             renderIndex += 1
+
+            ' Progresso di disegno
             ProgressBar1.Value = Math.Min(renderIndex, ProgressBar1.Maximum)
 
             Debug.WriteLine("RenderIndex " & renderIndex.ToString)
@@ -462,6 +486,28 @@ Public Class Form1
         ' STOP fluido
         RenderTimer.Stop()
     End Sub
+
+    Private Function GestisciVAI(cmd As RobotCommand) As Integer
+        If cmd.Parametri.Count = 0 Then Return renderIndex
+
+        Dim targetStr = cmd.Parametri(0).Trim()
+        Dim target As Integer
+
+        ' 🔹 VAI relativo
+        If targetStr.StartsWith("+") OrElse targetStr.StartsWith("-") Then
+            target = renderIndex + Integer.Parse(targetStr)
+        Else
+            ' 🔹 VAI assoluto (1-based)
+            target = Integer.Parse(targetStr) - 1
+        End If
+
+        ' Clamp di sicurezza
+        If target < 0 Then target = 0
+        If target >= Comandi.Count Then target = Comandi.Count - 1
+
+        ' Nuovo renderindex
+        Return target
+    End Function
 
     Public Sub EvidenziaComando(index As Integer)
         'Evidenzia il comando eseguito nella Listbox
@@ -984,10 +1030,7 @@ Public Class Form1
     Private lastCoord As PointF
 
     Private Function ScreenToWorld(p As Point) As PointF
-        Return New PointF(
-        View.Origine.X + p.X / View.Zoom,
-        View.Origine.Y + p.Y / View.Zoom
-    )
+        Return New PointF(View.Origine.X + (p.X - WorldOffset.X) / View.Zoom, View.Origine.Y + (p.Y - WorldOffset.Y) / View.Zoom)
     End Function
 
     'Mouse Label
@@ -1540,7 +1583,135 @@ Public Class Form1
         AdattaAlSchermo()
     End Sub
 
+    'Crea i righelli
+    Private Righelli As Boolean = False
+    Private HorizontalRuler As TransparentRuler
+    Private VerticalRuler As TransparentRuler
+    Private rulerBackColor As Color = Color.FromArgb(100, 44, 44, 250)
+    ' Drag
+    Private draggingRuler As Boolean = False
+    Private dragStartPoint As Point
+    Private draggedRuler As PictureBox = Nothing
+
+    Private Sub ButtonRighe_Click(sender As Object, e As EventArgs) Handles ButtonRighe.Click
+        If Righelli Then
+            ' Rimuovi righelli
+            If HorizontalRuler IsNot Nothing Then
+                Me.Controls.Remove(HorizontalRuler)
+                HorizontalRuler.Dispose()
+            End If
+            If VerticalRuler IsNot Nothing Then
+                Me.Controls.Remove(VerticalRuler)
+                VerticalRuler.Dispose()
+            End If
+
+            Righelli = False
+            ButtonRighe.BackColor = Color.Black
+        Else
+            ' Aggiungi righelli
+            Me.AllowTransparency = True
+
+            HorizontalRuler = New TransparentRuler() With {
+    .Width = PictureBox1.Width,
+    .Height = 30,
+    .Parent = PictureBox1,
+    .BackColor = Color.Transparent,
+    .Location = New Point(60, 60)
+}
+            VerticalRuler = New TransparentRuler() With {
+    .Height = PictureBox1.Height,
+    .Width = 30,
+    .Parent = PictureBox1,
+    .BackColor = Color.Transparent,
+    .Location = New Point(60, 60)
+}
+
+            ' Orizzontale
+            AddHandler HorizontalRuler.MouseDown, AddressOf Ruler_MouseDown
+            AddHandler HorizontalRuler.MouseMove, AddressOf Ruler_MouseMove
+            AddHandler HorizontalRuler.MouseUp, AddressOf Ruler_MouseUp
+
+            ' Verticale
+            AddHandler VerticalRuler.MouseDown, AddressOf Ruler_MouseDown
+            AddHandler VerticalRuler.MouseMove, AddressOf Ruler_MouseMove
+            AddHandler VerticalRuler.MouseUp, AddressOf Ruler_MouseUp
+
+            Me.Controls.Add(VerticalRuler)
+            Me.Controls.Add(HorizontalRuler)
+
+            VerticalRuler.BringToFront()
+            HorizontalRuler.BringToFront()
+
+            With HorizontalRuler
+                .Parent = PictureBox1
+                .BackColor = rulerBackColor
+            End With
+
+            With VerticalRuler
+                .Parent = PictureBox1
+                .BackColor = rulerBackColor
+            End With
+
+            Righelli = True
+            ButtonRighe.BackColor = Color.DarkOrchid
+        End If
+    End Sub
+
+    Private Sub Ruler_MouseDown(sender As Object, e As MouseEventArgs)
+        If e.Button = MouseButtons.Left Then
+            draggingRuler = True
+            draggedRuler = CType(sender, PictureBox)
+            dragStartPoint = e.Location
+            draggedRuler.BringToFront()
+        End If
+    End Sub
+
+    Private Sub Ruler_MouseMove(sender As Object, e As MouseEventArgs)
+        If draggingRuler AndAlso draggedRuler IsNot Nothing Then
+            Dim newX As Integer = draggedRuler.Left + (e.X - dragStartPoint.X)
+            Dim newY As Integer = draggedRuler.Top + (e.Y - dragStartPoint.Y)
+            draggedRuler.Location = New Point(newX, newY)
+            draggedRuler.Invalidate()
+        End If
+    End Sub
+
+    Private Sub Ruler_MouseUp(sender As Object, e As MouseEventArgs)
+        draggingRuler = False
+        draggedRuler = Nothing
+    End Sub
 End Class
+
+Public Class TransparentRuler
+    Inherits PictureBox
+
+    Public Sub New()
+        Me.SetStyle(ControlStyles.SupportsTransparentBackColor Or ControlStyles.OptimizedDoubleBuffer, True)
+    End Sub
+
+    Protected Overrides Sub OnPaint(e As PaintEventArgs)
+        ' Disegno tacche
+        If Me.Width > Me.Height Then
+            ' Orizzontale
+            Dim yCenter = Me.Height \ 2
+            For i As Integer = 0 To Me.Width Step 10
+                Dim h = If(i Mod 50 = 0, yCenter, yCenter \ 2)
+                e.Graphics.DrawLine(Pens.Black, i, 0, i, h)
+                If i Mod 50 = 0 Then e.Graphics.DrawString(i.ToString(), SystemFonts.DefaultFont, Brushes.Black, i + 2, h)
+            Next
+        Else
+            ' Verticale
+            Dim xCenter = Me.Width \ 2
+            For i As Integer = 0 To Me.Height Step 10
+                Dim w = If(i Mod 50 = 0, xCenter, xCenter \ 2)
+                e.Graphics.DrawLine(Pens.Black, 0, i, w, i)
+                If i Mod 50 = 0 Then e.Graphics.DrawString(i.ToString(), SystemFonts.DefaultFont, Brushes.Black, w + 2, i)
+            Next
+        End If
+
+        MyBase.OnPaint(e)
+    End Sub
+End Class
+
 
 Public Class RobotCommand
     Public Property Tipo As String
@@ -1557,9 +1728,7 @@ Public Class Viewport
     Public Property Zoom As Single = 1.0F
 End Class
 
-
 Public Class RobotInterpreter
-
     'Responsabile di : 
     '✔️ leggere il TXT
     '✔️ ignorare commenti
@@ -1673,7 +1842,6 @@ Public Class RobotInterpreter
         Return lista
     End Function
 
-
     'MACRO
     Private Macros As New Dictionary(Of String, MacroDef)
 
@@ -1696,7 +1864,6 @@ Public Class RobotInterpreter
 
         Return comandi
     End Function
-
 
     Private Function EspandiMacro(righe As List(Of String)) As List(Of String)
         ' Espande il contenuto dello script con macro, FOR e INCLUDE
@@ -1841,7 +2008,6 @@ Public Class RobotInterpreter
         Return Convert.ToString(v, Globalization.CultureInfo.InvariantCulture)
     End Function
 
-
     'FOR
     Private Function EspandiFor(righe As List(Of String), ByRef i As Integer) As List(Of String)
 
@@ -1915,7 +2081,6 @@ Public Class RobotInterpreter
         Return righeEspanse
     End Function
 
-
     ' Sostituisce {VAR} con i valori passati
     Private Function SostituisciParametriFOR(riga As String, vars As Dictionary(Of String, String)) As String
         Dim result = riga
@@ -1953,7 +2118,6 @@ Public Class RobotInterpreter
     Private Function EstraiNomeMacro(riga As String) As String
         Return riga.Split(";"c)(0).ToUpper()
     End Function
-
 End Class
 
 Public Class RobotContext 'Contesto g e bitmap
@@ -1983,14 +2147,11 @@ Public Class RobotContext 'Contesto g e bitmap
     Public StartPoint As PointF? = Nothing
 End Class
 
-
 Public Class Livello
     Public Property Nome As String
     Public Property Bitmap As Bitmap
     Public Property Visibile As Boolean = True
 End Class
-
-
 
 Public Class PatternDef
     'DashStyle.Dot, Dash, DashDot, Solid
@@ -2003,8 +2164,6 @@ Public Class PatternDef
     Public Property Spaziatura As Single
 End Class
 
-
-
 Public Class MacroDef
     'Le macro vengono espulse in comandi normali (LINEA, CERCHIO, …)
 
@@ -2012,11 +2171,6 @@ Public Class MacroDef
     Public Property Parametri As List(Of String)
     Public Property Corpo As List(Of String)
 End Class
-
-
-
-
-
 
 
 Public Class RobotDrawer

@@ -13,6 +13,8 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 
 ![PaintRobot Screenshot2](ScreenShot2.png)
 
+![PaintRobot Screenshot3](ScreenShot3.png)
+
 ---
 
 ## 📌 Caratteristiche principali
@@ -30,6 +32,8 @@ Non è un CAD interattivo: PaintRobot disegna **solo** ciò che viene descritto 
 - Macro definibili con DEFINE/END
 - Cicli FOR/END non annidabili
 - Concetti di Punto Iniziale e Ultimo Punto (FROM / LAST)
+- Comando VAI per spostarti nello script
+- Righelli Orizzontale e Verticale trasparenti, spostabili, Pixel-metered
 - Esportazione in SVG
 - Ideale per disegno automatico, generativo o standardizzato
 - Modalità Test: salva un file test.txt con migliaia di comandi casuali
@@ -225,6 +229,7 @@ MATRICE     ; MATRICE;x1,y1;x2,y2,xN,yN;PassoX,PassoY;Tipo;Spessore
 MATRICEQ    ; MATRICEQ;x1,y1;x2,y2;PASSOX,PASSOY;Tipo;Colore;Spessore
 MUOVI       ; MUOVI;x,y
 CHIUDI      ; CHIUDI;x,y;Colore;Spessore
+VAI         ; VAI;NumeroComando
 SPIRALE     ; SPIRALE;CentroX,CentroY;RaggioIniziale;RaggioFinale;Giri;Colore;Spessore;Direzione
 SINUSOIDE   ; SINUSOIDE;StartX,StartY;EndX,EndY;Ampiezza;Frequenza;Colore;Spessore
 

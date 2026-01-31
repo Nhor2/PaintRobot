@@ -52,6 +52,7 @@ Partial Class Form1
         Me.ButtonClose = New System.Windows.Forms.Button()
         Me.PictureBoxPR = New System.Windows.Forms.PictureBox()
         Me.PanelLeft = New System.Windows.Forms.Panel()
+        Me.ButtonRighe = New System.Windows.Forms.Button()
         Me.ButtonSVG = New System.Windows.Forms.Button()
         Me.ButtonColors = New System.Windows.Forms.Button()
         Me.ButtonRiavvia = New System.Windows.Forms.Button()
@@ -62,12 +63,12 @@ Partial Class Form1
         Me.LabelCoord = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.Menu1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.__PAINTROBOT__ = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.AdattaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.LstComandi = New System.Windows.Forms.ListBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.ListView1 = New System.Windows.Forms.ListView()
-        Me.__PAINTROBOT__ = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.PanelTop.SuspendLayout()
         CType(Me.PictureBoxPR, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelLeft.SuspendLayout()
@@ -411,6 +412,7 @@ Partial Class Form1
         'PanelLeft
         '
         Me.PanelLeft.BackColor = System.Drawing.Color.Black
+        Me.PanelLeft.Controls.Add(Me.ButtonRighe)
         Me.PanelLeft.Controls.Add(Me.ButtonSVG)
         Me.PanelLeft.Controls.Add(Me.ButtonColors)
         Me.PanelLeft.Controls.Add(Me.ButtonRiavvia)
@@ -423,6 +425,18 @@ Partial Class Form1
         Me.PanelLeft.Name = "PanelLeft"
         Me.PanelLeft.Size = New System.Drawing.Size(60, 570)
         Me.PanelLeft.TabIndex = 2
+        '
+        'ButtonRighe
+        '
+        Me.ButtonRighe.BackColor = System.Drawing.Color.Black
+        Me.ButtonRighe.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonRighe.ForeColor = System.Drawing.Color.White
+        Me.ButtonRighe.Location = New System.Drawing.Point(2, 260)
+        Me.ButtonRighe.Name = "ButtonRighe"
+        Me.ButtonRighe.Size = New System.Drawing.Size(56, 25)
+        Me.ButtonRighe.TabIndex = 26
+        Me.ButtonRighe.Text = "Righe"
+        Me.ButtonRighe.UseVisualStyleBackColor = False
         '
         'ButtonSVG
         '
@@ -533,8 +547,20 @@ Partial Class Form1
         Me.Menu1.BackColor = System.Drawing.Color.Black
         Me.Menu1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.__PAINTROBOT__, Me.ToolStripSeparator1, Me.AdattaToolStripMenuItem})
         Me.Menu1.Name = "ContextMenuOptions"
-        Me.Menu1.Size = New System.Drawing.Size(184, 76)
+        Me.Menu1.Size = New System.Drawing.Size(184, 54)
         Me.Menu1.Text = "___________________________"
+        '
+        '__PAINTROBOT__
+        '
+        Me.__PAINTROBOT__.ForeColor = System.Drawing.Color.White
+        Me.__PAINTROBOT__.Name = "__PAINTROBOT__"
+        Me.__PAINTROBOT__.Size = New System.Drawing.Size(183, 22)
+        Me.__PAINTROBOT__.Text = "__PAINTROBOT__"
+        '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(180, 6)
         '
         'AdattaToolStripMenuItem
         '
@@ -565,18 +591,6 @@ Partial Class Form1
         Me.ListView1.TabIndex = 25
         Me.ListView1.UseCompatibleStateImageBehavior = False
         Me.ListView1.View = System.Windows.Forms.View.Details
-        '
-        '__PAINTROBOT__
-        '
-        Me.__PAINTROBOT__.ForeColor = System.Drawing.Color.White
-        Me.__PAINTROBOT__.Name = "__PAINTROBOT__"
-        Me.__PAINTROBOT__.Size = New System.Drawing.Size(183, 22)
-        Me.__PAINTROBOT__.Text = "__PAINTROBOT__"
-        '
-        'ToolStripSeparator1
-        '
-        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(180, 6)
         '
         'Form1
         '
@@ -648,4 +662,5 @@ Partial Class Form1
     Friend WithEvents AdattaToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents __PAINTROBOT__ As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
+    Friend WithEvents ButtonRighe As Button
 End Class
